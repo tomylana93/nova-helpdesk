@@ -1,4 +1,152 @@
 <laravel-boost-guidelines>
+=== .ai/00-serena-core rules ===
+
+# Serena-First Core Rules
+
+## Scope
+
+These rules apply to all repository tasks.
+
+## Default Tooling Policy
+
+Use Serena MCP tools as the default path for code exploration and code edits.
+Only use non-Serena tools when Serena is unavailable or cannot perform the required operation.
+
+## Mandatory Startup Flow
+
+At the beginning of a task:
+1. Run `activate_project`.
+2. Run `check_onboarding_performed`.
+3. If onboarding is not performed, run onboarding before continuing.
+
+## Failure and Fallback Policy
+
+If Serena MCP fails:
+1. Retry one to two times.
+2. If it still fails, continue with safe fallback tools.
+3. Explicitly report the failure reason and expected impact in the final update.
+
+## Enforcement
+
+Do not skip Serena-first flow for convenience.
+Any exception must be justified in the task report.
+
+=== .ai/10-serena-memory rules ===
+
+# Serena Memory Management Rules
+
+## Read Memory Before Work
+
+Before implementation:
+1. Run `list_memories`.
+2. Read only memories relevant to the current task.
+
+## Write or Update Memory After Work
+
+After implementation:
+1. Persist only stable and reusable knowledge.
+2. Prefer updating existing memory over creating duplicates.
+
+## Prohibited Behavior
+
+- Do not blindly overwrite memory files.
+- Do not create duplicate memory files for the same topic.
+- Do not write irrelevant task noise into memory.
+
+## Minimum Quality Bar
+
+Memory entries should be concise, factual, and reusable for future tasks.
+
+=== .ai/20-frontend-ui-readonly rules ===
+
+# Frontend UI Component Rules
+
+## Reuse Policy
+
+For frontend work, always check existing components in:
+- `resources/js/components/ui`
+
+## Read-Only Policy
+
+The following path is read-only for manual edits:
+- `resources/js/components/ui/**`
+
+Do not modify existing UI components in this folder.
+
+## Adding New UI Components
+
+If a new component is needed:
+1. Use Shadcn Vue MCP tools to search and inspect available components/examples.
+2. Install or add the component through the official Shadcn workflow.
+3. Treat installed UI source as read-only unless the user explicitly instructs otherwise.
+
+## Usage Pattern
+
+Compose UI behavior from consumer-level files (pages/layouts/feature components), not by patching UI primitives.
+
+=== .ai/30-wayfinder-generated-readonly rules ===
+
+# Wayfinder Generated Files Policy
+
+## Generated Frontend Paths (Read-Only)
+
+Treat the following paths as generated artifacts:
+- `resources/js/routes/**`
+- `resources/js/actions/**`
+
+Do not manually edit files in these paths.
+
+## Required Change Flow
+
+When route/action output needs to change:
+1. Update backend route/controller sources.
+2. Regenerate artifacts with `wayfinder:generate`.
+
+## Enforcement
+
+Manual edits in generated files are not allowed because they are non-durable and will be overwritten.
+
+=== .ai/40-localization-php-only rules ===
+
+# Localization Rules (Laravel PHP Files Only)
+
+## Allowed Localization Format
+
+Use Laravel localization files:
+- `lang/<locale>/*.php`
+
+## Disallowed Format
+
+Do not create or use:
+- `lang/*.json`
+
+## Key and Structure Consistency
+
+Follow existing translation key patterns and file structure used by the project.
+Keep additions grouped by domain and file responsibility.
+
+=== .ai/90-task-completion-reporting rules ===
+
+# Task Completion and Reporting Rules
+
+## Completion Checklist
+
+Before finalizing a task:
+1. Run relevant tests for changed behavior.
+2. Run required formatting and linting commands according to project policy.
+3. Verify no unintended changes are included.
+
+## Required Final Report Items
+
+Every final task report must include:
+1. Serena usage status.
+2. Memory files read and memory files updated.
+3. Whether fallback was used, including reason and impact.
+
+## Failure Transparency
+
+If any required step could not be executed, state it explicitly with the blocker.
+
 === foundation rules ===
 
 # Laravel Boost Guidelines
@@ -22,6 +170,12 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
+- @inertiajs/vue3 (INERTIA) - v2
+- tailwindcss (TAILWINDCSS) - v4
+- vue (VUE) - v3
+- @laravel/vite-plugin-wayfinder (WAYFINDER) - v0
+- eslint (ESLINT) - v9
+- prettier (PRETTIER) - v3
 
 ## Skills Activation
 
@@ -29,6 +183,8 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - `wayfinder-development` — Activates whenever referencing backend routes in frontend components. Use when importing from @/actions or @/routes, calling Laravel routes from TypeScript, or working with Wayfinder route functions.
 - `pest-testing` — Tests applications using the Pest 4 PHP framework. Activates when writing tests, creating unit or feature tests, adding assertions, testing Livewire components, browser testing, debugging test failures, working with datasets or mocking; or when the user mentions test, spec, TDD, expects, assertion, coverage, or needs to verify functionality works.
+- `inertia-vue-development` — Develops Inertia.js v2 Vue client-side applications. Activates when creating Vue pages, forms, or navigation; using &lt;Link&gt;, &lt;Form&gt;, useForm, or router; working with deferred props, prefetching, or polling; or when user mentions Vue with Inertia, Vue pages, Vue forms, or Vue navigation.
+- `tailwindcss-development` — Styles applications using Tailwind CSS v4 utilities. Activates when adding styles, restyling components, working with gradients, spacing, layout, flex, grid, responsive design, dark mode, colors, typography, or borders; or when the user mentions CSS, styling, classes, Tailwind, restyle, hero section, cards, buttons, or any visual/UI changes.
 - `developing-with-fortify` — Laravel Fortify headless authentication backend development. Activate when implementing authentication features including login, registration, password reset, email verification, two-factor authentication (2FA/TOTP), profile updates, headless auth, authentication scaffolding, or auth guards in Laravel applications.
 
 ## Conventions
@@ -149,6 +305,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
 - Components live in `resources/js/pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
 - ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
+- IMPORTANT: Activate `inertia-vue-development` when working with Inertia Vue client-side patterns.
 
 === inertia-laravel/v2 rules ===
 
@@ -266,6 +423,21 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - Do NOT delete tests without approval.
 - CRITICAL: ALWAYS use `search-docs` tool for version-specific Pest documentation and updated code examples.
 - IMPORTANT: Activate `pest-testing` every time you're working with a Pest or testing-related task.
+
+=== inertia-vue/core rules ===
+
+# Inertia + Vue
+
+Vue components must have a single root element.
+- IMPORTANT: Activate `inertia-vue-development` when working with Inertia Vue client-side patterns.
+
+=== tailwindcss/core rules ===
+
+# Tailwind CSS
+
+- Always use existing Tailwind conventions; check project patterns before adding new ones.
+- IMPORTANT: Always use `search-docs` tool for version-specific Tailwind CSS documentation and updated code examples. Never rely on training data.
+- IMPORTANT: Activate `tailwindcss-development` every time you're working with a Tailwind CSS or styling-related task.
 
 === laravel/fortify rules ===
 
