@@ -1,0 +1,16 @@
+# Code Style & Conventions
+- Follow Laravel conventions and existing local patterns first.
+- PHP style:
+  - Use Laravel Pint (`preset: laravel`).
+  - 4-space indentation, LF, UTF-8 (`.editorconfig`).
+  - Prefer explicit types/return types and framework conventions from project guidelines.
+- JS/TS/Vue style:
+  - TypeScript + Vue ESLint config (`@vue/eslint-config-typescript` + `eslint-plugin-vue`).
+  - Import order is enforced/alphabetized via `eslint-plugin-import`.
+  - Prettier formatting with single quotes, semicolons, print width 80, tab width 4.
+- Inertia app structure:
+  - Pages in `resources/js/pages`.
+  - Reuse existing components/composables before creating new ones.
+- Testing conventions:
+  - Pest is primary test framework.
+  - Feature tests use `RefreshDatabase` via `tests/Pest.php`.
