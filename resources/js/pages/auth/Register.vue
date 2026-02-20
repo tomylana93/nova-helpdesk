@@ -38,7 +38,9 @@ const submit = (): void => {
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="name">{{ trans('auth.register.label.name') }}</Label>
+                    <Label for="name">{{
+                        trans('auth.register.label.name')
+                    }}</Label>
                     <Input
                         id="name"
                         v-model="form.name"
@@ -52,7 +54,9 @@ const submit = (): void => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">{{ trans('auth.register.label.email') }}</Label>
+                    <Label for="email">{{
+                        trans('auth.register.label.email')
+                    }}</Label>
                     <Input
                         id="email"
                         v-model="form.email"
@@ -65,27 +69,37 @@ const submit = (): void => {
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password">{{ trans('auth.register.label.password') }}</Label>
+                    <Label for="password">{{
+                        trans('auth.register.label.password')
+                    }}</Label>
                     <Input
                         id="password"
                         v-model="form.password"
                         type="password"
                         :tabindex="3"
                         autocomplete="new-password"
-                        :placeholder="trans('auth.register.placeholder.password')"
+                        :placeholder="
+                            trans('auth.register.placeholder.password')
+                        "
                     />
                     <InputError :message="form.errors.password" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation">{{ trans('auth.register.label.password_confirmation') }}</Label>
+                    <Label for="password_confirmation">{{
+                        trans('auth.register.label.password_confirmation')
+                    }}</Label>
                     <Input
                         id="password_confirmation"
                         v-model="form.password_confirmation"
                         type="password"
                         :tabindex="4"
                         autocomplete="new-password"
-                        :placeholder="trans('auth.register.placeholder.password_confirmation')"
+                        :placeholder="
+                            trans(
+                                'auth.register.placeholder.password_confirmation',
+                            )
+                        "
                     />
                     <InputError :message="form.errors.password_confirmation" />
                 </div>
@@ -108,7 +122,8 @@ const submit = (): void => {
                     :href="login()"
                     class="underline underline-offset-4"
                     :tabindex="6"
-                >{{ trans('auth.register.link.log_in') }}</TextLink>
+                    >{{ trans('auth.register.link.log_in') }}</TextLink
+                >
             </div>
         </form>
     </AuthBase>

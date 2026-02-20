@@ -1,13 +1,14 @@
 # Task Completion Checklist
+
 - Run focused automated tests for changed behavior:
-  - Prefer `php artisan test --compact` with file/filter scope.
+    - Prefer `php artisan test --compact` with file/filter scope.
 - Format PHP changes:
-  - `vendor/bin/pint --dirty --format agent`.
+    - `vendor/bin/pint --dirty --format agent`.
 - If frontend files changed, run relevant checks:
-  - `npm run lint` and/or `npm run format:check`.
+    - `npm run lint` and/or `npm run format:check`.
 - Verify no unintended file changes:
-  - `git status` and review diff.
+    - `git status` and review diff.
 - Keep changes aligned with AGENTS.md project rules:
-  - Laravel conventions, Inertia patterns, and existing structure.
+    - Laravel conventions, Inertia patterns, and existing structure.
 - If UI changes are not visible, ensure dev/build process is running:
-  - `npm run dev` or `composer run dev`.
+    - `npm run dev` or `composer run dev`.

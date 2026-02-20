@@ -36,16 +36,17 @@ const submit = (): void => {
 
 <template>
     <Head :title="trans('auth.login.title')" />
-    
+
     <AuthBase
         :title="trans('auth.login.header.title')"
         :description="trans('auth.login.header.description')"
     >
-
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">{{ trans('auth.login.label.email') }}</Label>
+                    <Label for="email">{{
+                        trans('auth.login.label.email')
+                    }}</Label>
                     <Input
                         id="email"
                         v-model="form.email"
@@ -60,7 +61,9 @@ const submit = (): void => {
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <Label for="password">{{ trans('auth.login.label.password') }}</Label>
+                        <Label for="password">{{
+                            trans('auth.login.label.password')
+                        }}</Label>
                         <TextLink
                             v-if="canResetPassword"
                             :href="request()"
@@ -83,8 +86,14 @@ const submit = (): void => {
 
                 <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" v-model:checked="form.remember" :tabindex="3" />
-                        <span>{{ trans('auth.login.helper_text.remember') }}</span>
+                        <Checkbox
+                            id="remember"
+                            v-model:checked="form.remember"
+                            :tabindex="3"
+                        />
+                        <span>{{
+                            trans('auth.login.helper_text.remember')
+                        }}</span>
                     </Label>
                 </div>
 
@@ -105,7 +114,9 @@ const submit = (): void => {
                 v-if="canRegister"
             >
                 {{ trans('auth.login.helper_text.no_account') }}
-                <TextLink :href="register()" :tabindex="5">{{ trans('auth.login.link.sign_up') }}</TextLink>
+                <TextLink :href="register()" :tabindex="5">{{
+                    trans('auth.login.link.sign_up')
+                }}</TextLink>
             </div>
         </form>
     </AuthBase>

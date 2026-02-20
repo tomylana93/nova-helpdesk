@@ -15,6 +15,7 @@ Only use non-Serena tools when Serena is unavailable or cannot perform the requi
 ## Mandatory Startup Flow
 
 At the beginning of a task:
+
 1. Run `activate_project`.
 2. Run `check_onboarding_performed`.
 3. If onboarding is not performed, run onboarding before continuing.
@@ -22,6 +23,7 @@ At the beginning of a task:
 ## Failure and Fallback Policy
 
 If Serena MCP fails:
+
 1. Retry one to two times.
 2. If it still fails, continue with safe fallback tools.
 3. Explicitly report the failure reason and expected impact in the final update.
@@ -38,12 +40,14 @@ Any exception must be justified in the task report.
 ## Read Memory Before Work
 
 Before implementation:
+
 1. Run `list_memories`.
 2. Read only memories relevant to the current task.
 
 ## Write or Update Memory After Work
 
 After implementation:
+
 1. Persist only stable and reusable knowledge.
 2. Prefer updating existing memory over creating duplicates.
 
@@ -64,11 +68,13 @@ Memory entries should be concise, factual, and reusable for future tasks.
 ## Reuse Policy
 
 For frontend work, always check existing components in:
+
 - `resources/js/components/ui`
 
 ## Read-Only Policy
 
 The following path is read-only for manual edits:
+
 - `resources/js/components/ui/**`
 
 Do not modify existing UI components in this folder.
@@ -76,6 +82,7 @@ Do not modify existing UI components in this folder.
 ## Adding New UI Components
 
 If a new component is needed:
+
 1. Use Shadcn Vue MCP tools to search and inspect available components/examples.
 2. Install or add the component through the official Shadcn workflow.
 3. Treat installed UI source as read-only unless the user explicitly instructs otherwise.
@@ -91,6 +98,7 @@ Compose UI behavior from consumer-level files (pages/layouts/feature components)
 ## Generated Frontend Paths (Read-Only)
 
 Treat the following paths as generated artifacts:
+
 - `resources/js/routes/**`
 - `resources/js/actions/**`
 
@@ -99,6 +107,7 @@ Do not manually edit files in these paths.
 ## Required Change Flow
 
 When route/action output needs to change:
+
 1. Update backend route/controller sources.
 2. Regenerate artifacts with `wayfinder:generate`.
 
@@ -113,11 +122,13 @@ Manual edits in generated files are not allowed because they are non-durable and
 ## Allowed Localization Format
 
 Use Laravel localization files:
+
 - `lang/<locale>/*.php`
 
 ## Disallowed Format
 
 Do not create or use:
+
 - `lang/*.json`
 
 ## Key and Structure Consistency
@@ -132,6 +143,7 @@ Keep additions grouped by domain and file responsibility.
 ## Completion Checklist
 
 Before finalizing a task:
+
 1. Run relevant tests for changed behavior.
 2. Run required formatting and linting commands according to project policy.
 3. Verify no unintended changes are included.
@@ -139,6 +151,7 @@ Before finalizing a task:
 ## Required Final Report Items
 
 Every final task report must include:
+
 1. Serena usage status.
 2. Memory files read and memory files updated.
 3. Whether fallback was used, including reason and impact.
@@ -272,6 +285,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 - Use appropriate PHP type hints for method parameters.
 
 <!-- Explicit Return Types and Method Params -->
+
 ```php
 protected function isAccessible(User $user, ?string $path = null): bool
 {
@@ -429,6 +443,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 # Inertia + Vue
 
 Vue components must have a single root element.
+
 - IMPORTANT: Activate `inertia-vue-development` when working with Inertia Vue client-side patterns.
 
 === tailwindcss/core rules ===
