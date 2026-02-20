@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/SettingsLayout.vue';
-import { edit, update } from '@/routes/profile';
+import { update } from '@/routes/profile';
 import { send } from '@/routes/verification';
-import { type BreadcrumbItem, type ProfileFormData } from '@/types';
+import { type ProfileFormData } from '@/types';
 
 type Props = {
     mustVerifyEmail: boolean;
@@ -19,13 +19,6 @@ type Props = {
 };
 
 defineProps<Props>();
-
-const breadcrumbItems: BreadcrumbItem[] = [
-    {
-        title: trans('profile.title'),
-        href: edit().url,
-    },
-];
 
 const page = usePage();
 const user = page.props.auth.user;
@@ -43,7 +36,7 @@ const submit = (): void => {
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
+    <AppLayout>
         <Head :title="trans('profile.title')" />
 
         <h1 class="sr-only">{{ trans('profile.sr_only_title') }}</h1>

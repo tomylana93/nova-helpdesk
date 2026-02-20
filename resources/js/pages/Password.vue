@@ -8,15 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/SettingsLayout.vue';
-import { edit, update } from '@/routes/user-password';
-import { type BreadcrumbItem, type PasswordFormData } from '@/types';
-
-const breadcrumbItems: BreadcrumbItem[] = [
-    {
-        title: trans('password.title'),
-        href: edit().url,
-    },
-];
+import { update } from '@/routes/user-password';
+import { type PasswordFormData } from '@/types';
 
 const form = useForm<PasswordFormData>({
     current_password: '',
@@ -35,7 +28,7 @@ const submit = (): void => {
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbItems">
+    <AppLayout>
         <Head :title="trans('password.title')" />
 
         <h1 class="sr-only">{{ trans('password.sr_only_title') }}</h1>

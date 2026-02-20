@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -42,6 +43,35 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'breadcrumbs' => fn (): array => $this->resolveBreadcrumbs($request),
         ];
+    }
+
+    /**
+     * Resolve the breadcrumb trail for the current route.
+     *
+     * @return array<int, array{title: string, href: string|null}>
+     */
+    protected function resolveBreadcrumbs(Request $request): array
+    {
+        $route = $request->route();
+
+        if (! $route) {
+            return [];
+        }
+
+        $routeName = $route->getName();
+
+        if (! is_string($routeName) || ! Breadcrumbs::exists($routeName)) {
+            return [];
+        }
+
+        return Breadcrumbs::generate($routeName, ...array_values($route->parametersWithoutNulls()))
+            ->map(fn (object $breadcrumb): array => [
+                'title' => (string) $breadcrumb->title,
+                'href' => $breadcrumb->url ?: null,
+            ])
+            ->values()
+            ->all();
     }
 }
