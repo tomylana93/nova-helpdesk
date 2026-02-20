@@ -67,7 +67,7 @@ const submit = (): void => {
                             class="text-sm"
                             :tabindex="5"
                         >
-                            {{ trans('auth.login.password.forgot') }}
+                            {{ trans('auth.login.link.forgot_password') }}
                         </TextLink>
                     </div>
                     <Input
@@ -84,7 +84,7 @@ const submit = (): void => {
                 <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
                         <Checkbox id="remember" v-model:checked="form.remember" :tabindex="3" />
-                        <span>{{ trans('auth.login.remember') }}</span>
+                        <span>{{ trans('auth.login.helper_text.remember') }}</span>
                     </Label>
                 </div>
 
@@ -96,7 +96,7 @@ const submit = (): void => {
                     data-test="login-button"
                 >
                     <Spinner v-if="form.processing" />
-                    {{ trans('auth.login.submit') }}
+                    {{ trans('auth.login.button.submit') }}
                 </Button>
             </div>
 
@@ -104,8 +104,8 @@ const submit = (): void => {
                 class="text-center text-sm text-muted-foreground"
                 v-if="canRegister"
             >
-                {{ trans('auth.login.no_account') }}
-                <TextLink :href="register()" :tabindex="5">{{ trans('auth.login.sign_up') }}</TextLink>
+                {{ trans('auth.login.helper_text.no_account') }}
+                <TextLink :href="register()" :tabindex="5">{{ trans('auth.login.link.sign_up') }}</TextLink>
             </div>
         </form>
     </AuthBase>

@@ -31,13 +31,46 @@ return [
             'email' => 'email@example.com',
             'password' => 'Password',
         ],
-        'password' => [
-            'forgot' => 'Forgot password?',
+        'button' => [
+            'submit' => 'Log in',
         ],
-        'remember' => 'Remember me',
-        'submit' => 'Log in',
-        'no_account' => "Don't have an account?",
-        'sign_up' => 'Sign up',
+        'link' => [
+            'forgot_password' => 'Forgot password?',
+            'sign_up' => 'Sign up',
+        ],
+        'helper_text' => [
+            'remember' => 'Remember me',
+            'no_account' => "Don't have an account?",
+        ],
+    ],
+
+    'register' => [
+        'title' => 'Register',
+        'header' => [
+            'title' => 'Create an account',
+            'description' => 'Enter your details below to create your account',
+        ],
+        'label' => [
+            'name' => 'Name',
+            'email' => 'Email address',
+            'password' => 'Password',
+            'password_confirmation' => 'Confirm password',
+        ],
+        'placeholder' => [
+            'name' => 'Full name',
+            'email' => 'email@example.com',
+            'password' => 'Password',
+            'password_confirmation' => 'Confirm password',
+        ],
+        'button' => [
+            'submit' => 'Create account',
+        ],
+        'link' => [
+            'log_in' => 'Log in',
+        ],
+        'helper_text' => [
+            'have_account' => 'Already have an account?',
+        ],
     ],
 
 ];

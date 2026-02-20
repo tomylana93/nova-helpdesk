@@ -24,3 +24,10 @@ export type LoginFormData = {
     password: string;
     remember: boolean;
 };
+
+export type RegisterFormData = {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+};
