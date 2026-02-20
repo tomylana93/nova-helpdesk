@@ -15,6 +15,9 @@
 - Inertia app structure:
     - Pages in `resources/js/pages`.
     - Reuse existing components/composables before creating new ones.
+- Sidebar navigation convention:
+    - `NavMain.vue` uses optional `groupLabel` prop (no hardcoded group text in component).
+    - Navigation group container should not render when `items` is empty.
 - Testing conventions:
     - Pest is primary test framework.
     - Feature tests use `RefreshDatabase` via `tests/Pest.php`.

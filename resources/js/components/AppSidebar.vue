@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { computed } from 'vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -17,13 +19,17 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
+const mainNavItems = computed<NavItem[]>(() => [
     {
-        title: 'Dashboard',
+        title: trans('breadcrumbs.dashboard'),
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
+]);
+
+const mainNavGroupLabel = computed<string>(() =>
+    trans('navigation.main_group.platform'),
+);
 
 const footerNavItems: NavItem[] = [
     {
@@ -54,7 +60,7 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <NavMain :items="mainNavItems" :group-label="mainNavGroupLabel" />
         </SidebarContent>
 
         <SidebarFooter>
