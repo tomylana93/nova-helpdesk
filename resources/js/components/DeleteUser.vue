@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { destroy } from '@/routes/profile';
 
 const passwordInput = useTemplateRef('passwordInput');
 </script>
@@ -45,7 +45,7 @@ const passwordInput = useTemplateRef('passwordInput');
                 </DialogTrigger>
                 <DialogContent>
                     <Form
-                        v-bind="ProfileController.destroy.form()"
+                        v-bind="destroy.form()"
                         reset-on-success
                         @error="() => passwordInput?.$el?.focus()"
                         :options="{

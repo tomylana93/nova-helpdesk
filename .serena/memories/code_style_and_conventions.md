@@ -17,3 +17,5 @@
 - Testing conventions:
   - Pest is primary test framework.
   - Feature tests use `RefreshDatabase` via `tests/Pest.php`.
+- Settings forms convention: `Profile`, `Password`, `TwoFactor`, and related Two-Factor modal/recovery components use typed `useForm` + `form.submit(wayfinderRoute())`.
+- Settings localization convention: use `trans()` with split PHP language files (`lang/en/profile.php`, `lang/en/password.php`, `lang/en/two_factor.php`).

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Form } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef } from 'vue';
 import AlertError from '@/components/AlertError.vue';
@@ -13,12 +14,14 @@ import {
 } from '@/components/ui/card';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
+import type { EmptyFormData } from '@/types';
 
 const { recoveryCodesList, fetchRecoveryCodes, errors } = useTwoFactorAuth();
 const isRecoveryCodesVisible = ref<boolean>(false);
 const recoveryCodeSectionRef = useTemplateRef('recoveryCodeSectionRef');
+const regenerateForm = useForm<EmptyFormData>({});
 
-const toggleRecoveryCodesVisibility = async () => {
+const toggleRecoveryCodesVisibility = async (): Promise<void> => {
     if (!isRecoveryCodesVisible.value && !recoveryCodesList.value.length) {
         await fetchRecoveryCodes();
     }
@@ -29,6 +32,15 @@ const toggleRecoveryCodesVisibility = async () => {
         await nextTick();
         recoveryCodeSectionRef.value?.scrollIntoView({ behavior: 'smooth' });
     }
+};
+
+const submitRegenerate = (): void => {
+    regenerateForm.submit(regenerateRecoveryCodes(), {
+        preserveScroll: true,
+        onSuccess: () => {
+            void fetchRecoveryCodes();
+        },
+    });
 };
 
 onMounted(async () => {
@@ -42,11 +54,12 @@ onMounted(async () => {
     <Card class="w-full">
         <CardHeader>
             <CardTitle class="flex gap-3">
-                <LockKeyhole class="size-4" />2FA Recovery Codes
+                <LockKeyhole class="size-4" />{{
+                    trans('two_factor.recovery.title')
+                }}
             </CardTitle>
             <CardDescription>
-                Recovery codes let you regain access if you lose your 2FA
-                device. Store them in a secure password manager.
+                {{ trans('two_factor.recovery.description') }}
             </CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,26 +71,27 @@ onMounted(async () => {
                         :is="isRecoveryCodesVisible ? EyeOff : Eye"
                         class="size-4"
                     />
-                    {{ isRecoveryCodesVisible ? 'Hide' : 'View' }} Recovery
-                    Codes
+                    {{
+                        isRecoveryCodesVisible
+                            ? trans('two_factor.recovery.button.hide')
+                            : trans('two_factor.recovery.button.view')
+                    }}
+                    {{ trans('two_factor.recovery.button.codes') }}
                 </Button>
 
-                <Form
+                <form
                     v-if="isRecoveryCodesVisible && recoveryCodesList.length"
-                    v-bind="regenerateRecoveryCodes.form()"
-                    method="post"
-                    :options="{ preserveScroll: true }"
-                    @success="fetchRecoveryCodes"
-                    #default="{ processing }"
+                    @submit.prevent="submitRegenerate"
                 >
                     <Button
                         variant="secondary"
                         type="submit"
-                        :disabled="processing"
+                        :disabled="regenerateForm.processing"
                     >
-                        <RefreshCw /> Regenerate Codes
+                        <RefreshCw />
+                        {{ trans('two_factor.recovery.button.regenerate') }}
                     </Button>
-                </Form>
+                </form>
             </div>
             <div
                 :class="[
@@ -111,10 +125,7 @@ onMounted(async () => {
                         </div>
                     </div>
                     <p class="text-xs text-muted-foreground select-none">
-                        Each recovery code can be used once to access your
-                        account and will be removed after use. If you need more,
-                        click
-                        <span class="font-bold">Regenerate Codes</span> above.
+                        {{ trans('two_factor.recovery.helper_text') }}
                     </p>
                 </div>
             </div>

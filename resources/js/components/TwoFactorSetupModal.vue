@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
+import { trans } from 'laravel-vue-i18n';
 import { Check, Copy, ScanLine } from 'lucide-vue-next';
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import AlertError from '@/components/AlertError.vue';
@@ -21,8 +22,8 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/composables/useAppearance';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
-import type { TwoFactorConfigContent } from '@/types';
 import { confirm } from '@/routes/two-factor';
+import type { TwoFactorConfigContent, TwoFactorConfirmFormData } from '@/types';
 
 type Props = {
     requiresConfirmation: boolean;
@@ -39,37 +40,37 @@ const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, errors } =
     useTwoFactorAuth();
 
 const showVerificationStep = ref(false);
-const code = ref<string>('');
+const confirmForm = useForm<TwoFactorConfirmFormData>({
+    code: '',
+});
 
 const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 
 const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: 'Two-Factor Authentication Enabled',
-            description:
-                'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-            buttonText: 'Close',
+            title: trans('two_factor.modal.enabled.title'),
+            description: trans('two_factor.modal.enabled.description'),
+            buttonText: trans('two_factor.modal.enabled.button_text'),
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: 'Verify Authentication Code',
-            description: 'Enter the 6-digit code from your authenticator app',
-            buttonText: 'Continue',
+            title: trans('two_factor.modal.verify.title'),
+            description: trans('two_factor.modal.verify.description'),
+            buttonText: trans('two_factor.modal.verify.button_text'),
         };
     }
 
     return {
-        title: 'Enable Two-Factor Authentication',
-        description:
-            'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-        buttonText: 'Continue',
+        title: trans('two_factor.modal.setup.title'),
+        description: trans('two_factor.modal.setup.description'),
+        buttonText: trans('two_factor.modal.setup.button_text'),
     };
 });
 
-const handleModalNextStep = () => {
+const handleModalNextStep = (): void => {
     if (props.requiresConfirmation) {
         showVerificationStep.value = true;
 
@@ -84,19 +85,32 @@ const handleModalNextStep = () => {
     isOpen.value = false;
 };
 
-const resetModalState = () => {
+const submitConfirmation = (): void => {
+    confirmForm.submit(confirm(), {
+        preserveScroll: true,
+        onSuccess: () => {
+            isOpen.value = false;
+        },
+        onFinish: () => {
+            confirmForm.reset('code');
+        },
+    });
+};
+
+const resetModalState = (): void => {
     if (props.twoFactorEnabled) {
         clearSetupData();
     }
 
     showVerificationStep.value = false;
-    code.value = '';
+    confirmForm.reset('code');
+    confirmForm.clearErrors();
 };
 
 watch(
     () => isOpen.value,
-    async (isOpen) => {
-        if (!isOpen) {
+    async (opened) => {
+        if (!opened) {
             resetModalState();
             return;
         }
@@ -195,9 +209,9 @@ watch(
                             <div
                                 class="absolute inset-0 top-1/2 h-px w-full bg-border"
                             />
-                            <span class="relative bg-card px-2 py-1"
-                                >or, enter the code manually</span
-                            >
+                            <span class="relative bg-card px-2 py-1">{{
+                                trans('two_factor.modal.manual_entry_or')
+                            }}</span>
                         </div>
 
                         <div
@@ -236,14 +250,7 @@ watch(
                 </template>
 
                 <template v-else>
-                    <Form
-                        v-bind="confirm.form()"
-                        reset-on-error
-                        @finish="code = ''"
-                        @success="isOpen = false"
-                        v-slot="{ errors, processing }"
-                    >
-                        <input type="hidden" name="code" :value="code" />
+                    <form @submit.prevent="submitConfirmation">
                         <div
                             ref="pinInputContainerRef"
                             class="relative w-full space-y-3"
@@ -253,9 +260,9 @@ watch(
                             >
                                 <InputOTP
                                     id="otp"
-                                    v-model="code"
+                                    v-model="confirmForm.code"
                                     :maxlength="6"
-                                    :disabled="processing"
+                                    :disabled="confirmForm.processing"
                                 >
                                     <InputOTPGroup>
                                         <InputOTPSlot
@@ -266,10 +273,7 @@ watch(
                                     </InputOTPGroup>
                                 </InputOTP>
                                 <InputError
-                                    :message="
-                                        errors?.confirmTwoFactorAuthentication
-                                            ?.code
-                                    "
+                                    :message="confirmForm.errors.code"
                                 />
                             </div>
 
@@ -279,20 +283,25 @@ watch(
                                     variant="outline"
                                     class="w-auto flex-1"
                                     @click="showVerificationStep = false"
-                                    :disabled="processing"
+                                    :disabled="confirmForm.processing"
                                 >
-                                    Back
+                                    {{ trans('two_factor.modal.button.back') }}
                                 </Button>
                                 <Button
                                     type="submit"
                                     class="w-auto flex-1"
-                                    :disabled="processing || code.length < 6"
+                                    :disabled="
+                                        confirmForm.processing ||
+                                        confirmForm.code.length < 6
+                                    "
                                 >
-                                    Confirm
+                                    {{
+                                        trans('two_factor.modal.button.confirm')
+                                    }}
                                 </Button>
                             </div>
                         </div>
-                    </Form>
+                    </form>
                 </template>
             </div>
         </DialogContent>

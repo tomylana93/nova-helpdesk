@@ -7,10 +7,10 @@
 - Main route entrypoints:
   - `/` -> redirects to `/login`
   - `/dashboard` -> Inertia page `Dashboard` (auth + verified)
-  - settings routes in `routes/settings.php`.
+  - account/settings-related endpoints are at root paths: `/profile`, `/password`, `/appearance`, `/two-factor`.
 - High-level structure:
   - `app/` domain logic, controllers, models, actions.
-  - `routes/` web/settings/console routes.
+  - `routes/` web/console routes (`settings` routes are consolidated in `routes/web.php`).
   - `resources/js/` Inertia app: `pages`, `components`, `layouts`, `actions`, `routes`, `composables`.
   - `tests/Feature`, `tests/Unit`.
   - tooling config in `composer.json`, `package.json`, `pint.json`, `eslint.config.js`, `.prettierrc`.
