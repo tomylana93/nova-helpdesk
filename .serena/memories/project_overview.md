@@ -5,7 +5,7 @@
 - Frontend stack: Vue 3 + TypeScript, Inertia Vue 3, Vite, Tailwind CSS 4, Reka UI/lucide.
 - Testing stack: Pest 4 (Feature tests use RefreshDatabase), PHPUnit 12.
 - Main route entrypoints:
-  - `/` -> Inertia page `Welcome`
+  - `/` -> redirects to `/login`
   - `/dashboard` -> Inertia page `Dashboard` (auth + verified)
   - settings routes in `routes/settings.php`.
 - High-level structure:
