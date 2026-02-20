@@ -7,6 +7,26 @@
                 "/home/tomylana93/projects/nova-helpdesk/artisan",
                 "boost:mcp"
             ]
+        },
+        "Inertia.js Documentation": {
+            "url": "https://inertiajs.com/docs/mcp",
+            "type": "http"
+        },
+        "oraios/serena": {
+            "command": "uvx",
+            "args": [
+                "--from",
+                "git+https://github.com/oraios/serena",
+                "serena",
+                "start-mcp-server",
+                "serena==latest",
+                "--context",
+                "ide"
+            ]
+        },
+        "shadcn": {
+            "command": "npx",
+            "args": ["shadcn-vue@latest", "mcp"]
         }
     }
 }
