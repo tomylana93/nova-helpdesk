@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -34,49 +35,48 @@ const submit = (): void => {
 </script>
 
 <template>
+    <Head :title="trans('auth.login.title')" />
+    
     <AuthBase
-        title="Log in to your account"
-        description="Enter your email and password below to log in"
+        :title="trans('auth.login.header.title')"
+        :description="trans('auth.login.header.description')"
     >
-        <Head title="Log in" />
 
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="email">{{ trans('auth.login.label.email') }}</Label>
                     <Input
                         id="email"
                         v-model="form.email"
                         type="email"
-                        required
                         autofocus
                         :tabindex="1"
                         autocomplete="email"
-                        placeholder="email@example.com"
+                        :placeholder="trans('auth.login.placeholder.email')"
                     />
                     <InputError :message="form.errors.email" />
                 </div>
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
+                        <Label for="password">{{ trans('auth.login.label.password') }}</Label>
                         <TextLink
                             v-if="canResetPassword"
                             :href="request()"
                             class="text-sm"
                             :tabindex="5"
                         >
-                            Forgot password?
+                            {{ trans('auth.login.password.forgot') }}
                         </TextLink>
                     </div>
                     <Input
                         id="password"
                         v-model="form.password"
                         type="password"
-                        required
                         :tabindex="2"
                         autocomplete="current-password"
-                        placeholder="Password"
+                        :placeholder="trans('auth.login.placeholder.password')"
                     />
                     <InputError :message="form.errors.password" />
                 </div>
@@ -84,7 +84,7 @@ const submit = (): void => {
                 <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
                         <Checkbox id="remember" v-model:checked="form.remember" :tabindex="3" />
-                        <span>Remember me</span>
+                        <span>{{ trans('auth.login.remember') }}</span>
                     </Label>
                 </div>
 
@@ -96,7 +96,7 @@ const submit = (): void => {
                     data-test="login-button"
                 >
                     <Spinner v-if="form.processing" />
-                    Log in
+                    {{ trans('auth.login.submit') }}
                 </Button>
             </div>
 
@@ -104,8 +104,8 @@ const submit = (): void => {
                 class="text-center text-sm text-muted-foreground"
                 v-if="canRegister"
             >
-                Don't have an account?
-                <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
+                {{ trans('auth.login.no_account') }}
+                <TextLink :href="register()" :tabindex="5">{{ trans('auth.login.sign_up') }}</TextLink>
             </div>
         </form>
     </AuthBase>
