@@ -11,7 +11,7 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->active()->create();
 
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
@@ -20,6 +20,20 @@ test('users can authenticate using the login screen', function () {
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
+});
+
+test('disabled users can not authenticate and receive disabled message', function () {
+    $user = User::factory()->disabled()->create();
+
+    $response = $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertSessionHasErrors([
+        'email' => __('auth.login.disabled'),
+    ]);
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
@@ -32,7 +46,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
         'confirmPassword' => true,
     ]);
 
-    $user = User::factory()->create();
+    $user = User::factory()->active()->create();
 
     $user->forceFill([
         'two_factor_secret' => encrypt('test-secret'),
@@ -51,7 +65,7 @@ test('users with two factor enabled are redirected to two factor challenge', fun
 });
 
 test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->active()->create();
 
     $this->post(route('login.store'), [
         'email' => $user->email,
@@ -62,7 +76,7 @@ test('users can not authenticate with invalid password', function () {
 });
 
 test('users can logout', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->active()->create();
 
     $response = $this->actingAs($user)->post(route('logout'));
 
@@ -71,7 +85,7 @@ test('users can logout', function () {
 });
 
 test('users are rate limited', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->active()->create();
 
     RateLimiter::increment(md5('login'.implode('|', [$user->email, '127.0.0.1'])), amount: 5);
 

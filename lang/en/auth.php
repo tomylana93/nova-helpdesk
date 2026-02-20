@@ -42,6 +42,7 @@ return [
             'remember' => 'Remember me',
             'no_account' => "Don't have an account?",
         ],
+        'disabled' => 'Your account is disabled. Please contact support.',
     ],
 
     'register' => [
