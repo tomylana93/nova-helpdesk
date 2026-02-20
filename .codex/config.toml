@@ -1,0 +1,4 @@
+[mcp_servers.laravel-boost]
+command = "wsl.exe"
+args = ["/usr/bin/php8.5", "/home/tomylana93/projects/nova-helpdesk/artisan", "boost:mcp"]
+cwd = "/home/tomylana93/projects/nova-helpdesk"
