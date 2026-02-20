@@ -8,6 +8,9 @@
   - TypeScript + Vue ESLint config (`@vue/eslint-config-typescript` + `eslint-plugin-vue`).
   - Import order is enforced/alphabetized via `eslint-plugin-import`.
   - Prettier formatting with single quotes, semicolons, print width 80, tab width 4.
+  - For Inertia forms, prefer `useForm` helper when programmatic control is needed.
+  - Use strict TypeScript generics for forms (for example: `useForm<LoginFormData>(...)`).
+  - Keep form payload types exported from shared type modules (for example: `resources/js/types/auth.ts`).
 - Inertia app structure:
   - Pages in `resources/js/pages`.
   - Reuse existing components/composables before creating new ones.

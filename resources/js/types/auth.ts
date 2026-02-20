@@ -18,3 +18,9 @@ export type TwoFactorConfigContent = {
     description: string;
     buttonText: string;
 };
+
+export type LoginFormData = {
+    email: string;
+    password: string;
+    remember: boolean;
+};
