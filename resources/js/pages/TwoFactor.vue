@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
 
@@ -51,7 +52,7 @@ onUnmounted(() => {
 
 <template>
     <AppLayout>
-        <Head :title="trans('two_factor.title')" />
+        <AppHead :title="trans('two_factor.title')" />
 
         <h1 class="sr-only">{{ trans('two_factor.sr_only_title') }}</h1>
 

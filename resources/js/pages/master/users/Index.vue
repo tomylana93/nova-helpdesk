@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 import { PlusSquare } from 'lucide-vue-next';
 
 import ContentHeader from '@/components/ContentHeader.vue';
@@ -23,7 +24,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head :title="trans('user.title.index')" />
+    <AppHead :title="trans('user.title.index')" />
 
     <AppLayout>
         <ContentWrapper>

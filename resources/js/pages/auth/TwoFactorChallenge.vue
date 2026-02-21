@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 import { computed, ref } from 'vue';
 
 import InputError from '@/components/InputError.vue';
@@ -55,7 +56,7 @@ const code = ref<string>('');
         :title="authConfigContent.title"
         :description="authConfigContent.description"
     >
-        <Head :title="trans('auth.two_factor_challenge.title')" />
+        <AppHead :title="trans('auth.two_factor_challenge.title')" />
 
         <div class="space-y-6">
             <template v-if="!showRecoveryInput">

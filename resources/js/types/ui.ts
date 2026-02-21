@@ -1,3 +1,4 @@
+import type { InertiaLinkProps } from '@inertiajs/vue3';
 import type { Component } from 'vue';
 
 export type Appearance = 'light' | 'dark' | 'system';
@@ -11,6 +12,12 @@ export type ModuleCard = {
     titleKey: string;
     descriptionKey: string;
     ctaKey: string;
-    href: string;
+    href: NonNullable<InertiaLinkProps['href']>;
     icon: Component;
+};
+
+export type Option = {
+    label: string;
+    value: string;
+    color?: string;
 };

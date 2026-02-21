@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import { store } from '@/routes/password/confirm';
         :title="trans('auth.confirm_password.header.title')"
         :description="trans('auth.confirm_password.header.description')"
     >
-        <Head :title="trans('auth.confirm_password.title')" />
+        <AppHead :title="trans('auth.confirm_password.title')" />
 
         <Form
             v-bind="store.form()"

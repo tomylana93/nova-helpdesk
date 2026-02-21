@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Settings\GeneralSettings;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -36,6 +37,9 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        /** @var GeneralSettings $generalSettings */
+        $generalSettings = app(GeneralSettings::class);
+        
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -44,6 +48,22 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'breadcrumbs' => fn (): array => $this->resolveBreadcrumbs($request),
+             'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+                'warning' => fn () => $request->session()->get('warning'),
+                'info' => fn () => $request->session()->get('info'),
+            ],
+            'settings' => [
+                'general' => [
+                    'app_name' => $generalSettings->app_name,
+                    'app_logo' => $generalSettings->app_logo ?? asset('assets/images/logo.png'),
+                    'app_icon' => $generalSettings->app_icon ?? asset('assets/images/icon.png'),
+                    'app_favicon' => $generalSettings->app_favicon ?? asset('assets/images/favicon.ico'),
+                    'header_style' => $generalSettings->header_style,
+                    'language' => $generalSettings->language,
+                ],
+            ],
         ];
     }
 

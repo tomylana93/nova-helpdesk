@@ -31,3 +31,4 @@
 - Settings localization convention: use `trans()` with split PHP language files (`lang/en/profile.php`, `lang/en/password.php`, `lang/en/two_factor.php`).
 - Generic/shared button labels should prefer `app.button.*` keys (for example `app.button.create`) over feature-specific keys when text is reusable.
 - Datatable/UI localization convention: UI table keys use `lang/en/ui.php` under `ui.datatable`, `ui.datatable_actions`, and `ui.common`.
+- Vue image src typing convention: when source can be `string | null`, normalize to `undefined` at binding/computed level (`value ?? undefined`) to satisfy `ImgHTMLAttributes.src`.

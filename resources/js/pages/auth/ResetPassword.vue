@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 import { ref } from 'vue';
 
 import InputError from '@/components/InputError.vue';
@@ -24,7 +25,7 @@ const inputEmail = ref(props.email);
         :title="trans('auth.reset_password.header.title')"
         :description="trans('auth.reset_password.header.description')"
     >
-        <Head :title="trans('auth.reset_password.title')" />
+        <AppHead :title="trans('auth.reset_password.title')" />
 
         <Form
             v-bind="update.form()"

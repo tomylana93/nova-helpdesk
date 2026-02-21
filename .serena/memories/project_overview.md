@@ -10,6 +10,7 @@
     - `/dashboard` -> Inertia page `Dashboard` (auth + verified)
     - account/settings-related endpoints are at root paths: `/profile`, `/password`, `/two-factor`.
     - profile account deletion flow has been removed from this codebase (`profile.destroy` route, `DeleteUser.vue`, and `ProfileDeleteRequest` are no longer used).
+    - `/settings/general` provides a General Settings Inertia page with image upload endpoints (`POST/DELETE /settings/general/images/{type}` for `app_logo`, `app_icon`, `app_favicon`).
     - master module routes under `/master` with `master.*` names (`master.index`, `master.users.index`).
 - `master.index` now renders Inertia page `master/Index` as a hub page with module cards configured from a local array (currently includes Users) linking to `/master/users`.
 - Sidebar main navigation includes a `Master` item that links to `master.index`.

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -30,7 +31,7 @@ const submit = (): void => {
 </script>
 
 <template>
-    <Head :title="trans('auth.register.title')" />
+    <AppHead :title="trans('auth.register.title')" />
 
     <AuthBase
         :title="trans('auth.register.header.title')"

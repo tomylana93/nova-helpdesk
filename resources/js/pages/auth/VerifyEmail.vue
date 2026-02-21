@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ defineProps<{
         :title="trans('auth.verify_email.header.title')"
         :description="trans('auth.verify_email.header.description')"
     >
-        <Head :title="trans('auth.verify_email.title')" />
+        <AppHead :title="trans('auth.verify_email.title')" />
 
         <div
             v-if="status === 'verification-link-sent'"

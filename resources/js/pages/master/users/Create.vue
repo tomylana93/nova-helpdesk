@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 import { PlusSquare, X } from 'lucide-vue-next';
 
 import ContentHeader from '@/components/ContentHeader.vue';
@@ -28,7 +29,7 @@ const submit = (): void => {
 </script>
 
 <template>
-    <Head :title="trans('user.title.create')" />
+    <AppHead :title="trans('user.title.create')" />
 
     <AppLayout>
         <ContentWrapper>

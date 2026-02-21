@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -22,7 +23,7 @@ defineProps<{
         :title="trans('auth.forgot_password.header.title')"
         :description="trans('auth.forgot_password.header.description')"
     >
-        <Head :title="trans('auth.forgot_password.title')" />
+        <AppHead :title="trans('auth.forgot_password.title')" />
 
         <div
             v-if="status"

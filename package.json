@@ -38,6 +38,9 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "embla-carousel-vue": "^8.6.0",
+        "filepond-plugin-file-poster": "^2.5.2",
+        "filepond-plugin-file-validate-type": "^1.2.9",
+        "filepond-plugin-image-preview": "^4.6.12",
         "laravel-vite-plugin": "^2.0.0",
         "laravel-vue-i18n": "^2.8.0",
         "lucide-vue-next": "^0.468.0",
@@ -48,6 +51,7 @@
         "vaul-vue": "^0.4.1",
         "vee-validate": "^4.15.1",
         "vue": "^3.5.13",
+        "vue-filepond": "^7.0.4",
         "vue-input-otp": "^0.3.2",
         "vue-sonner": "^2.0.9",
         "zod": "^3.25.76"

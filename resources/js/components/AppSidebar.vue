@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
-import { BookOpen, Database, Folder, LayoutGrid } from 'lucide-vue-next';
+import { BookOpen, Database, Folder, LayoutGrid, Settings } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import NavFooter from '@/components/NavFooter.vue';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as masterIndex } from '@/routes/master';
+import { index as settingsIndex } from '@/routes/settings';
 import { type NavItem } from '@/types';
 
 import AppLogo from './AppLogo.vue';
@@ -35,6 +36,14 @@ const masterNavItems = computed<NavItem[]>(() => [
         title: trans('breadcrumbs.master'),
         href: masterIndex(),
         icon: Database,
+    },
+]);
+
+const settingNavItems = computed<NavItem[]>(() => [
+    {
+        title: trans('breadcrumbs.settings'),
+        href: settingsIndex(),
+        icon: Settings,
     },
 ]);
 
@@ -69,6 +78,7 @@ const footerNavItems: NavItem[] = [
         <SidebarContent>
             <NavMain :items="mainNavItems" />
             <NavMain :items="masterNavItems" :group-label="trans('navigation.main_group.master')" />
+            <NavMain :items="settingNavItems" :group-label="trans('navigation.main_group.settings')" />
         </SidebarContent>
 
         <SidebarFooter>

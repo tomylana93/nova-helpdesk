@@ -14,17 +14,17 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { index as usersIndex } from '@/routes/master/users';
+import { edit as editGeneral } from '@/routes/settings/general';
 import type { ModuleCard } from '@/types';
 
 const moduleCards: ModuleCard[] = [
     {
-        key: 'users',
-        badgeKey: 'breadcrumbs.master',
-        titleKey: 'master.modules.users.title',
-        descriptionKey: 'master.modules.users.description',
-        ctaKey: 'master.modules.users.cta',
-        href: usersIndex(),
+        key: 'general',
+        badgeKey: 'breadcrumbs.settings.general',
+        titleKey: 'settings.general.title',
+        descriptionKey: 'settings.general.description',
+        ctaKey: 'settings.general.cta',
+        href: editGeneral(),
         icon: Users,
     },
 ];

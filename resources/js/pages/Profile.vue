@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -37,7 +38,7 @@ const submit = (): void => {
 
 <template>
     <AppLayout>
-        <Head :title="trans('profile.title')" />
+        <AppHead :title="trans('profile.title')" />
 
         <h1 class="sr-only">{{ trans('profile.sr_only_title') }}</h1>
 

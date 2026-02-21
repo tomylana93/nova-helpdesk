@@ -29,3 +29,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/master.php';
+require __DIR__.'/settings.php';

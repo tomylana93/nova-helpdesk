@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import AppHead from '@/components/AppHead.vue';
 
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -30,7 +31,7 @@ const submit = (): void => {
 
 <template>
     <AppLayout>
-        <Head :title="trans('password.title')" />
+        <AppHead :title="trans('password.title')" />
 
         <h1 class="sr-only">{{ trans('password.sr_only_title') }}</h1>
 

@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import AppLogoIconText from '@/components/AppLogoIconText.vue';
 
 const page = usePage();
-const appName = page.props.name;
+const headerStyle = computed(() => page.props.settings.general.header_style);
 </script>
 
 <template>
-    <div
-        class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
-    >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
+    <div v-if="headerStyle === 'icon'">
+        <AppLogoIconText />
     </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold"
-            >{{ appName }}</span
-        >
+
+    <div
+        v-else
+        class="h-12 w-auto transition-all duration-200 ease-linear group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-auto"
+    >
+        <AppLogoIcon class="h-full w-auto object-contain" />
     </div>
 </template>
