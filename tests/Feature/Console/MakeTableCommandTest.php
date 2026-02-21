@@ -3,18 +3,18 @@
 use Illuminate\Support\Facades\File;
 
 afterEach(function () {
-    File::delete(app_path('Tables/UserTable.php'));
+    File::delete(app_path('Tables/FixtureUserTable.php'));
     File::delete(app_path('Tables/AccountTable.php'));
     File::delete(app_path('Tables/OverwriteTable.php'));
-    File::delete(app_path('Tables/Admin/UserTable.php'));
+    File::delete(app_path('Tables/Admin/FixtureUserTable.php'));
     File::deleteDirectory(app_path('Tables/Admin'));
 });
 
 test('it generates table class using convention defaults', function () {
-    $this->artisan('make:table', ['name' => 'User'])
+    $this->artisan('make:table', ['name' => 'FixtureUser'])
         ->assertSuccessful();
 
-    $path = app_path('Tables/UserTable.php');
+    $path = app_path('Tables/FixtureUserTable.php');
 
     expect(File::exists($path))->toBeTrue();
 
@@ -22,23 +22,23 @@ test('it generates table class using convention defaults', function () {
 
     expect($content)
         ->toContain('namespace App\Tables;')
-        ->toContain('class UserTable extends AbstractTable')
-        ->toContain('use App\Http\Resources\UserResource;')
-        ->toContain('use App\Models\User;')
-        ->toContain('return UserResource::class;')
-        ->toContain('return User::query();');
+        ->toContain('class FixtureUserTable extends AbstractTable')
+        ->toContain('use App\Http\Resources\FixtureUserResource;')
+        ->toContain('use App\Models\FixtureUser;')
+        ->toContain('return FixtureUserResource::class;')
+        ->toContain('return FixtureUser::query();');
 });
 
 test('it normalizes table suffix in generated class name', function () {
-    $this->artisan('make:table', ['name' => 'UserTable'])
+    $this->artisan('make:table', ['name' => 'FixtureUserTable'])
         ->assertSuccessful();
 
-    $path = app_path('Tables/UserTable.php');
+    $path = app_path('Tables/FixtureUserTable.php');
     $content = File::get($path);
 
     expect($content)
-        ->toContain('class UserTable extends AbstractTable')
-        ->not->toContain('class UserTableTable');
+        ->toContain('class FixtureUserTable extends AbstractTable')
+        ->not->toContain('class FixtureUserTableTable');
 });
 
 test('it resolves model and resource from options', function () {
@@ -60,10 +60,10 @@ test('it resolves model and resource from options', function () {
 });
 
 test('it supports nested namespace from table name', function () {
-    $this->artisan('make:table', ['name' => 'Admin/User'])
+    $this->artisan('make:table', ['name' => 'Admin/FixtureUser'])
         ->assertSuccessful();
 
-    $path = app_path('Tables/Admin/UserTable.php');
+    $path = app_path('Tables/Admin/FixtureUserTable.php');
 
     expect(File::exists($path))->toBeTrue();
 
@@ -71,7 +71,7 @@ test('it supports nested namespace from table name', function () {
 
     expect($content)
         ->toContain('namespace App\Tables\Admin;')
-        ->toContain('class UserTable extends AbstractTable');
+        ->toContain('class FixtureUserTable extends AbstractTable');
 });
 
 test('it requires force option to overwrite existing table class', function () {
