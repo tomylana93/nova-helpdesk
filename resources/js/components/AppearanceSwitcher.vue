@@ -7,10 +7,8 @@ import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuLabel,
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAppearance } from '@/composables/useAppearance';
@@ -72,12 +70,7 @@ const onValueChange = (value: AcceptableValue): void => {
             </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" class="w-44">
-            <DropdownMenuLabel>
-                {{ trans('appearance.switcher.aria_label') }}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-
+        <DropdownMenuContent align="end">
             <DropdownMenuRadioGroup
                 :model-value="appearance"
                 @update:model-value="onValueChange"
