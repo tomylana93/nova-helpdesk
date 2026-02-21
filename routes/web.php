@@ -26,10 +26,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('throttle:6,1')
         ->name('user-password.update');
 
-    Route::get('appearance', function () {
-        return Inertia::render('Appearance');
-    })->name('appearance.edit');
-
     Route::get('two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
 });

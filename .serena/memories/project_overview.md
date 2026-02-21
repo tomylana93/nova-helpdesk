@@ -8,7 +8,7 @@
 - Main route entrypoints:
     - `/` -> redirects to `/login`
     - `/dashboard` -> Inertia page `Dashboard` (auth + verified)
-    - account/settings-related endpoints are at root paths: `/profile`, `/password`, `/appearance`, `/two-factor`.
+    - account/settings-related endpoints are at root paths: `/profile`, `/password`, `/two-factor`.
 - High-level structure:
     - `app/` domain logic, controllers, models, actions.
     - `routes/` web/console routes (`settings` routes are consolidated in `routes/web.php`), plus breadcrumb definitions in `routes/breadcrumbs.php`.
