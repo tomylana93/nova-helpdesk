@@ -15,6 +15,10 @@ return [
         'columns' => [
             'label' => 'Columns',
         ],
+        'selection' => [
+            'select_all' => 'Select all',
+            'select_row' => 'Select row',
+        ],
         'actions' => [
             'retry' => 'Retry',
         ],

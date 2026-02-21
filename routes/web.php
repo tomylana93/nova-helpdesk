@@ -18,8 +18,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     Route::get('password', [PasswordController::class, 'edit'])->name('user-password.edit');
 
     Route::put('password', [PasswordController::class, 'update'])

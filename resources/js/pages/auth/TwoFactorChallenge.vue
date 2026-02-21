@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 
 import InputError from '@/components/InputError.vue';
@@ -17,18 +18,24 @@ import type { TwoFactorConfigContent } from '@/types';
 const authConfigContent = computed<TwoFactorConfigContent>(() => {
     if (showRecoveryInput.value) {
         return {
-            title: 'Recovery Code',
-            description:
-                'Please confirm access to your account by entering one of your emergency recovery codes.',
-            buttonText: 'login using an authentication code',
+            title: trans('auth.two_factor_challenge.recovery.title'),
+            description: trans(
+                'auth.two_factor_challenge.recovery.description',
+            ),
+            buttonText: trans(
+                'auth.two_factor_challenge.recovery.button_text',
+            ),
         };
     }
 
     return {
-        title: 'Authentication Code',
-        description:
-            'Enter the authentication code provided by your authenticator application.',
-        buttonText: 'login using a recovery code',
+        title: trans('auth.two_factor_challenge.authentication.title'),
+        description: trans(
+            'auth.two_factor_challenge.authentication.description',
+        ),
+        buttonText: trans(
+            'auth.two_factor_challenge.authentication.button_text',
+        ),
     };
 });
 
@@ -48,7 +55,7 @@ const code = ref<string>('');
         :title="authConfigContent.title"
         :description="authConfigContent.description"
     >
-        <Head title="Two-Factor Authentication" />
+        <Head :title="trans('auth.two_factor_challenge.title')" />
 
         <div class="space-y-6">
             <template v-if="!showRecoveryInput">
@@ -82,11 +89,13 @@ const code = ref<string>('');
                         </div>
                         <InputError :message="errors.code" />
                     </div>
-                    <Button type="submit" class="w-full" :disabled="processing"
-                        >Continue</Button
-                    >
+                    <Button type="submit" class="w-full" :disabled="processing">
+                        {{ trans('auth.two_factor_challenge.button.continue') }}
+                    </Button>
                     <div class="text-center text-sm text-muted-foreground">
-                        <span>or you can </span>
+                        <span>{{
+                            trans('auth.two_factor_challenge.helper_text.or_you_can')
+                        }}</span>
                         <button
                             type="button"
                             class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
@@ -108,17 +117,23 @@ const code = ref<string>('');
                     <Input
                         name="recovery_code"
                         type="text"
-                        placeholder="Enter recovery code"
+                        :placeholder="
+                            trans(
+                                'auth.two_factor_challenge.recovery.placeholder',
+                            )
+                        "
                         :autofocus="showRecoveryInput"
                         required
                     />
                     <InputError :message="errors.recovery_code" />
-                    <Button type="submit" class="w-full" :disabled="processing"
-                        >Continue</Button
-                    >
+                    <Button type="submit" class="w-full" :disabled="processing">
+                        {{ trans('auth.two_factor_challenge.button.continue') }}
+                    </Button>
 
                     <div class="text-center text-sm text-muted-foreground">
-                        <span>or you can </span>
+                        <span>{{
+                            trans('auth.two_factor_challenge.helper_text.or_you_can')
+                        }}</span>
                         <button
                             type="button"
                             class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"

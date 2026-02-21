@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
@@ -13,15 +14,15 @@ import { type NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: trans('breadcrumbs.profile'),
         href: editProfile(),
     },
     {
-        title: 'Password',
+        title: trans('breadcrumbs.password'),
         href: editPassword(),
     },
     {
-        title: 'Two-Factor Auth',
+        title: trans('breadcrumbs.two_factor'),
         href: show(),
     },
 ];
@@ -32,15 +33,15 @@ const { isCurrentUrl } = useCurrentUrl();
 <template>
     <div class="px-4 py-6">
         <Heading
-            title="Settings"
-            description="Manage your profile and account settings"
+            :title="trans('app.settings.title')"
+            :description="trans('app.settings.description')"
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
                 <nav
                     class="flex flex-col space-y-1 space-x-0"
-                    aria-label="Settings"
+                    :aria-label="trans('app.settings.aria_navigation')"
                 >
                     <Button
                         v-for="item in sidebarNavItems"
@@ -53,7 +54,11 @@ const { isCurrentUrl } = useCurrentUrl();
                         as-child
                     >
                         <Link :href="item.href">
-                            <component :is="item.icon" class="h-4 w-4" />
+                            <component
+                                v-if="item.icon"
+                                :is="item.icon"
+                                class="h-4 w-4"
+                            />
                             {{ item.title }}
                         </Link>
                     </Button>

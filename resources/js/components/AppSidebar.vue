@@ -40,12 +40,12 @@ const masterNavItems = computed<NavItem[]>(() => [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Github Repo',
+        title: trans('navigation.footer.github_repo'),
         href: 'https://github.com/laravel/vue-starter-kit',
         icon: Folder,
     },
     {
-        title: 'Documentation',
+        title: trans('navigation.footer.documentation'),
         href: 'https://laravel.com/docs/starter-kits#vue',
         icon: BookOpen,
     },

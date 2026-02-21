@@ -1,12 +1,13 @@
-import type { ColumnDef } from "@tanstack/vue-table";
-import { h } from "vue";
+import type { ColumnDef } from '@tanstack/vue-table';
+import { trans } from 'laravel-vue-i18n';
+import { h } from 'vue';
 
-import { DataTableAction, DataTableColumnHeader } from "@/components/datatable";
-import { Checkbox } from "@/components/ui/checkbox";
-import { edit } from "@/routes/master/users";
-import type { UserTableRow } from "@/types";
+import { DataTableAction, DataTableColumnHeader } from '@/components/datatable';
+import { Checkbox } from '@/components/ui/checkbox';
+import { edit } from '@/routes/master/users';
+import type { UserTableRow } from '@/types';
 
-export const userColumns : ColumnDef<UserTableRow>[] = [
+export const userColumns: ColumnDef<UserTableRow>[] = [
     {
         id: 'select',
         header: ({ table }) =>
@@ -14,14 +15,14 @@ export const userColumns : ColumnDef<UserTableRow>[] = [
                 modelValue: table.getIsAllPageRowsSelected(),
                 'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
                     table.toggleAllPageRowsSelected(!!value),
-                ariaLabel: 'Select all',
+                ariaLabel: trans('ui.datatable.selection.select_all'),
             }),
         cell: ({ row }) =>
             h(Checkbox, {
                 modelValue: row.getIsSelected(),
                 'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
                     row.toggleSelected(!!value),
-                ariaLabel: 'Select row',
+                ariaLabel: trans('ui.datatable.selection.select_row'),
             }),
         enableSorting: false,
         enableHiding: false,
@@ -60,7 +61,7 @@ export const userColumns : ColumnDef<UserTableRow>[] = [
             h(DataTableAction, {
                 row,
                 routes: {
-                    edit:  (id: string) => edit(id)
+                    edit: (id: string) => edit(id),
                 },
             }),
     },

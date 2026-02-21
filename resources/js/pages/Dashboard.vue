@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 
@@ -7,7 +8,7 @@ import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head :title="trans('breadcrumbs.dashboard')" />
 
     <AppLayout>
         <div
