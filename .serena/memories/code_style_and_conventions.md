@@ -18,6 +18,9 @@
 - Sidebar navigation convention:
     - `NavMain.vue` uses optional `groupLabel` prop (no hardcoded group text in component).
     - Navigation group container should not render when `items` is empty.
+- Theme UX convention:
+    - Sidebar header uses `AppearanceSwitcher.vue` (icon-only Light/Dark/System controls) backed by `useAppearance` and `trans()` keys in `lang/en/appearance.php`.
+    - Appearance switcher prefers `ui/toggle-group` + tooltip primitives for segmented control UX.
 - Testing conventions:
     - Pest is primary test framework.
     - Feature tests use `RefreshDatabase` via `tests/Pest.php`.
