@@ -28,6 +28,10 @@
     - reusable validation rules for users are centralized in `app/Concerns/UserValidationRules.php`.
     - frontend pages are `resources/js/pages/master/users/Index.vue`, `resources/js/pages/master/users/Create.vue`, and `resources/js/pages/master/users/Edit.vue`.
     - create/edit pages use the standard `ContentWrapper` form layout with shared `app.button.*` labels.
+    - user primary key is UUID (`users.id` string) and session linkage uses `sessions.user_id` as UUID.
+    - user edit/update controller routes use implicit model binding injection (`User $user`) with UUID primary key.
+    - master users route uses Laravel helper `whereUuid('user')` for route parameter constraint.
+    - wayfinder generated route params for `master/users/{user}` are now `string | number`, and current UI passes UUID string.
     - scope intentionally excludes `show` and `destroy` (resource route only `index/create/store/edit/update`).
     - create flow sets `status` to active in action (create form has no status field).
     - update flow allows `status` change, does not update password, and does not reset `email_verified_at`.

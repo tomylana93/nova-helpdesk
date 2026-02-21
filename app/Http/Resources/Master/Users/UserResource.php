@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             : (string) $status;
 
         return [
-            'id' => (int) $this->id,
+            'id' => (string) $this->id,
             'name' => (string) $this->name,
             'email' => (string) $this->email,
             'status' => $statusValue,

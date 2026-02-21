@@ -24,7 +24,7 @@ class UserTableResource extends JsonResource
             : UserStatusEnum::tryFrom($statusValue);
 
         return [
-            'id' => (int) $this->id,
+            'id' => (string) $this->id,
             'name' => (string) $this->name,
             'email' => (string) $this->email,
             'status' => $resolvedStatus?->label() ?? $statusValue,

@@ -1,5 +1,5 @@
 export type UserTableRow = {
-    id: number;
+    id: string;
     name: string;
     email: string;
     status: string;
@@ -20,7 +20,7 @@ export type UserForm = {
 }
 
 export type EditableUser = {
-    id: number;
+    id: string;
     name: string;
     email: string;
     status: string;

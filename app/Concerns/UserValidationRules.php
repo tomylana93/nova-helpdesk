@@ -24,7 +24,7 @@ trait UserValidationRules
      *
      * @return array<int, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    protected function userEmailRules(?int $ignoreUserId = null): array
+    protected function userEmailRules(?string $ignoreUserId = null): array
     {
         return [
             'required',
@@ -79,7 +79,7 @@ trait UserValidationRules
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    protected function updateUserRules(int $userId): array
+    protected function updateUserRules(string $userId): array
     {
         return [
             'name' => $this->userNameRules(),

@@ -60,7 +60,7 @@ export const userColumns : ColumnDef<UserTableRow>[] = [
             h(DataTableAction, {
                 row,
                 routes: {
-                    edit:  (id: number) => edit(id)
+                    edit:  (id: string) => edit(id)
                 },
             }),
     },

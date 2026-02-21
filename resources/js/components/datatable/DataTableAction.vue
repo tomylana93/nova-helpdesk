@@ -25,9 +25,9 @@ import {
 
 interface Props {
     routes: {
-        show?: (id: number) => { url: string };
-        edit?: (id: number) => { url: string };
-        destroy?: (id: number) => { url: string };
+        show?: (id: string) => { url: string };
+        edit?: (id: string) => { url: string };
+        destroy?: (id: string) => { url: string };
     };
     row: any;
 }

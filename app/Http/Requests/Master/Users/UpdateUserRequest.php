@@ -27,7 +27,7 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->route('user');
-        $userId = $user instanceof User ? $user->id : (int) $user;
+        $userId = $user instanceof User ? (string) $user->getKey() : (string) $user;
 
         return $this->updateUserRules($userId);
     }

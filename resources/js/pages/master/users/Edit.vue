@@ -25,6 +25,8 @@ const props = defineProps<{
     statusOptions: UserStatusOption[];
 }>();
 
+console.log(props.user);
+
 const form = useForm<UserForm>({
     name: props.user.name,
     email: props.user.email,
