@@ -1,0 +1,21 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Tables\AbstractTable;
+use Illuminate\Database\Eloquent\Builder;
+use {{ namespacedModel }};
+use {{ namespacedResource }};
+
+class {{ class }} extends AbstractTable
+{
+    public function resource(): string
+    {
+        return {{ resource }}::class;
+    }
+
+    public function query(): Builder
+    {
+        return {{ model }}::query();
+    }
+}

@@ -29,6 +29,12 @@
 - `npm run format`
 - `npm run format:check`
 
+## Code Generation
+
+- `php artisan make:table <Name>`
+- `php artisan make:table <Name> --model=<Model> --resource=<Resource>`
+- `php artisan make:action <Name>`
+
 ## Useful System Commands (Linux)
 
 - `git status`, `git diff`, `git add -p`, `git commit`
