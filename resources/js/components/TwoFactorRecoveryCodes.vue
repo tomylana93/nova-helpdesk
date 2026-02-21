@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-vue-next';
 import { nextTick, onMounted, ref, useTemplateRef } from 'vue';
+
 import AlertError from '@/components/AlertError.vue';
 import { Button } from '@/components/ui/button';
 import {

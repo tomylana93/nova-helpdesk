@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+import { BookOpen, Database, Folder, LayoutGrid } from 'lucide-vue-next';
 import { computed } from 'vue';
+
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -16,7 +17,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as masterIndex } from '@/routes/master';
 import { type NavItem } from '@/types';
+
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems = computed<NavItem[]>(() => [
@@ -27,9 +30,13 @@ const mainNavItems = computed<NavItem[]>(() => [
     },
 ]);
 
-const mainNavGroupLabel = computed<string>(() =>
-    trans('navigation.main_group.platform'),
-);
+const masterNavItems = computed<NavItem[]>(() => [
+    {
+        title: trans('breadcrumbs.master'),
+        href: masterIndex(),
+        icon: Database,
+    },
+]);
 
 const footerNavItems: NavItem[] = [
     {
@@ -60,7 +67,8 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" :group-label="mainNavGroupLabel" />
+            <NavMain :items="mainNavItems" />
+            <NavMain :items="masterNavItems" :group-label="trans('navigation.main_group.master')" />
         </SidebarContent>
 
         <SidebarFooter>

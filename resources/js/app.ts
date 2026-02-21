@@ -3,6 +3,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { i18nVue } from 'laravel-vue-i18n';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
+
 import '../css/app.css';
 import { initializeTheme } from './composables/useAppearance';
 

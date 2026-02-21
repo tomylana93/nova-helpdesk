@@ -53,10 +53,28 @@ export default defineConfigWithVueTs(
                         'sibling',
                         'index',
                     ],
+                    pathGroups: [
+                        {
+                            pattern: '@/**',
+                            group: 'internal',
+                            position: 'before',
+                        },
+                    ],
+                    pathGroupsExcludedImportTypes: ['builtin'],
+                    'newlines-between': 'always',
                     alphabetize: {
                         order: 'asc',
                         caseInsensitive: true,
                     },
+                },
+            ],
+            'sort-imports': [
+                'error',
+                {
+                    ignoreCase: true,
+                    ignoreDeclarationSort: true,
+                    ignoreMemberSort: false,
+                    allowSeparatedGroups: true,
                 },
             ],
         },

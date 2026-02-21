@@ -7,14 +7,17 @@
     - Prefer explicit types/return types and framework conventions from project guidelines.
 - JS/TS/Vue style:
     - TypeScript + Vue ESLint config (`@vue/eslint-config-typescript` + `eslint-plugin-vue`).
-    - Import order is enforced/alphabetized via `eslint-plugin-import`.
+    - Import order is auto-fixed via ESLint (`import/order` with alias `@/**` grouped as internal + `sort-imports` for member sorting).
     - Prettier formatting with single quotes, semicolons, print width 80, tab width 4.
     - For Inertia forms, prefer `useForm` helper when programmatic control is needed.
     - Use strict TypeScript generics for forms (for example: `useForm<LoginFormData>(...)`).
     - Keep form payload types exported from shared type modules (for example: `resources/js/types/auth.ts`).
+    - `laravel-vue-i18n` `trans()` replacement values should be passed as strings to satisfy TS typings.
 - Inertia app structure:
     - Pages in `resources/js/pages`.
     - Reuse existing components/composables before creating new ones.
+    - Shared page/module types should be centralized under `resources/js/types` and re-exported via `resources/js/types/index.ts`.
+    - UI-level shared types (including module card config shapes) live in `resources/js/types/ui.ts`.
 - Sidebar navigation convention:
     - `NavMain.vue` uses optional `groupLabel` prop (no hardcoded group text in component).
     - Navigation group container should not render when `items` is empty.
@@ -26,3 +29,5 @@
     - Feature tests use `RefreshDatabase` via `tests/Pest.php`.
 - Settings forms convention: `Profile`, `Password`, `TwoFactor`, and related Two-Factor modal/recovery components use typed `useForm` + `form.submit(wayfinderRoute())`.
 - Settings localization convention: use `trans()` with split PHP language files (`lang/en/profile.php`, `lang/en/password.php`, `lang/en/two_factor.php`).
+- Generic/shared button labels should prefer `app.button.*` keys (for example `app.button.create`) over feature-specific keys when text is reusable.
+- Datatable/UI localization convention: UI table keys use `lang/en/ui.php` under `ui.datatable`, `ui.datatable_actions`, and `ui.common`.

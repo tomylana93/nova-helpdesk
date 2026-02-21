@@ -9,6 +9,9 @@
     - `/` -> redirects to `/login`
     - `/dashboard` -> Inertia page `Dashboard` (auth + verified)
     - account/settings-related endpoints are at root paths: `/profile`, `/password`, `/two-factor`.
+    - master module routes under `/master` with `master.*` names (`master.index`, `master.users.index`).
+- `master.index` now renders Inertia page `master/Index` as a hub page with module cards configured from a local array (currently includes Users) linking to `/master/users`.
+- Sidebar main navigation includes a `Master` item that links to `master.index`.
 - High-level structure:
     - `app/` domain logic, controllers, models, actions.
     - `routes/` web/console routes (`settings` routes are consolidated in `routes/web.php`), plus breadcrumb definitions in `routes/breadcrumbs.php`.
@@ -16,3 +19,16 @@
     - `resources/js/` Inertia app: `pages`, `components`, `layouts`, `actions`, `routes`, `composables`.
     - `tests/Feature`, `tests/Unit`.
     - tooling config in `composer.json`, `package.json`, `pint.json`, `eslint.config.js`, `.prettierrc`.
+- Current module placement convention in this repo:
+    - user listing table class is under `app/Tables/Master/UserTable.php` (`App\Tables\Master`).
+    - user table resource is under `app/Http/Resources/Master/Users/UserTableResource.php` (`App\Http\Resources\Master\Users`).
+- Master users CRU flow:
+    - backend `UserController` uses FormRequest + Action pattern for `store` and `update`.
+    - `UserController@edit` returns user payload via `App\Http\Resources\Master\Users\UserResource`.
+    - reusable validation rules for users are centralized in `app/Concerns/UserValidationRules.php`.
+    - frontend pages are `resources/js/pages/master/users/Index.vue`, `resources/js/pages/master/users/Create.vue`, and `resources/js/pages/master/users/Edit.vue`.
+    - create/edit pages use the standard `ContentWrapper` form layout with shared `app.button.*` labels.
+    - scope intentionally excludes `show` and `destroy` (resource route only `index/create/store/edit/update`).
+    - create flow sets `status` to active in action (create form has no status field).
+    - update flow allows `status` change, does not update password, and does not reset `email_verified_at`.
+    - breadcrumbs include `master.users.create` and `master.users.edit`.

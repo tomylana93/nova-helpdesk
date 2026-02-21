@@ -2,6 +2,6 @@
 
 return [
     'main_group' => [
-        'platform' => 'Platform',
+        'master' => 'Master Data',
     ],
 ];

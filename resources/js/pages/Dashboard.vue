@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+
 import AppLayout from '@/layouts/AppLayout.vue';
+
 import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 </script>
 

@@ -3,6 +3,7 @@ import { trans } from 'laravel-vue-i18n';
 import { Check, Monitor, Moon, Sun } from 'lucide-vue-next';
 import type { AcceptableValue } from 'reka-ui';
 import { computed } from 'vue';
+
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
