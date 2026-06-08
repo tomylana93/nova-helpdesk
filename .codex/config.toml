@@ -1,0 +1,16 @@
+[mcp_servers.serena]
+command = "serena"
+args = ["start-mcp-server", "--context=codex", "--project-from-cwd"]
+
+[mcp_servers.shadcn_vue]
+command = "pnpm"
+args = ["dlx", "shadcn-vue@latest", "mcp"]
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
+env_vars = ["DISPLAY"]
+
+[mcp_servers.laravel-boost]
+command = "php"
+args = ["artisan", "boost:mcp"]

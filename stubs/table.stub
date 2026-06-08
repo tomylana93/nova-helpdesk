@@ -1,0 +1,32 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Tables\AbstractTable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use LogicException;
+
+/**
+ * @extends AbstractTable<Model>
+ */
+class {{ class }} extends AbstractTable
+{
+    /**
+     * @return Builder<Model>
+     */
+    protected function query(): Builder
+    {
+        throw new LogicException('Implement the query() method.');
+    }
+
+    /**
+     * @param  LengthAwarePaginator<int, Model>  $paginator
+     * @return list<array<string, mixed>>
+     */
+    protected function rows(LengthAwarePaginator $paginator): array
+    {
+        return [];
+    }
+}

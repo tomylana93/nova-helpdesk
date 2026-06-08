@@ -1,0 +1,13 @@
+packages:
+  - '.'
+
+publicHoistPattern:
+  - '@inertiajs/core'
+
+ignoredBuiltDependencies:
+  - unrs-resolver
+  - vue-demi
+
+allowBuilds:
+  unrs-resolver: false
+  vue-demi: false

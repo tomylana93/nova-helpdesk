@@ -1,0 +1,41 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "mcp": {
+        "laravel-boost": {
+            "type": "local",
+            "enabled": true,
+            "command": [
+                "php",
+                "artisan",
+                "boost:mcp"
+            ]
+        },
+        "serena": {
+            "type": "local",
+            "enabled": true,
+            "command": [
+                "serena",
+                "start-mcp-server",
+                "--context=ide"
+            ]
+        },
+        "shadcn-vue": {
+            "type": "local",
+            "enabled": true,
+            "command": [
+                "pnpm",
+                "dlx",
+                "shadcn-vue@latest",
+                "mcp"
+            ]
+        },
+        "playwright": {
+            "type": "local",
+            "enabled": true,
+            "command": [
+                "npx",
+                "@playwright/mcp@latest"
+            ]
+        }
+    }
+}

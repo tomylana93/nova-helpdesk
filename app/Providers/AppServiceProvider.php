@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Providers;
+
+use App\Enums\UserRole;
+use App\Models\User;
+use App\Policies\AdminSettingsPolicy;
+use App\Settings\GeneralSettings;
+use App\Settings\PasswordSettings;
+use App\Settings\StyleSettings;
+use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        $this->configureDefaults();
+    }
+
+    /**
+     * Configure default behaviors for production-ready applications.
+     */
+    protected function configureDefaults(): void
+    {
+        Date::use(CarbonImmutable::class);
+
+        DB::prohibitDestructiveCommands(
+            app()->isProduction(),
+        );
+
+        Password::defaults(fn (): ?Password => app()->isProduction()
+            ? Password::min(12)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()
+                ->uncompromised()
+            : null,
+        );
+
+        Gate::before(static fn (User $user): ?bool => $user->hasRole(UserRole::SuperAdmin) ? true : null);
+
+        Gate::policy(GeneralSettings::class, AdminSettingsPolicy::class);
+        Gate::policy(StyleSettings::class, AdminSettingsPolicy::class);
+        Gate::policy(PasswordSettings::class, AdminSettingsPolicy::class);
+
+        RateLimiter::for('temporary-uploads', static function (Request $request): array {
+            $key = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+            return [
+                Limit::perMinute(20)->by('temporary-uploads:minute:'.$key),
+                Limit::perHour(100)->by('temporary-uploads:hour:'.$key),
+            ];
+        });
+    }
+}
