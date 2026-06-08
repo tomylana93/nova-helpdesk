@@ -13,9 +13,5 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         throw_if(app()->isProduction(), LogicException::class, 'DatabaseSeeder cannot be run in the production environment.');
-
-        $this->call([
-            UserSeeder::class,
-        ]);
     }
 }

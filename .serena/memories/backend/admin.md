@@ -16,5 +16,4 @@
 - Frontend auth UI should use shared `auth.abilities` booleans (`manage_settings`, `view_users`, `create_users`, `update_users`) from `HandleInertiaRequests` to hide admin navigation/cards/actions, but backend policy checks remain authoritative.
 - `app/Tables/MasterData/UserTable` eager-loads user roles and returns `role` + `roleLabel` in row payloads; the admin users index renders a dedicated Role column.
 - `app/Http/Resources/UserResource.php` centralizes user payload shaping for show/edit pages and includes the single active role string under `role`.
-- `database/seeders/UserSeeder.php` seeds three sample users (`active`, `disabled`, `suspended`) and assigns stable example roles (`admin`, `dispatcher`, `compliance_officer`).
 - Style enums: `SiteTheme`, `SiteFont`, `SiteLayout`, `SiteAuthLayout`, `SiteLogoStyle`.
