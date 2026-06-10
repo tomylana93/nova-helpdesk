@@ -49,7 +49,7 @@ return [
             'branch' => 'Select branch (optional)',
             'department' => 'Select department (optional)',
             'queue' => 'Select queue (optional)',
-            'category' => 'Select category (optional)',
+            'category' => 'Select category',
             'assignee' => 'Select assignee (optional)',
         ],
         'action' => [

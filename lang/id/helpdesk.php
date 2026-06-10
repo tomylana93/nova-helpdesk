@@ -49,7 +49,7 @@ return [
             'branch' => 'Pilih cabang (opsional)',
             'department' => 'Pilih departemen (opsional)',
             'queue' => 'Pilih antrean (opsional)',
-            'category' => 'Pilih kategori (opsional)',
+            'category' => 'Pilih kategori',
             'assignee' => 'Pilih petugas (opsional)',
         ],
         'action' => [
