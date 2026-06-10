@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "php",
+      "args": [
+        "/home/tomylana93/projects/nova-helpdesk/artisan",
+        "boost:mcp"
+      ]
+    }
+  }
+}
