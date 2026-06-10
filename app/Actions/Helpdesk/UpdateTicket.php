@@ -5,6 +5,7 @@ namespace App\Actions\Helpdesk;
 use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Notifications\TicketNotification;
 
 class UpdateTicket
 {
@@ -35,12 +36,31 @@ class UpdateTicket
                 'from' => $oldStatus,
                 'to' => $data['status'],
             ]);
+
+            // Notify requester of status change
+            $ticket->requester->notify(new TicketNotification(
+                $ticket,
+                'status_changed',
+                "Your ticket {$ticket->ticket_number} status has been changed to {$ticket->status->label()}."
+            ));
         }
 
         if (isset($data['assigned_to']) && $data['assigned_to'] !== $oldAssignee) {
             $this->recordActivity->handle($ticket, 'assigned', $actor, [
                 'assigned_to' => $data['assigned_to'],
             ]);
+
+            // Notify newly assigned agent
+            if (! empty($data['assigned_to'])) {
+                $newAssignee = User::query()->find($data['assigned_to']);
+                if ($newAssignee) {
+                    $newAssignee->notify(new TicketNotification(
+                        $ticket,
+                        'assigned',
+                        "Ticket {$ticket->ticket_number} has been assigned to you."
+                    ));
+                }
+            }
         }
     }
 }

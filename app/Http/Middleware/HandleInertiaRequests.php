@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\AdminPermission;
 use App\Enums\SiteFont;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Settings\GeneralSettings;
 use App\Settings\StyleSettings;
@@ -51,8 +52,19 @@ class HandleInertiaRequests extends Middleware
             'name' => $generalSettings->site_name,
             'locale' => app()->getLocale(),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? new UserResource($request->user())->resolve($request) : null,
                 'abilities' => $this->abilities($request->user()),
+                'unreadNotificationsCount' => $request->user()?->unreadNotifications()->count() ?? 0,
+                'notifications' => $request->user()
+                    ? $request->user()->unreadNotifications()->latest()->take(5)->get()->map(fn ($n): array => [
+                        'id' => $n->id,
+                        'type' => $n->data['type'] ?? 'info',
+                        'ticket_id' => $n->data['ticket_id'] ?? null,
+                        'ticket_number' => $n->data['ticket_number'] ?? null,
+                        'subject' => $n->data['subject'] ?? null,
+                        'message' => $n->data['message'] ?? '',
+                        'created_at' => $n->created_at?->toJSON(),
+                    ])->all() : [],
             ],
             'style' => [
                 ...$styleSettings->toArray(),

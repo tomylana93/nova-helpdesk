@@ -15,7 +15,7 @@ class TicketApprovalController extends Controller
 {
     public function approve(Request $request, Ticket $ticket, ApproveTicket $approveTicket): RedirectResponse
     {
-        $this->authorize('update', $ticket);
+        $this->authorize('approve', $ticket);
 
         abort_unless($ticket->status === TicketStatus::WaitingForApproval, 422, 'Ticket is not pending approval.');
 
@@ -32,7 +32,7 @@ class TicketApprovalController extends Controller
 
     public function reject(Request $request, Ticket $ticket, RejectTicket $rejectTicket): RedirectResponse
     {
-        $this->authorize('update', $ticket);
+        $this->authorize('approve', $ticket);
 
         abort_unless($ticket->status === TicketStatus::WaitingForApproval, 422, 'Ticket is not pending approval.');
 

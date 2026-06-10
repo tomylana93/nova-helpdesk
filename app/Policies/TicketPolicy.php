@@ -40,4 +40,9 @@ class TicketPolicy
     {
         return $user->can(AdminPermission::UpdateTickets->value);
     }
+
+    public function approve(User $user, Ticket $ticket): bool
+    {
+        return $user->can(AdminPermission::ManageApprovals->value);
+    }
 }

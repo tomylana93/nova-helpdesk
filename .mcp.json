@@ -6,6 +6,14 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "shadcnVue": {
+            "command": "pnpm",
+            "args": [
+                "dlx",
+                "shadcn-vue@latest",
+                "mcp"
+            ]
         }
     }
 }

@@ -1,10 +1,13 @@
 <?php
 
 use App\Enums\AdminPermission;
+use App\Enums\GeneralStatus;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
 use App\Enums\UserRole;
+use App\Models\Branch;
+use App\Models\Department;
 use App\Models\Ticket;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
@@ -227,4 +230,96 @@ test('agent can reject a waiting_for_approval ticket', function (): void {
     $ticket->refresh();
     expect($ticket->status)->toBe(TicketStatus::Closed);
     expect($ticket->approval?->status)->toBe('rejected');
+});
+
+test('user without manage approvals permission cannot approve or reject a ticket', function (): void {
+    $userWithoutPerm = createRequesterUser();
+    $ticket = Ticket::factory()->create(['status' => TicketStatus::WaitingForApproval]);
+
+    $this
+        ->actingAs($userWithoutPerm)
+        ->post(route('tickets.approve', $ticket), ['decision_note' => 'Looks good'])
+        ->assertStatus(403);
+
+    $this
+        ->actingAs($userWithoutPerm)
+        ->post(route('tickets.reject', $ticket), ['decision_note' => 'Not justified'])
+        ->assertStatus(403);
+});
+
+test('non-agent cannot post internal comment', function (): void {
+    $requester = createRequesterUser();
+    $ticket = Ticket::factory()->create(['requester_id' => $requester->id]);
+
+    $this
+        ->actingAs($requester)
+        ->post(route('tickets.comments.store', $ticket), [
+            'body' => 'Internal note.',
+            'visibility' => 'internal',
+        ])
+        ->assertSessionHasErrors(['visibility']);
+});
+
+test('cannot assign ticket to non-agent user', function (): void {
+    $agent = createAgentUser();
+    $ticket = Ticket::factory()->create();
+    $nonAgent = createRequesterUser();
+
+    $this
+        ->actingAs($agent)
+        ->patch(route('tickets.update', $ticket), [
+            'subject' => 'Updated Subject',
+            'description' => 'Updated Desc',
+            'status' => TicketStatus::InProgress->value,
+            'priority' => TicketPriority::High->value,
+            'assigned_to' => $nonAgent->id,
+        ])
+        ->assertSessionHasErrors(['assigned_to']);
+});
+
+test('cannot create ticket with mismatched department and branch', function (): void {
+    $requester = createRequesterUser();
+    $branchA = Branch::factory()->create();
+    $branchB = Branch::factory()->create();
+    $departmentOfB = Department::factory()->create(['branch_id' => $branchB->id]);
+
+    $this
+        ->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Test',
+            'description' => 'Test',
+            'priority' => TicketPriority::Low->value,
+            'branch_id' => $branchA->id,
+            'department_id' => $departmentOfB->id,
+        ])
+        ->assertSessionHasErrors(['department_id']);
+});
+
+test('cannot create ticket with inactive branch or department', function (): void {
+    $requester = createRequesterUser();
+    $inactiveBranch = Branch::factory()->create(['status' => GeneralStatus::Inactive->value]);
+    $inactiveDepartment = Department::factory()->create(['status' => GeneralStatus::Inactive->value]);
+
+    $this
+        ->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Test',
+            'description' => 'Test',
+            'priority' => TicketPriority::Low->value,
+            'branch_id' => $inactiveBranch->id,
+        ])
+        ->assertSessionHasErrors(['branch_id']);
+
+    $this
+        ->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Test',
+            'description' => 'Test',
+            'priority' => TicketPriority::Low->value,
+            'department_id' => $inactiveDepartment->id,
+        ])
+        ->assertSessionHasErrors(['department_id']);
 });
