@@ -2,6 +2,12 @@
 
 return [
     'settings' => [
+        'title' => 'Pengaturan',
+        'heading' => 'Pengaturan',
+        'description' => 'Kelola pengaturan Anda di sini.',
+        'action' => [
+            'open' => 'Buka pengaturan',
+        ],
         'general' => [
             'title' => 'Pengaturan Umum',
             'heading' => 'Pengaturan Umum',
