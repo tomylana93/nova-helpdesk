@@ -13,6 +13,7 @@ return [
         'all_roles' => 'Semua peran',
         'all_statuses' => 'Semua status',
         'all_branches' => 'Semua cabang',
+        'all_parents' => 'Semua kategori induk',
         'columns' => 'Kolom',
         'rows' => 'Baris per halaman',
     ],
