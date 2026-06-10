@@ -12,6 +12,7 @@ return [
     'label' => [
         'all_roles' => 'Semua peran',
         'all_statuses' => 'Semua status',
+        'all_branches' => 'Semua cabang',
         'columns' => 'Kolom',
         'rows' => 'Baris per halaman',
     ],

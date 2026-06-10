@@ -51,7 +51,7 @@ expect()->extend('toBeOne', function () {
 
 function grantAdminPermissions(User $user): User
 {
-    $role = Role::findOrCreate(UserRole::Admin->value, 'web');
+    $role = Role::findOrCreate(UserRole::SuperAdmin->value, 'web');
 
     $permissions = array_map(
         static fn (AdminPermission $permission): string => $permission->value,

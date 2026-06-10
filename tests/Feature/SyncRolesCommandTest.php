@@ -8,8 +8,8 @@ use Spatie\Permission\Models\Role;
 test('it syncs all application roles from the enum', function (): void {
     $this->artisan('permission:sync-roles')
         ->expectsOutputToContain(UserRole::SuperAdmin->value)
-        ->expectsOutputToContain(UserRole::Admin->value)
-        ->expectsOutputToContain(UserRole::ComplianceOfficer->value)
+        ->expectsOutputToContain(UserRole::ItAgent->value)
+        ->expectsOutputToContain(UserRole::Requester->value)
         ->expectsOutputToContain(AdminPermission::ManageSettings->value)
         ->assertSuccessful();
 
@@ -17,7 +17,7 @@ test('it syncs all application roles from the enum', function (): void {
         ->toBe(count(UserRole::cases()))
         ->and(Permission::query()->where('guard_name', 'web')->count())
         ->toBe(count(AdminPermission::cases()))
-        ->and(Role::findByName(UserRole::Admin->value, 'web')->getPermissionNames()->all())
+        ->and(Role::findByName(UserRole::SuperAdmin->value, 'web')->getPermissionNames()->all())
         ->toBe(array_map(
             static fn (AdminPermission $permission): string => $permission->value,
             AdminPermission::cases(),
@@ -35,9 +35,9 @@ test('it is safe to rerun the sync roles command', function (): void {
         ->toBe(count(UserRole::cases()));
 });
 
-test('user role labels stay in english for indonesian locale', function (): void {
+test('user role labels translate correctly for indonesian locale', function (): void {
     app()->setLocale('id');
 
-    expect(UserRole::Dispatcher->label())->toBe('Dispatcher');
-    expect(UserRole::WarehouseSupervisor->label())->toBe('Warehouse Supervisor');
+    expect(UserRole::ItAgent->label())->toBe('Agen IT');
+    expect(UserRole::Requester->label())->toBe('Pemohon');
 });

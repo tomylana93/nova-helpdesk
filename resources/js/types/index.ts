@@ -4,3 +4,7 @@ export * from './ui';
 export * from './settings';
 export * from './datatable';
 export * from './user';
+export * from './branch';
+export * from './department';
+export * from './queue';
+export * from './ticket-category';

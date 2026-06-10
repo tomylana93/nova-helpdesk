@@ -175,12 +175,16 @@ return [
                 'email' => 'Email',
                 'status' => 'Status',
                 'role' => 'Role',
+                'branch' => 'Branch',
+                'department' => 'Department',
             ],
             'placeholder' => [
                 'name' => 'Enter full name',
                 'email' => 'Enter email address',
                 'status' => 'Select status',
                 'role' => 'Select role',
+                'branch' => 'Select branch',
+                'department' => 'Select department',
             ],
             'action' => [
                 'create' => 'Create User',
@@ -197,6 +201,190 @@ return [
                 'updated' => [
                     'success' => 'User updated successfully.',
                     'error' => 'Failed to update user. Please try again.',
+                ],
+            ],
+        ],
+        'branch' => [
+            'index' => [
+                'title' => 'Branches',
+                'heading' => 'Branch Management',
+                'description' => 'Manage company branches.',
+            ],
+            'create' => [
+                'title' => 'Create Branch',
+                'heading' => 'Create New Branch',
+                'description' => 'Add a new branch to the system.',
+            ],
+            'show' => [
+                'title' => 'Branch Detail',
+                'heading' => 'Branch Detail',
+                'description' => 'View branch information.',
+            ],
+            'edit' => [
+                'title' => 'Edit Branch',
+                'heading' => 'Edit Branch',
+                'description' => 'Update branch information.',
+            ],
+            'label' => [
+                'code' => 'Code',
+                'name' => 'Name',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'code' => 'Enter branch code (e.g. BR-HO)',
+                'name' => 'Enter branch name',
+                'status' => 'Select status',
+            ],
+            'action' => [
+                'create' => 'Create Branch',
+                'update' => 'Update Branch',
+                'back' => 'Back to Branches',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Branch created successfully.',
+                ],
+                'updated' => [
+                    'success' => 'Branch updated successfully.',
+                ],
+            ],
+        ],
+        'department' => [
+            'index' => [
+                'title' => 'Departments',
+                'heading' => 'Department Management',
+                'description' => 'Manage branch departments.',
+            ],
+            'create' => [
+                'title' => 'Create Department',
+                'heading' => 'Create New Department',
+                'description' => 'Add a new department to the system.',
+            ],
+            'show' => [
+                'title' => 'Department Detail',
+                'heading' => 'Department Detail',
+                'description' => 'View department information.',
+            ],
+            'edit' => [
+                'title' => 'Edit Department',
+                'heading' => 'Edit Department',
+                'description' => 'Update department information.',
+            ],
+            'label' => [
+                'branch' => 'Branch',
+                'code' => 'Code',
+                'name' => 'Name',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'branch' => 'Select branch',
+                'code' => 'Enter department code (e.g. DEPT-IT)',
+                'name' => 'Enter department name',
+                'status' => 'Select status',
+            ],
+            'action' => [
+                'create' => 'Create Department',
+                'update' => 'Update Department',
+                'back' => 'Back to Departments',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Department created successfully.',
+                ],
+                'updated' => [
+                    'success' => 'Department updated successfully.',
+                ],
+            ],
+        ],
+        'queue' => [
+            'index' => [
+                'title' => 'Queues',
+                'heading' => 'Queue Management',
+                'description' => 'Manage ticket queues.',
+            ],
+            'create' => [
+                'title' => 'Create Queue',
+                'heading' => 'Create New Queue',
+                'description' => 'Add a new ticket queue.',
+            ],
+            'show' => [
+                'title' => 'Queue Detail',
+                'heading' => 'Queue Detail',
+                'description' => 'View queue details.',
+            ],
+            'edit' => [
+                'title' => 'Edit Queue',
+                'heading' => 'Edit Queue',
+                'description' => 'Update queue details.',
+            ],
+            'label' => [
+                'name' => 'Name',
+                'description' => 'Description',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'name' => 'Enter queue name',
+                'description' => 'Enter queue description',
+                'status' => 'Select status',
+            ],
+            'action' => [
+                'create' => 'Create Queue',
+                'update' => 'Update Queue',
+                'back' => 'Back to Queues',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Queue created successfully.',
+                ],
+                'updated' => [
+                    'success' => 'Queue updated successfully.',
+                ],
+            ],
+        ],
+        'ticket_category' => [
+            'index' => [
+                'title' => 'Ticket Categories',
+                'heading' => 'Ticket Category Management',
+                'description' => 'Manage ticket categories and subcategories.',
+            ],
+            'create' => [
+                'title' => 'Create Category',
+                'heading' => 'Create New Category',
+                'description' => 'Add a new ticket category or subcategory.',
+            ],
+            'show' => [
+                'title' => 'Category Detail',
+                'heading' => 'Category Detail',
+                'description' => 'View category details.',
+            ],
+            'edit' => [
+                'title' => 'Edit Category',
+                'heading' => 'Edit Category',
+                'description' => 'Update category details.',
+            ],
+            'label' => [
+                'parent' => 'Parent Category',
+                'name' => 'Name',
+                'description' => 'Description',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'parent' => 'Select parent category (optional)',
+                'name' => 'Enter category name',
+                'description' => 'Enter category description',
+                'status' => 'Select status',
+            ],
+            'action' => [
+                'create' => 'Create Category',
+                'update' => 'Update Category',
+                'back' => 'Back to Categories',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Category created successfully.',
+                ],
+                'updated' => [
+                    'success' => 'Category updated successfully.',
                 ],
             ],
         ],

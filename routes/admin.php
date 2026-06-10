@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\MasterData\BranchController;
+use App\Http\Controllers\Admin\MasterData\DepartmentController;
+use App\Http\Controllers\Admin\MasterData\QueueController;
+use App\Http\Controllers\Admin\MasterData\TicketCategoryController;
 use App\Http\Controllers\Admin\MasterData\UserController;
 use App\Http\Controllers\Admin\Settings\GeneralSettingsController;
 use App\Http\Controllers\Admin\Settings\PasswordSettingsController;
@@ -31,6 +35,18 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
     Route::prefix('master-data')->name('master-data.')->group(function () {
         Route::inertia('/', 'admin/master-data/Index')->can('viewAny', User::class)->name('index');
         Route::resource('users', UserController::class)->only([
+            'index', 'create', 'store', 'show', 'edit', 'update',
+        ]);
+        Route::resource('branches', BranchController::class)->only([
+            'index', 'create', 'store', 'show', 'edit', 'update',
+        ]);
+        Route::resource('departments', DepartmentController::class)->only([
+            'index', 'create', 'store', 'show', 'edit', 'update',
+        ]);
+        Route::resource('queues', QueueController::class)->only([
+            'index', 'create', 'store', 'show', 'edit', 'update',
+        ]);
+        Route::resource('ticket-categories', TicketCategoryController::class)->only([
             'index', 'create', 'store', 'show', 'edit', 'update',
         ]);
     });

@@ -12,6 +12,7 @@ return [
     'label' => [
         'all_roles' => 'All roles',
         'all_statuses' => 'All statuses',
+        'all_branches' => 'All branches',
         'columns' => 'Columns',
         'rows' => 'Rows per page',
     ],

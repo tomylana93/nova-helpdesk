@@ -37,6 +37,8 @@ class StoreUserRequest extends FormRequest
                 Rule::exists(config('permission.table_names.roles'), 'name')
                     ->where('guard_name', 'web'),
             ],
+            'branch_id' => ['required', 'exists:branches,id'],
+            'department_id' => ['nullable', 'exists:departments,id'],
         ];
     }
 }

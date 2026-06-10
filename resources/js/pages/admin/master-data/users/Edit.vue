@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
+import { computed, watch } from 'vue';
 import { update } from '@/actions/App/Http/Controllers/Admin/MasterData/UserController';
 import InputError from '@/components/InputError.vue';
 import PageWrapper from '@/components/PageWrapper.vue';
@@ -21,9 +22,11 @@ import { edit, index } from '@/routes/admin/master-data/users';
 import type { SelectOption, User, UserRoleName } from '@/types';
 
 type Props = {
-    user: User;
+    user: User & { branch_id?: string | null; department_id?: string | null };
     userRoleOptions: SelectOption[];
     userStatusOptions: SelectOption[];
+    branchOptions: SelectOption[];
+    departmentOptions: (SelectOption & { branchId: string })[];
 };
 
 type EditUserFormData = {
@@ -31,6 +34,8 @@ type EditUserFormData = {
     email: string;
     status: User['status'];
     role: UserRoleName | '';
+    branch_id: string;
+    department_id: string;
 };
 
 const props = defineProps<Props>();
@@ -44,7 +49,33 @@ const form = useForm<EditUserFormData>({
     email: props.user.email,
     status: props.user.status,
     role: props.user.role ?? '',
+    branch_id: props.user.branch_id ?? '',
+    department_id: props.user.department_id ?? '',
 });
+
+const filteredDepartmentOptions = computed(() => {
+    if (!form.branch_id) {
+        return [];
+    }
+
+    return props.departmentOptions.filter(
+        (option) => option.branchId === form.branch_id,
+    );
+});
+
+watch(
+    () => form.branch_id,
+    (newBranchId) => {
+        // Only reset if branch changes and selected department doesn't belong to new branch
+        const matches = props.departmentOptions.find(
+            (d) => d.value === form.department_id && d.branchId === newBranchId,
+        );
+
+        if (!matches) {
+            form.department_id = '';
+        }
+    },
+);
 
 function submit(): void {
     form.submit(update(props.user.id));
@@ -97,7 +128,7 @@ setLayoutProps({
                     :placeholder="
                         trans('admin.master_data.user.placeholder.name')
                     "
-                    :arials-invalid="!!form.errors.name"
+                    :aria-invalid="!!form.errors.name"
                 />
                 <InputError :message="form.errors.name" />
             </div>
@@ -147,7 +178,7 @@ setLayoutProps({
                 <InputError :message="form.errors.role" />
             </div>
             <div class="grid gap-2">
-                <Label for="email">{{
+                <Label for="status">{{
                     trans('admin.master_data.user.label.status')
                 }}</Label>
                 <Select
@@ -176,6 +207,69 @@ setLayoutProps({
                     </SelectContent>
                 </Select>
                 <InputError :message="form.errors.status" />
+            </div>
+            <div class="grid gap-2">
+                <Label for="branch_id">{{
+                    trans('admin.master_data.user.label.branch')
+                }}</Label>
+                <Select
+                    id="branch_id"
+                    v-model="form.branch_id"
+                    name="branch_id"
+                    :aria-invalid="!!form.errors.branch_id"
+                >
+                    <SelectTrigger class="w-full">
+                        <SelectValue
+                            :placeholder="
+                                trans(
+                                    'admin.master_data.user.placeholder.branch',
+                                )
+                            "
+                        />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            v-for="option in props.branchOptions"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <InputError :message="form.errors.branch_id" />
+            </div>
+            <div class="grid gap-2">
+                <Label for="department_id">{{
+                    trans('admin.master_data.user.label.department')
+                }}</Label>
+                <Select
+                    id="department_id"
+                    v-model="form.department_id"
+                    name="department_id"
+                    :disabled="!form.branch_id"
+                    :aria-invalid="!!form.errors.department_id"
+                >
+                    <SelectTrigger class="w-full">
+                        <SelectValue
+                            :placeholder="
+                                trans(
+                                    'admin.master_data.user.placeholder.department',
+                                )
+                            "
+                        />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            v-for="option in filteredDepartmentOptions"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <InputError :message="form.errors.department_id" />
             </div>
             <div
                 class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"

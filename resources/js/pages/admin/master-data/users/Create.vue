@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
+import { computed, watch } from 'vue';
 import { store } from '@/actions/App/Http/Controllers/Admin/MasterData/UserController';
 import InputError from '@/components/InputError.vue';
 import PageWrapper from '@/components/PageWrapper.vue';
@@ -22,12 +23,16 @@ import type { SelectOption, UserRoleName } from '@/types';
 
 type Props = {
     userRoleOptions: SelectOption[];
+    branchOptions: SelectOption[];
+    departmentOptions: (SelectOption & { branchId: string })[];
 };
 
 type CreateUserFormData = {
     name: string;
     email: string;
     role: UserRoleName | '';
+    branch_id: string;
+    department_id: string;
 };
 
 const props = defineProps<Props>();
@@ -40,7 +45,26 @@ const form = useForm<CreateUserFormData>({
     name: '',
     email: '',
     role: '',
+    branch_id: '',
+    department_id: '',
 });
+
+const filteredDepartmentOptions = computed(() => {
+    if (!form.branch_id) {
+        return [];
+    }
+
+    return props.departmentOptions.filter(
+        (option) => option.branchId === form.branch_id,
+    );
+});
+
+watch(
+    () => form.branch_id,
+    () => {
+        form.department_id = '';
+    },
+);
 
 function submit(): void {
     form.submit(store());
@@ -139,6 +163,69 @@ setLayoutProps({
                     </SelectContent>
                 </Select>
                 <InputError :message="form.errors.role" />
+            </div>
+            <div class="grid gap-2">
+                <Label for="branch_id">{{
+                    trans('admin.master_data.user.label.branch')
+                }}</Label>
+                <Select
+                    id="branch_id"
+                    v-model="form.branch_id"
+                    name="branch_id"
+                    :aria-invalid="!!form.errors.branch_id"
+                >
+                    <SelectTrigger class="w-full">
+                        <SelectValue
+                            :placeholder="
+                                trans(
+                                    'admin.master_data.user.placeholder.branch',
+                                )
+                            "
+                        />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            v-for="option in props.branchOptions"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <InputError :message="form.errors.branch_id" />
+            </div>
+            <div class="grid gap-2">
+                <Label for="department_id">{{
+                    trans('admin.master_data.user.label.department')
+                }}</Label>
+                <Select
+                    id="department_id"
+                    v-model="form.department_id"
+                    name="department_id"
+                    :disabled="!form.branch_id"
+                    :aria-invalid="!!form.errors.department_id"
+                >
+                    <SelectTrigger class="w-full">
+                        <SelectValue
+                            :placeholder="
+                                trans(
+                                    'admin.master_data.user.placeholder.department',
+                                )
+                            "
+                        />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem
+                            v-for="option in filteredDepartmentOptions"
+                            :key="option.value"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <InputError :message="form.errors.department_id" />
             </div>
             <div
                 class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"

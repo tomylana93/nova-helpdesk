@@ -74,6 +74,10 @@ class HandleInertiaRequests extends Middleware
                 'view_users' => false,
                 'create_users' => false,
                 'update_users' => false,
+                'manage_branches' => false,
+                'manage_departments' => false,
+                'manage_queues' => false,
+                'manage_categories' => false,
             ];
         }
 
@@ -82,6 +86,10 @@ class HandleInertiaRequests extends Middleware
             'view_users' => $user->can(AdminPermission::ViewUsers->value),
             'create_users' => $user->can(AdminPermission::CreateUsers->value),
             'update_users' => $user->can(AdminPermission::UpdateUsers->value),
+            'manage_branches' => $user->can(AdminPermission::ManageBranches->value),
+            'manage_departments' => $user->can(AdminPermission::ManageDepartments->value),
+            'manage_queues' => $user->can(AdminPermission::ManageQueues->value),
+            'manage_categories' => $user->can(AdminPermission::ManageCategories->value),
         ];
     }
 }

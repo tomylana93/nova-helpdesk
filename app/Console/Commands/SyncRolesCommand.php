@@ -62,11 +62,11 @@ class SyncRolesCommand extends Command
             AdminPermission::cases(),
         );
 
-        Role::findOrCreate(UserRole::Admin->value, 'web')
+        Role::findOrCreate(UserRole::SuperAdmin->value, 'web')
             ->syncPermissions($adminPermissions);
 
         foreach (UserRole::cases() as $role) {
-            if (in_array($role, [UserRole::SuperAdmin, UserRole::Admin], true)) {
+            if ($role === UserRole::SuperAdmin) {
                 continue;
             }
 

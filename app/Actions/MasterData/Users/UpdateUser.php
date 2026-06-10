@@ -14,6 +14,8 @@ class UpdateUser
                 'name' => $data['name'] ?? $user->name,
                 'email' => $data['email'] ?? $user->email,
                 'status' => $data['status'] ?? $user->status,
+                'branch_id' => $data['branch_id'] ?? $user->branch_id,
+                'department_id' => array_key_exists('department_id', $data) ? $data['department_id'] : $user->department_id,
             ])->save();
 
             $user->syncRoles([$data['role']]);

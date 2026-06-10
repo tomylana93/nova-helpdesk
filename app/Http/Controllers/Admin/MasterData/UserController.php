@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin\MasterData;
 
 use App\Actions\MasterData\Users\CreateUser;
 use App\Actions\MasterData\Users\UpdateUser;
+use App\Enums\GeneralStatus;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MasterData\StoreUserRequest;
 use App\Http\Requests\Admin\MasterData\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Branch;
+use App\Models\Department;
 use App\Models\User;
 use App\Tables\MasterData\UserTable;
 use Illuminate\Http\RedirectResponse;
@@ -31,8 +34,24 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
+        $branchOptions = Branch::query()
+            ->where('status', GeneralStatus::Active->value)
+            ->select(['id as value', 'name as label'])
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+
+        $departmentOptions = Department::query()
+            ->where('status', GeneralStatus::Active->value)
+            ->select(['id as value', 'branch_id as branchId', 'name as label'])
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+
         return Inertia::render('admin/master-data/users/Create', [
             'userRoleOptions' => UserRole::options(),
+            'branchOptions' => $branchOptions,
+            'departmentOptions' => $departmentOptions,
         ]);
     }
 
@@ -50,7 +69,7 @@ class UserController extends Controller
         $this->authorize('view', $user);
 
         return Inertia::render('admin/master-data/users/Show', [
-            'user' => UserResource::make($user)->resolve(),
+            'user' => UserResource::make($user->load(['branch', 'department']))->resolve(),
         ]);
     }
 
@@ -58,10 +77,26 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
+        $branchOptions = Branch::query()
+            ->where('status', GeneralStatus::Active->value)
+            ->select(['id as value', 'name as label'])
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+
+        $departmentOptions = Department::query()
+            ->where('status', GeneralStatus::Active->value)
+            ->select(['id as value', 'branch_id as branchId', 'name as label'])
+            ->orderBy('name')
+            ->get()
+            ->toArray();
+
         return Inertia::render('admin/master-data/users/Edit', [
             'user' => UserResource::make($user)->resolve(),
             'userRoleOptions' => UserRole::options(),
             'userStatusOptions' => UserStatus::options(),
+            'branchOptions' => $branchOptions,
+            'departmentOptions' => $departmentOptions,
         ]);
     }
 

@@ -1,19 +1,7 @@
 import type { BrandingAssets, SharedStyleSettings } from './settings';
 
 export type UserStatus = 'active' | 'disable' | 'suspend';
-export type UserRoleName =
-    | 'super_admin'
-    | 'admin'
-    | 'operations_manager'
-    | 'branch_manager'
-    | 'dispatcher'
-    | 'warehouse_supervisor'
-    | 'fleet_coordinator'
-    | 'procurement_officer'
-    | 'sales_executive'
-    | 'customer_service'
-    | 'finance_officer'
-    | 'compliance_officer';
+export type UserRoleName = 'super_admin' | 'it_agent' | 'requester';
 
 export type User = {
     id: string;
@@ -24,6 +12,10 @@ export type User = {
     roleLabel?: string | null;
     statusLabel?: string;
     avatar?: string;
+    branch_id?: string | null;
+    department_id?: string | null;
+    branchName?: string | null;
+    departmentName?: string | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
@@ -38,6 +30,10 @@ export type AuthAbilities = {
     view_users: boolean;
     create_users: boolean;
     update_users: boolean;
+    manage_branches: boolean;
+    manage_departments: boolean;
+    manage_queues: boolean;
+    manage_categories: boolean;
 };
 
 export type SharedPageProps = {
