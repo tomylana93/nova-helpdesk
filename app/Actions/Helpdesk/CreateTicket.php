@@ -51,13 +51,25 @@ class CreateTicket
         // 1. Notify Requester
         $requester->notify(new TicketNotification($ticket, 'created', "Your ticket {$ticket->ticket_number} has been created."));
 
-        // 2. Notify Assignee OR Broadcast to all agents
+        // 2. Notify Assignee OR fan out to all agents/super admins
         if (! empty($ticket->assigned_to)) {
             $assignee = User::query()->find($ticket->assigned_to);
             if ($assignee) {
                 $assignee->notify(new TicketNotification($ticket, 'assigned', "Ticket {$ticket->ticket_number} has been assigned to you."));
             }
         } else {
+            // Persist a notification for every agent/super admin so it survives reloads and
+            // appears in the bell, not just as a transient broadcast. Exclude the requester
+            // to avoid double-notifying an agent who created the ticket themselves.
+            $staff = User::query()
+                ->whereHas('roles', function ($query): void {
+                    $query->whereIn('name', [UserRole::ItAgent->value, UserRole::SuperAdmin->value]);
+                })
+                ->whereKeyNot($requester->id)
+                ->get();
+
+            Notification::send($staff, new TicketNotification($ticket, 'created_unassigned', "New unassigned ticket {$ticket->ticket_number} has been created."));
+
             event(new TicketCreated($ticket));
         }
 

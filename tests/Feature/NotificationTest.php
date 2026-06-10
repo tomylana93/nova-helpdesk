@@ -232,3 +232,94 @@ test('check-sla scheduled command checks warnings and breaches', function (): vo
     $this->artisan('helpdesk:check-sla')->assertSuccessful();
     Event::assertNotDispatched(SlaEscalated::class);
 });
+
+test('unassigned ticket creation notifies all agents and super admins', function (): void {
+    Notification::fake();
+
+    $requester = User::factory()->create();
+    $requester->syncRoles([UserRole::Requester->value]);
+
+    $agent = User::factory()->create();
+    $agent->syncRoles([UserRole::ItAgent->value]);
+
+    $admin = User::factory()->create();
+    $admin->syncRoles([UserRole::SuperAdmin->value]);
+
+    $branch = Branch::factory()->create();
+    $department = Department::factory()->create(['branch_id' => $branch->id]);
+    $category = TicketCategory::factory()->create();
+
+    $this->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Printer Jammed',
+            'description' => 'Help with printer please.',
+            'priority' => TicketPriority::Low->value,
+            'branch_id' => $branch->id,
+            'department_id' => $department->id,
+            'category_id' => $category->id,
+        ])
+        ->assertRedirect();
+
+    $ticket = Ticket::query()->latest()->first();
+
+    // Both staff members receive the persisted agent-facing notification.
+    foreach ([$agent, $admin] as $staff) {
+        Notification::assertSentTo($staff, TicketNotification::class, function ($notification) use ($ticket): bool {
+            return $notification->type === 'created_unassigned' && $notification->ticket->id === $ticket->id;
+        });
+    }
+
+    // Requester only receives their own "created" notification, not the agent fan-out.
+    Notification::assertSentToTimes($requester, TicketNotification::class, 1);
+    Notification::assertSentTo($requester, TicketNotification::class, function ($notification): bool {
+        return $notification->type === 'created';
+    });
+});
+
+test('agent who self-creates an unassigned ticket is not double notified', function (): void {
+    Notification::fake();
+
+    $agent = User::factory()->create();
+    $agent->syncRoles([UserRole::ItAgent->value]);
+
+    $branch = Branch::factory()->create();
+    $department = Department::factory()->create(['branch_id' => $branch->id]);
+    $category = TicketCategory::factory()->create();
+
+    $this->actingAs($agent)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Printer Jammed',
+            'description' => 'Help with printer please.',
+            'priority' => TicketPriority::Low->value,
+            'branch_id' => $branch->id,
+            'department_id' => $department->id,
+            'category_id' => $category->id,
+        ])
+        ->assertRedirect();
+
+    // The creating agent gets only the "created" notification, not the fan-out.
+    Notification::assertSentToTimes($agent, TicketNotification::class, 1);
+    Notification::assertSentTo($agent, TicketNotification::class, function ($notification): bool {
+        return $notification->type === 'created';
+    });
+});
+
+test('private notification channel only authorizes its owner', function (): void {
+    $userA = User::factory()->create();
+    $userB = User::factory()->create();
+
+    // Pull the registered authorization callback for the user notification channel.
+    // The HTTP /broadcasting/auth endpoint cannot be used here because the test suite
+    // runs on the "null" broadcaster, which bypasses channel authorization entirely.
+    $broadcaster = Broadcast::driver();
+    $channels = (new ReflectionClass($broadcaster))->getProperty('channels');
+    $channels->setAccessible(true);
+    $callback = $channels->getValue($broadcaster)['App.Models.User.{id}'];
+
+    // Owner is authorized for their own channel; another user is rejected.
+    // Guards against the UUID-to-int collapse bug where every id became 0.
+    expect($callback($userA, (string) $userA->id))->toBeTrue();
+    expect($callback($userA, (string) $userB->id))->toBeFalse();
+});

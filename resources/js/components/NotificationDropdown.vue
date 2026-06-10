@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
+import { useEcho, useEchoNotification } from '@laravel/echo-vue';
 import { Bell, CheckCheck, Inbox } from 'lucide-vue-next';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,13 +25,6 @@ interface EchoNotification {
     ticket_number?: string | null;
     subject?: string | null;
     message?: string;
-}
-
-interface TicketCreatedEvent {
-    ticket_id: string;
-    ticket_number: string;
-    subject: string;
-    message: string;
 }
 
 interface SlaEscalatedEvent {
@@ -85,102 +79,75 @@ const handleMarkAsRead = (id: string) => {
     );
 };
 
-onMounted(() => {
-    const user = page.props.auth.user;
+const user = page.props.auth.user;
 
-    if (user && window.Echo) {
-        // Listen to personal private notification channel
-        window.Echo.private(`App.Models.User.${user.id}`).notification(
-            (notification: EchoNotification) => {
-                unreadCount.value++;
+// Echo composables register their own mount/unmount lifecycle hooks and must be
+// called synchronously during setup. The auth state is stable for the lifetime
+// of this component, so the conditional calls below are safe.
+if (user) {
+    // Personal private notification channel.
+    useEchoNotification<EchoNotification>(
+        `App.Models.User.${user.id}`,
+        (notification) => {
+            unreadCount.value++;
 
-                const newItem: NotificationItem = {
-                    id: notification.id,
-                    type: notification.type || 'info',
-                    ticket_id: notification.ticket_id || null,
-                    ticket_number: notification.ticket_number || null,
-                    subject: notification.subject || null,
-                    message: notification.message || '',
-                    created_at: new Date().toISOString(),
-                };
+            const newItem: NotificationItem = {
+                id: notification.id,
+                type: notification.type || 'info',
+                ticket_id: notification.ticket_id || null,
+                ticket_number: notification.ticket_number || null,
+                subject: notification.subject || null,
+                message: notification.message || '',
+                created_at: new Date().toISOString(),
+            };
 
-                notificationsList.value = [
-                    newItem,
-                    ...notificationsList.value.slice(0, 4),
-                ];
+            notificationsList.value = [
+                newItem,
+                ...notificationsList.value.slice(0, 4),
+            ];
 
-                toast.info(notification.message || 'New notification', {
-                    description: notification.subject || undefined,
-                    action: notification.ticket_id
-                        ? {
-                              label: 'View Ticket',
-                              onClick: () => {
-                                  handleMarkAsRead(notification.id);
-                                  router.visit(
-                                      showTicketRoute(notification.ticket_id!),
-                                  );
-                              },
-                          }
-                        : undefined,
+            toast.info(notification.message || 'New notification', {
+                description: notification.subject || undefined,
+                action: notification.ticket_id
+                    ? {
+                          label: 'View Ticket',
+                          onClick: () => {
+                              handleMarkAsRead(notification.id);
+                              router.visit(
+                                  showTicketRoute(notification.ticket_id!),
+                              );
+                          },
+                      }
+                    : undefined,
+            });
+        },
+    );
+
+    // Shared agent channel for IT Agents and Super Admins.
+    // New unassigned tickets now arrive as a persisted notification on the user's
+    // personal channel (handled by useEchoNotification above), so we only listen
+    // here for SLA escalations, which are broadcast-only.
+    if (user.role === 'it_agent' || user.role === 'super_admin') {
+        useEcho<SlaEscalatedEvent>(
+            'helpdesk.agents',
+            '.App\\Events\\SlaEscalated',
+            (e) => {
+                const alertType =
+                    e.escalation_type === 'breached' ? 'error' : 'warning';
+
+                toast[alertType](`SLA Alert (${e.escalation_type})`, {
+                    description: `${e.ticket_number}: ${e.subject}`,
+                    action: {
+                        label: 'View',
+                        onClick: () => {
+                            router.visit(showTicketRoute(e.ticket_id));
+                        },
+                    },
                 });
             },
         );
-
-        // Listen to shared agent channel if IT Agent or Super Admin
-        const isAgent = user.role === 'it_agent' || user.role === 'super_admin';
-
-        if (isAgent) {
-            window.Echo.private('helpdesk.agents')
-                .listen(
-                    '.App\\Events\\TicketCreated',
-                    (e: TicketCreatedEvent) => {
-                        toast.info(
-                            `New Unassigned Ticket: ${e.ticket_number}`,
-                            {
-                                description: e.subject,
-                                action: {
-                                    label: 'View',
-                                    onClick: () => {
-                                        router.visit(
-                                            showTicketRoute(e.ticket_id),
-                                        );
-                                    },
-                                },
-                            },
-                        );
-                    },
-                )
-                .listen(
-                    '.App\\Events\\SlaEscalated',
-                    (e: SlaEscalatedEvent) => {
-                        const alertType =
-                            e.escalation_type === 'breached'
-                                ? 'error'
-                                : 'warning';
-
-                        toast[alertType](`SLA Alert (${e.escalation_type})`, {
-                            description: `${e.ticket_number}: ${e.subject}`,
-                            action: {
-                                label: 'View',
-                                onClick: () => {
-                                    router.visit(showTicketRoute(e.ticket_id));
-                                },
-                            },
-                        });
-                    },
-                );
-        }
     }
-});
-
-onUnmounted(() => {
-    const user = page.props.auth.user;
-
-    if (user && window.Echo) {
-        window.Echo.leave(`App.Models.User.${user.id}`);
-        window.Echo.leave('helpdesk.agents');
-    }
-});
+}
 </script>
 
 <template>
