@@ -8,8 +8,9 @@
       ]
     },
     "shadcnVue": {
-      "command": "npx",
+      "command": "pnpm",
       "args": [
+        "dlx",
         "shadcn-vue@latest",
         "mcp"
       ]
