@@ -8,6 +8,7 @@ use App\Enums\TicketType;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Ticket;
+use App\Models\TicketCategory;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -30,7 +31,7 @@ class TicketFactory extends Factory
             'requester_id' => User::factory(),
             'assigned_to' => null,
             'queue_id' => null,
-            'category_id' => null,
+            'category_id' => TicketCategory::factory(),
             'priority' => fake()->randomElement(TicketPriority::cases()),
             'status' => TicketStatus::New,
             'subject' => fake()->sentence(),

@@ -66,7 +66,7 @@ class UpdateTicketRequest extends FormRequest
                 Rule::exists('queues', 'id')->where('status', GeneralStatus::Active->value),
             ],
             'category_id' => [
-                'nullable',
+                'required',
                 Rule::exists('ticket_categories', 'id')->where('status', GeneralStatus::Active->value),
             ],
         ];

@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -27,7 +29,7 @@ type Props = {
     branchOptions: SelectOption[];
     departmentOptions: SelectOption[];
     queueOptions: SelectOption[];
-    categoryOptions: SelectOption[];
+    categoryOptions: { label: string; options: SelectOption[] }[];
     agentOptions: SelectOption[];
 };
 
@@ -264,13 +266,19 @@ setLayoutProps({
                             />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem
-                                v-for="option in props.categoryOptions"
-                                :key="option.value"
-                                :value="option.value"
+                            <SelectGroup
+                                v-for="group in props.categoryOptions"
+                                :key="group.label"
                             >
-                                {{ option.label }}
-                            </SelectItem>
+                                <SelectLabel>{{ group.label }}</SelectLabel>
+                                <SelectItem
+                                    v-for="option in group.options"
+                                    :key="option.value"
+                                    :value="option.value"
+                                >
+                                    {{ option.label }}
+                                </SelectItem>
+                            </SelectGroup>
                         </SelectContent>
                     </Select>
                     <InputError :message="form.errors.category_id" />

@@ -28,8 +28,19 @@ class CreateTicket
             ? TicketStatus::WaitingForApproval
             : TicketStatus::New;
 
+        $isAgent = $requester->hasRole(UserRole::ItAgent->value) || $requester->hasRole(UserRole::SuperAdmin->value);
+        $branchId = $data['branch_id'] ?? null;
+        $departmentId = $data['department_id'] ?? null;
+
+        if (! $isAgent) {
+            $branchId = $branchId ?: $requester->branch_id;
+            $departmentId = $departmentId ?: $requester->department_id;
+        }
+
         $ticket = Ticket::query()->create([
             ...$data,
+            'branch_id' => $branchId,
+            'department_id' => $departmentId,
             'requester_id' => $requester->id,
             'status' => $initialStatus,
         ]);

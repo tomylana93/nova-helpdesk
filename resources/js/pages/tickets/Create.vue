@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
+import { Head, Link, setLayoutProps, useForm, usePage } from '@inertiajs/vue3';
 import { store } from '@/actions/App/Http/Controllers/Helpdesk/TicketController';
 import InputError from '@/components/InputError.vue';
 import PageWrapper from '@/components/PageWrapper.vue';
@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -18,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { create, index } from '@/routes/tickets';
-import type { SelectOption } from '@/types';
+import type { AuthenticatedSharedPageProps, SelectOption } from '@/types';
 
 type DepartmentOption = SelectOption & { branch_id: string | null };
 
@@ -28,7 +30,7 @@ type Props = {
     branchOptions: SelectOption[];
     departmentOptions: DepartmentOption[];
     queueOptions: SelectOption[];
-    categoryOptions: SelectOption[];
+    categoryOptions: { label: string; options: SelectOption[] }[];
 };
 
 type CreateTicketFormData = {
@@ -47,6 +49,11 @@ const props = defineProps<Props>();
 defineOptions({ inheritAttrs: false });
 
 const { trans } = useTrans();
+
+const page = usePage<AuthenticatedSharedPageProps>();
+const isAgent =
+    page.props.auth.user?.role === 'it_agent' ||
+    page.props.auth.user?.role === 'super_admin';
 
 const form = useForm<CreateTicketFormData>({
     type: '',
@@ -196,19 +203,25 @@ setLayoutProps({
                             />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem
-                                v-for="option in props.categoryOptions"
-                                :key="option.value"
-                                :value="option.value"
+                            <SelectGroup
+                                v-for="group in props.categoryOptions"
+                                :key="group.label"
                             >
-                                {{ option.label }}
-                            </SelectItem>
+                                <SelectLabel>{{ group.label }}</SelectLabel>
+                                <SelectItem
+                                    v-for="option in group.options"
+                                    :key="option.value"
+                                    :value="option.value"
+                                >
+                                    {{ option.label }}
+                                </SelectItem>
+                            </SelectGroup>
                         </SelectContent>
                     </Select>
                     <InputError :message="form.errors.category_id" />
                 </div>
 
-                <div class="grid gap-2">
+                <div v-if="isAgent" class="grid gap-2">
                     <Label for="branch_id">{{
                         trans('helpdesk.ticket.label.branch')
                     }}</Label>
@@ -237,7 +250,7 @@ setLayoutProps({
                     <InputError :message="form.errors.branch_id" />
                 </div>
 
-                <div class="grid gap-2">
+                <div v-if="isAgent" class="grid gap-2">
                     <Label for="department_id">{{
                         trans('helpdesk.ticket.label.department')
                     }}</Label>

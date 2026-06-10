@@ -10,6 +10,7 @@ use App\Events\TicketCreated;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Ticket;
+use App\Models\TicketCategory;
 use App\Models\User;
 use App\Notifications\TicketNotification;
 use Illuminate\Support\Facades\Event;
@@ -50,6 +51,7 @@ test('ticket creation sends notifications and broadcasts', function (): void {
 
     $branch = Branch::factory()->create();
     $department = Department::factory()->create(['branch_id' => $branch->id]);
+    $category = TicketCategory::factory()->create();
 
     $response = $this
         ->actingAs($requester)
@@ -60,6 +62,7 @@ test('ticket creation sends notifications and broadcasts', function (): void {
             'priority' => TicketPriority::Low->value,
             'branch_id' => $branch->id,
             'department_id' => $department->id,
+            'category_id' => $category->id,
         ]);
 
     $response->assertRedirect();
@@ -86,7 +89,8 @@ test('updating status sends notification to requester', function (): void {
     $requester = User::factory()->create();
     $requester->syncRoles([UserRole::Requester->value]);
 
-    $ticket = Ticket::factory()->create(['requester_id' => $requester->id]);
+    $category = TicketCategory::factory()->create();
+    $ticket = Ticket::factory()->create(['requester_id' => $requester->id, 'category_id' => $category->id]);
 
     $response = $this
         ->actingAs($agent)
@@ -95,6 +99,7 @@ test('updating status sends notification to requester', function (): void {
             'description' => $ticket->description,
             'status' => TicketStatus::InProgress->value,
             'priority' => TicketPriority::High->value,
+            'category_id' => $category->id,
         ]);
 
     $response->assertSessionHasNoErrors()->assertRedirect();

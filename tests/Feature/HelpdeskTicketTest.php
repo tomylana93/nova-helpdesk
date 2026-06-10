@@ -9,6 +9,7 @@ use App\Enums\UserRole;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Ticket;
+use App\Models\TicketCategory;
 use App\Models\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -77,6 +78,7 @@ test('unauthenticated user is redirected from ticket index', function (): void {
 
 test('requester can submit an incident ticket', function (): void {
     $requester = createRequesterUser();
+    $category = TicketCategory::factory()->create();
 
     $response = $this
         ->actingAs($requester)
@@ -85,6 +87,7 @@ test('requester can submit an incident ticket', function (): void {
             'subject' => 'My printer is broken',
             'description' => 'Cannot print from any device.',
             'priority' => TicketPriority::Medium->value,
+            'category_id' => $category->id,
         ]);
 
     $response->assertSessionHasNoErrors()->assertRedirect();
@@ -99,12 +102,14 @@ test('requester can submit an incident ticket', function (): void {
 
 test('service_request ticket starts in waiting_for_approval status', function (): void {
     $requester = createRequesterUser();
+    $category = TicketCategory::factory()->create();
 
     $this->actingAs($requester)->post(route('tickets.store'), [
         'type' => TicketType::ServiceRequest->value,
         'subject' => 'Need new laptop',
         'description' => 'My laptop is too old.',
         'priority' => TicketPriority::Low->value,
+        'category_id' => $category->id,
     ]);
 
     $ticket = Ticket::query()->where('subject', 'Need new laptop')->first();
@@ -120,7 +125,7 @@ test('ticket submission validates required fields', function (): void {
         ->from(route('tickets.create'))
         ->post(route('tickets.store'), []);
 
-    $response->assertSessionHasErrors(['type', 'subject', 'description', 'priority']);
+    $response->assertSessionHasErrors(['type', 'subject', 'description', 'priority', 'category_id']);
 });
 
 // --- SHOW ---
@@ -151,7 +156,8 @@ test('agent can view any ticket', function (): void {
 
 test('agent can update a ticket', function (): void {
     $agent = createAgentUser();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::New]);
+    $category = TicketCategory::factory()->create();
+    $ticket = Ticket::factory()->create(['status' => TicketStatus::New, 'category_id' => $category->id]);
 
     $response = $this
         ->actingAs($agent)
@@ -160,6 +166,7 @@ test('agent can update a ticket', function (): void {
             'description' => 'Updated description',
             'status' => TicketStatus::Triaged->value,
             'priority' => TicketPriority::High->value,
+            'category_id' => $category->id,
         ]);
 
     $response->assertSessionHasNoErrors()->assertRedirect();
@@ -171,13 +178,15 @@ test('agent can update a ticket', function (): void {
 
 test('requester cannot update a ticket', function (): void {
     $requester = createRequesterUser();
-    $ticket = Ticket::factory()->create(['requester_id' => $requester->id]);
+    $category = TicketCategory::factory()->create();
+    $ticket = Ticket::factory()->create(['requester_id' => $requester->id, 'category_id' => $category->id]);
 
     $this->actingAs($requester)->patch(route('tickets.update', $ticket), [
         'subject' => 'Updated subject',
         'description' => 'Updated description',
         'status' => TicketStatus::Closed->value,
         'priority' => TicketPriority::Low->value,
+        'category_id' => $category->id,
     ])->assertForbidden();
 });
 
@@ -262,7 +271,8 @@ test('non-agent cannot post internal comment', function (): void {
 
 test('cannot assign ticket to non-agent user', function (): void {
     $agent = createAgentUser();
-    $ticket = Ticket::factory()->create();
+    $category = TicketCategory::factory()->create();
+    $ticket = Ticket::factory()->create(['category_id' => $category->id]);
     $nonAgent = createRequesterUser();
 
     $this
@@ -273,6 +283,7 @@ test('cannot assign ticket to non-agent user', function (): void {
             'status' => TicketStatus::InProgress->value,
             'priority' => TicketPriority::High->value,
             'assigned_to' => $nonAgent->id,
+            'category_id' => $category->id,
         ])
         ->assertSessionHasErrors(['assigned_to']);
 });
@@ -282,6 +293,7 @@ test('cannot create ticket with mismatched department and branch', function (): 
     $branchA = Branch::factory()->create();
     $branchB = Branch::factory()->create();
     $departmentOfB = Department::factory()->create(['branch_id' => $branchB->id]);
+    $category = TicketCategory::factory()->create();
 
     $this
         ->actingAs($requester)
@@ -292,6 +304,7 @@ test('cannot create ticket with mismatched department and branch', function (): 
             'priority' => TicketPriority::Low->value,
             'branch_id' => $branchA->id,
             'department_id' => $departmentOfB->id,
+            'category_id' => $category->id,
         ])
         ->assertSessionHasErrors(['department_id']);
 });
@@ -300,6 +313,7 @@ test('cannot create ticket with inactive branch or department', function (): voi
     $requester = createRequesterUser();
     $inactiveBranch = Branch::factory()->create(['status' => GeneralStatus::Inactive->value]);
     $inactiveDepartment = Department::factory()->create(['status' => GeneralStatus::Inactive->value]);
+    $category = TicketCategory::factory()->create();
 
     $this
         ->actingAs($requester)
@@ -309,6 +323,7 @@ test('cannot create ticket with inactive branch or department', function (): voi
             'description' => 'Test',
             'priority' => TicketPriority::Low->value,
             'branch_id' => $inactiveBranch->id,
+            'category_id' => $category->id,
         ])
         ->assertSessionHasErrors(['branch_id']);
 
@@ -320,6 +335,7 @@ test('cannot create ticket with inactive branch or department', function (): voi
             'description' => 'Test',
             'priority' => TicketPriority::Low->value,
             'department_id' => $inactiveDepartment->id,
+            'category_id' => $category->id,
         ])
         ->assertSessionHasErrors(['department_id']);
 });
