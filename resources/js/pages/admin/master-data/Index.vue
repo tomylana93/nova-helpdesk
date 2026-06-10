@@ -98,9 +98,13 @@ const masterDataCard = computed<CardItem[]>(() => {
         :description="trans('admin.master_data.description')"
     >
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <Card v-for="item in masterDataCard" :key="item.title">
-                <CardContent class="flex items-center gap-4">
-                    <component :is="item.icon" class="size-6" />
+            <Card
+                v-for="item in masterDataCard"
+                :key="item.title"
+                class="flex h-full flex-col"
+            >
+                <CardContent class="flex flex-1 items-start gap-4">
+                    <component :is="item.icon" class="mt-0.5 size-6" />
                     <div class="flex flex-col gap-1">
                         <h3 class="text-sm font-medium">{{ item.title }}</h3>
                         <p class="text-sm text-muted-foreground">
@@ -108,7 +112,7 @@ const masterDataCard = computed<CardItem[]>(() => {
                         </p>
                     </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter class="pt-0">
                     <Button :as="Link" :href="item.href">
                         {{ trans('admin.master_data.action.open') }}
                     </Button>
