@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 Schedule::command('uploads:prune-temporary')
     ->hourly()
     ->withoutOverlapping();
+
+Schedule::command('helpdesk:check-sla')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

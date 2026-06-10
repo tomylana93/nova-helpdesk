@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import DarkModeToggle from '@/components/DarkModeToggle.vue';
+import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbsProps } from '@/types';
 
@@ -20,8 +21,9 @@ withDefaults(defineProps<BreadcrumbsProps>(), {
             </template>
         </div>
 
-        <div class="ml-auto">
+        <div class="ml-auto flex items-center gap-2">
             <DarkModeToggle />
+            <NotificationDropdown />
         </div>
     </header>
 </template>

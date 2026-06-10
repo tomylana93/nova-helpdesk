@@ -4,8 +4,12 @@ namespace App\Actions\Helpdesk;
 
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
+use App\Enums\UserRole;
+use App\Events\TicketCreated;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Notifications\TicketNotification;
+use Illuminate\Support\Facades\Notification;
 
 class CreateTicket
 {
@@ -32,6 +36,25 @@ class CreateTicket
 
         $this->assignSla->handle($ticket);
         $this->recordActivity->handle($ticket, 'created', $requester);
+
+        // 1. Notify Requester
+        $requester->notify(new TicketNotification($ticket, 'created', "Your ticket {$ticket->ticket_number} has been created."));
+
+        // 2. Notify Assignee OR Broadcast to all agents
+        if (! empty($ticket->assigned_to)) {
+            $assignee = User::query()->find($ticket->assigned_to);
+            if ($assignee) {
+                $assignee->notify(new TicketNotification($ticket, 'assigned', "Ticket {$ticket->ticket_number} has been assigned to you."));
+            }
+        } else {
+            event(new TicketCreated($ticket));
+        }
+
+        // 3. Notify Super Admins if approval required
+        if ($ticket->status === TicketStatus::WaitingForApproval) {
+            $superAdmins = User::query()->role(UserRole::SuperAdmin->value)->get();
+            Notification::send($superAdmins, new TicketNotification($ticket, 'approval_request', "Ticket {$ticket->ticket_number} requires approval."));
+        }
 
         return $ticket;
     }

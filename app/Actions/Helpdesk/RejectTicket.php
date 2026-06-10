@@ -6,6 +6,7 @@ use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\TicketApproval;
 use App\Models\User;
+use App\Notifications\TicketNotification;
 use Illuminate\Support\Facades\DB;
 
 class RejectTicket
@@ -25,5 +26,11 @@ class RejectTicket
 
             $ticket->update(['status' => TicketStatus::Closed]);
         });
+
+        $ticket->requester->notify(new TicketNotification(
+            $ticket,
+            'approval_decision',
+            "Your ticket {$ticket->ticket_number} approval request has been rejected. Status is now Closed."
+        ));
     }
 }

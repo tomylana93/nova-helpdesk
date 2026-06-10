@@ -41,12 +41,25 @@ export type AuthAbilities = {
     manage_approvals: boolean;
 };
 
+export type NotificationItem = {
+    id: string;
+    type: string;
+    ticket_id: string | null;
+    ticket_number: string | null;
+    subject: string | null;
+    message: string;
+    read_at?: string | null;
+    created_at: string;
+};
+
 export type SharedPageProps = {
     name: string;
     locale: string;
     auth: {
         user: User | null;
         abilities: AuthAbilities;
+        unreadNotificationsCount: number;
+        notifications: NotificationItem[];
     };
     style: SharedStyleSettings;
     branding: BrandingAssets;
@@ -57,5 +70,8 @@ export type SharedPageProps = {
 export type AuthenticatedSharedPageProps = SharedPageProps & {
     auth: {
         user: User;
+        abilities: AuthAbilities;
+        unreadNotificationsCount: number;
+        notifications: NotificationItem[];
     };
 };

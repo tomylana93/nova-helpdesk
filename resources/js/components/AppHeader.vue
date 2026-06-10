@@ -13,6 +13,7 @@ import AppBrand from '@/components/AppBrand.vue';
 import AppLogo from '@/components/AppLogo.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import DarkModeToggle from '@/components/DarkModeToggle.vue';
+import NotificationDropdown from '@/components/NotificationDropdown.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -193,6 +194,7 @@ const mainNavItems = computed<NavItem[]>(() => {
 
                 <div class="ml-auto flex items-center gap-2">
                     <DarkModeToggle />
+                    <NotificationDropdown />
 
                     <div class="relative flex items-center">
                         <Button
