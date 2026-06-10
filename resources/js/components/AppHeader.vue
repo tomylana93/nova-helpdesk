@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import {
+    Database,
+    LayoutGrid,
+    Menu,
+    Search,
+    Settings,
+    Ticket,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppBrand from '@/components/AppBrand.vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -30,6 +37,9 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { dashboard } from '@/routes';
+import { index as adminMasterDataIndex } from '@/routes/admin/master-data';
+import { index as adminSettingsIndex } from '@/routes/admin/settings';
+import { index as ticketsIndex } from '@/routes/tickets';
 import type {
     AuthenticatedSharedPageProps,
     BreadcrumbsProps,
@@ -47,13 +57,43 @@ const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
 const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
+const mainNavItems = computed<NavItem[]>(() => {
+    const abilities = page.props.auth.abilities;
+
+    return [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+        ...(abilities.view_tickets
+            ? [{ title: 'Tickets', href: ticketsIndex(), icon: Ticket }]
+            : []),
+        ...(abilities.manage_settings
+            ? [
+                  {
+                      title: 'Settings',
+                      href: adminSettingsIndex(),
+                      icon: Settings,
+                  },
+              ]
+            : []),
+        ...(abilities.view_users ||
+        abilities.manage_branches ||
+        abilities.manage_departments ||
+        abilities.manage_queues ||
+        abilities.manage_categories ||
+        abilities.manage_sla_policies
+            ? [
+                  {
+                      title: 'Master Data',
+                      href: adminMasterDataIndex(),
+                      icon: Database,
+                  },
+              ]
+            : []),
+    ];
+});
 </script>
 
 <template>

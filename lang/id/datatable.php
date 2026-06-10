@@ -14,6 +14,7 @@ return [
         'all_statuses' => 'Semua status',
         'all_branches' => 'Semua cabang',
         'all_parents' => 'Semua kategori induk',
+        'all_priorities' => 'Semua prioritas',
         'columns' => 'Kolom',
         'rows' => 'Baris per halaman',
     ],

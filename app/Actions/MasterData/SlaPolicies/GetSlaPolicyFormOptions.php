@@ -24,10 +24,7 @@ class GetSlaPolicyFormOptions
             ->all();
 
         return [
-            'typeOptions' => [
-                ['value' => '', 'label' => __('admin.master_data.sla_policy.label.all_types')],
-                ...TicketType::options(),
-            ],
+            'typeOptions' => TicketType::options(),
             'priorityOptions' => TicketPriority::options(),
             'queueOptions' => $queueOptions,
         ];
