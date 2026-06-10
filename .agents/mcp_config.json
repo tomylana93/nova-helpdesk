@@ -6,6 +6,27 @@
         "/home/tomylana93/projects/nova-helpdesk/artisan",
         "boost:mcp"
       ]
+    },
+    "serena": {
+      "command": "serena",
+      "args": [
+        "start-mcp-server",
+        "--context=antigravity"
+      ]
+    },
+    "shadcn-vue": {
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "shadcn-vue@latest",
+        "mcp"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
     }
   }
 }
