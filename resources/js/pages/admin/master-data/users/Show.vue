@@ -14,7 +14,7 @@ import { edit, index, show } from '@/routes/admin/master-data/users';
 import type { SharedPageProps, User } from '@/types';
 
 type Props = {
-    user: User;
+    user: User & { branchName?: string | null; departmentName?: string | null };
 };
 
 const props = defineProps<Props>();
@@ -132,6 +132,34 @@ function formatDate(dateString: string): string {
                         <span v-else class="text-sm text-muted-foreground"
                             >—</span
                         >
+                    </div>
+                    <Separator />
+                    <div
+                        class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
+                    >
+                        <span
+                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                        >
+                            {{ trans('admin.master_data.user.label.branch') }}
+                        </span>
+                        <span class="text-sm">
+                            {{ props.user.branchName ?? '—' }}
+                        </span>
+                    </div>
+                    <Separator />
+                    <div
+                        class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
+                    >
+                        <span
+                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                        >
+                            {{
+                                trans('admin.master_data.user.label.department')
+                            }}
+                        </span>
+                        <span class="text-sm">
+                            {{ props.user.departmentName ?? '—' }}
+                        </span>
                     </div>
                     <Separator />
                     <div

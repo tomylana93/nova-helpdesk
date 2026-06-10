@@ -11,17 +11,20 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'status', 'password'])]
+#[Fillable(['name', 'email', 'status', 'password', 'branch_id', 'department_id'])]
 #[Hidden(['password', 'remember_token'])]
 #[Appends(['avatar'])]
 /**
  * @property UserStatus $status
+ * @property Branch|null $branch
+ * @property Department|null $department
  */
 class User extends Authenticatable implements HasMedia
 {
@@ -61,6 +64,22 @@ class User extends Authenticatable implements HasMedia
         }
 
         $this->notify(new ResetPassword($token));
+    }
+
+    /**
+     * Get the branch associated with the user.
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Get the department associated with the user.
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /**

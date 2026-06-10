@@ -11,3 +11,4 @@
 - Table pattern uses `app/Tables/AbstractTable` with `spatie/laravel-query-builder` for deferred Inertia datatables.
 - Settings pattern uses `app/Settings/{Group}` (`general`, `style`, `password`) via `spatie/laravel-settings`.
 - Read `mem:backend/admin` for admin/settings/master-data behavior and `mem:backend/uploads-media` for temporary uploads + media library flow.
+- Read `mem:backend/helpdesk-audit` before changing ticket approval, ticket comments, or ticket relationship validation; it records current unresolved authorization/integrity risks in the helpdesk flow.

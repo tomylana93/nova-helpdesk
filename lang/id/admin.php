@@ -2,6 +2,12 @@
 
 return [
     'settings' => [
+        'title' => 'Pengaturan',
+        'heading' => 'Pengaturan',
+        'description' => 'Kelola pengaturan Anda di sini.',
+        'action' => [
+            'open' => 'Buka pengaturan',
+        ],
         'general' => [
             'title' => 'Pengaturan Umum',
             'heading' => 'Pengaturan Umum',
@@ -167,12 +173,16 @@ return [
                 'email' => 'Email',
                 'status' => 'Status',
                 'role' => 'Peran',
+                'branch' => 'Cabang',
+                'department' => 'Departemen',
             ],
             'placeholder' => [
                 'name' => 'Masukkan nama lengkap',
                 'email' => 'Masukkan alamat email',
                 'status' => 'Pilih status',
                 'role' => 'Pilih peran',
+                'branch' => 'Pilih cabang',
+                'department' => 'Pilih departemen',
             ],
             'action' => [
                 'create' => 'Buat User',
@@ -189,6 +199,237 @@ return [
                 'updated' => [
                     'success' => 'User berhasil diperbarui.',
                     'error' => 'Gagal memperbarui user. Silakan coba lagi.',
+                ],
+            ],
+        ],
+        'branch' => [
+            'index' => [
+                'title' => 'Cabang',
+                'heading' => 'Manajemen Cabang',
+                'description' => 'Kelola cabang perusahaan.',
+            ],
+            'create' => [
+                'title' => 'Buat Cabang',
+                'heading' => 'Buat Cabang Baru',
+                'description' => 'Tambahkan cabang baru ke sistem.',
+            ],
+            'show' => [
+                'title' => 'Detail Cabang',
+                'heading' => 'Detail Cabang',
+                'description' => 'Lihat informasi cabang.',
+            ],
+            'edit' => [
+                'title' => 'Ubah Cabang',
+                'heading' => 'Ubah Cabang',
+                'description' => 'Perbarui informasi cabang.',
+            ],
+            'label' => [
+                'code' => 'Kode',
+                'name' => 'Nama',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'code' => 'Masukkan kode cabang (contoh: BR-HO)',
+                'name' => 'Masukkan nama cabang',
+                'status' => 'Pilih status',
+            ],
+            'action' => [
+                'create' => 'Buat Cabang',
+                'update' => 'Perbarui Cabang',
+                'back' => 'Kembali ke Cabang',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Cabang berhasil dibuat.',
+                ],
+                'updated' => [
+                    'success' => 'Cabang berhasil diperbarui.',
+                ],
+            ],
+        ],
+        'department' => [
+            'index' => [
+                'title' => 'Departemen',
+                'heading' => 'Manajemen Departemen',
+                'description' => 'Kelola departemen cabang.',
+            ],
+            'create' => [
+                'title' => 'Buat Departemen',
+                'heading' => 'Buat Departemen Baru',
+                'description' => 'Tambahkan departemen baru ke sistem.',
+            ],
+            'show' => [
+                'title' => 'Detail Departemen',
+                'heading' => 'Detail Departemen',
+                'description' => 'Lihat informasi departemen.',
+            ],
+            'edit' => [
+                'title' => 'Ubah Departemen',
+                'heading' => 'Ubah Departemen',
+                'description' => 'Perbarui informasi departemen.',
+            ],
+            'label' => [
+                'branch' => 'Cabang',
+                'code' => 'Kode',
+                'name' => 'Nama',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'branch' => 'Pilih cabang',
+                'code' => 'Masukkan kode departemen (contoh: DEPT-IT)',
+                'name' => 'Masukkan nama departemen',
+                'status' => 'Pilih status',
+            ],
+            'action' => [
+                'create' => 'Buat Departemen',
+                'update' => 'Perbarui Departemen',
+                'back' => 'Kembali ke Departemen',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Departemen berhasil dibuat.',
+                ],
+                'updated' => [
+                    'success' => 'Departemen berhasil diperbarui.',
+                ],
+            ],
+        ],
+        'queue' => [
+            'index' => [
+                'title' => 'Antrean',
+                'heading' => 'Manajemen Antrean',
+                'description' => 'Kelola antrean tiket.',
+            ],
+            'create' => [
+                'title' => 'Buat Antrean',
+                'heading' => 'Buat Antrean Baru',
+                'description' => 'Tambahkan antrean tiket baru.',
+            ],
+            'show' => [
+                'title' => 'Detail Antrean',
+                'heading' => 'Detail Antrean',
+                'description' => 'Lihat detail antrean.',
+            ],
+            'edit' => [
+                'title' => 'Ubah Antrean',
+                'heading' => 'Ubah Antrean',
+                'description' => 'Perbarui detail antrean.',
+            ],
+            'label' => [
+                'name' => 'Nama',
+                'description' => 'Deskripsi',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'name' => 'Masukkan nama antrean',
+                'description' => 'Masukkan deskripsi antrean',
+                'status' => 'Pilih status',
+            ],
+            'action' => [
+                'create' => 'Buat Antrean',
+                'update' => 'Perbarui Antrean',
+                'back' => 'Kembali ke Antrean',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Antrean berhasil dibuat.',
+                ],
+                'updated' => [
+                    'success' => 'Antrean berhasil diperbarui.',
+                ],
+            ],
+        ],
+        'sla_policy' => [
+            'index' => [
+                'title' => 'Kebijakan SLA',
+                'heading' => 'Manajemen Kebijakan SLA',
+                'description' => 'Kelola kebijakan SLA untuk target respons dan penyelesaian.',
+            ],
+            'create' => [
+                'title' => 'Buat Kebijakan SLA',
+                'heading' => 'Buat Kebijakan SLA Baru',
+                'description' => 'Tentukan kebijakan SLA untuk tipe dan prioritas tiket.',
+            ],
+            'show' => [
+                'title' => 'Detail Kebijakan SLA',
+                'heading' => 'Detail Kebijakan SLA',
+                'description' => 'Lihat detail kebijakan SLA.',
+            ],
+            'edit' => [
+                'title' => 'Edit Kebijakan SLA',
+                'heading' => 'Edit Kebijakan SLA',
+                'description' => 'Perbarui target kebijakan SLA.',
+            ],
+            'label' => [
+                'name' => 'Nama',
+                'ticket_type' => 'Tipe Tiket',
+                'all_types' => 'Semua Tipe',
+                'priority' => 'Prioritas',
+                'queue' => 'Antrean (opsional)',
+                'first_response' => 'Target Respons Pertama (menit)',
+                'resolution' => 'Target Penyelesaian (menit)',
+                'is_active' => 'Aktif',
+            ],
+            'placeholder' => [
+                'name' => 'Masukkan nama kebijakan',
+                'ticket_type' => 'Semua tipe tiket',
+                'priority' => 'Pilih prioritas',
+                'queue' => 'Pilih antrean (opsional)',
+            ],
+            'action' => [
+                'create' => 'Buat Kebijakan',
+                'update' => 'Perbarui Kebijakan',
+                'back' => 'Kembali ke Kebijakan SLA',
+            ],
+            'message' => [
+                'created' => ['success' => 'Kebijakan SLA berhasil dibuat.'],
+                'updated' => ['success' => 'Kebijakan SLA berhasil diperbarui.'],
+            ],
+        ],
+        'ticket_category' => [
+            'index' => [
+                'title' => 'Kategori Tiket',
+                'heading' => 'Manajemen Kategori Tiket',
+                'description' => 'Kelola kategori dan subkategori tiket.',
+            ],
+            'create' => [
+                'title' => 'Buat Kategori',
+                'heading' => 'Buat Kategori Baru',
+                'description' => 'Tambahkan kategori atau subkategori tiket baru.',
+            ],
+            'show' => [
+                'title' => 'Detail Kategori',
+                'heading' => 'Detail Kategori',
+                'description' => 'Lihat detail kategori.',
+            ],
+            'edit' => [
+                'title' => 'Ubah Kategori',
+                'heading' => 'Ubah Kategori',
+                'description' => 'Perbarui detail kategori.',
+            ],
+            'label' => [
+                'parent' => 'Kategori Induk',
+                'name' => 'Nama',
+                'description' => 'Deskripsi',
+                'status' => 'Status',
+            ],
+            'placeholder' => [
+                'parent' => 'Pilih kategori induk (opsional)',
+                'name' => 'Masukkan nama kategori',
+                'description' => 'Masukkan deskripsi kategori',
+                'status' => 'Pilih status',
+            ],
+            'action' => [
+                'create' => 'Buat Kategori',
+                'update' => 'Perbarui Kategori',
+                'back' => 'Kembali ke Kategori',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Kategori berhasil dibuat.',
+                ],
+                'updated' => [
+                    'success' => 'Kategori berhasil diperbarui.',
                 ],
             ],
         ],

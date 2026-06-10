@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Database, LayoutGrid, Settings } from 'lucide-vue-next';
+import { Database, LayoutGrid, Settings, Ticket } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -17,6 +17,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as adminMasterDataIndex } from '@/routes/admin/master-data';
 import { index as adminSettingsIndex } from '@/routes/admin/settings';
+import { index as ticketsIndex } from '@/routes/tickets';
 import type { NavGroup, SharedPageProps } from '@/types';
 
 const page = usePage<SharedPageProps>();
@@ -33,6 +34,15 @@ const mainNavGroups = computed<NavGroup[]>(() => {
                     href: dashboard(),
                     icon: LayoutGrid,
                 },
+                ...(abilities.view_tickets
+                    ? [
+                          {
+                              title: 'Tickets',
+                              href: ticketsIndex(),
+                              icon: Ticket,
+                          },
+                      ]
+                    : []),
             ],
         },
         {
@@ -47,7 +57,12 @@ const mainNavGroups = computed<NavGroup[]>(() => {
                           },
                       ]
                     : []),
-                ...(abilities.view_users
+                ...(abilities.view_users ||
+                abilities.manage_branches ||
+                abilities.manage_departments ||
+                abilities.manage_queues ||
+                abilities.manage_categories ||
+                abilities.manage_sla_policies
                     ? [
                           {
                               title: 'Master Data',

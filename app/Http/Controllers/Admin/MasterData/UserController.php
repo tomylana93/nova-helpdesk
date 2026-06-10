@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\MasterData;
 
 use App\Actions\MasterData\Users\CreateUser;
+use App\Actions\MasterData\Users\GetUserFormOptions;
 use App\Actions\MasterData\Users\UpdateUser;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
@@ -27,12 +28,13 @@ class UserController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(GetUserFormOptions $formOptions): Response
     {
         $this->authorize('create', User::class);
 
         return Inertia::render('admin/master-data/users/Create', [
             'userRoleOptions' => UserRole::options(),
+            ...$formOptions->handle(),
         ]);
     }
 
@@ -50,11 +52,11 @@ class UserController extends Controller
         $this->authorize('view', $user);
 
         return Inertia::render('admin/master-data/users/Show', [
-            'user' => UserResource::make($user)->resolve(),
+            'user' => UserResource::make($user->load(['branch', 'department']))->resolve(),
         ]);
     }
 
-    public function edit(User $user): Response
+    public function edit(User $user, GetUserFormOptions $formOptions): Response
     {
         $this->authorize('update', $user);
 
@@ -62,6 +64,7 @@ class UserController extends Controller
             'user' => UserResource::make($user)->resolve(),
             'userRoleOptions' => UserRole::options(),
             'userStatusOptions' => UserStatus::options(),
+            ...$formOptions->handle(),
         ]);
     }
 

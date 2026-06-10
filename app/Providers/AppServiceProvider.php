@@ -3,8 +3,12 @@
 namespace App\Providers;
 
 use App\Enums\UserRole;
+use App\Models\SlaPolicy;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Policies\AdminSettingsPolicy;
+use App\Policies\SlaPolicyPolicy;
+use App\Policies\TicketPolicy;
 use App\Settings\GeneralSettings;
 use App\Settings\PasswordSettings;
 use App\Settings\StyleSettings;
@@ -62,6 +66,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(GeneralSettings::class, AdminSettingsPolicy::class);
         Gate::policy(StyleSettings::class, AdminSettingsPolicy::class);
         Gate::policy(PasswordSettings::class, AdminSettingsPolicy::class);
+        Gate::policy(Ticket::class, TicketPolicy::class);
+        Gate::policy(SlaPolicy::class, SlaPolicyPolicy::class);
 
         RateLimiter::for('temporary-uploads', static function (Request $request): array {
             $key = $request->user()?->getAuthIdentifier() ?? $request->ip();

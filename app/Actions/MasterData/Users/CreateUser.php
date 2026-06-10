@@ -22,6 +22,8 @@ class CreateUser
                 'email' => $data['email'],
                 'password' => Hash::make($this->passwordSettings->default_user_password),
                 'status' => UserStatus::Active,
+                'branch_id' => $data['branch_id'] ?? null,
+                'department_id' => $data['department_id'] ?? null,
             ]);
 
             $user->syncRoles([$data['role']]);

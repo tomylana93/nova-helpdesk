@@ -2,6 +2,7 @@
 
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use App\Models\Branch;
 use App\Models\User;
 use App\Settings\PasswordSettings;
 use Illuminate\Support\Facades\Date;
@@ -11,14 +12,16 @@ use Spatie\Permission\Models\Role;
 
 test('admin users can be created with active status by default', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    $branch = Branch::factory()->create();
 
     $response = $this
         ->actingAs($actor)
         ->post(route('admin.master-data.users.store'), [
             'name' => 'New User',
             'email' => 'new-user@example.test',
-            'role' => UserRole::Dispatcher->value,
+            'role' => UserRole::ItAgent->value,
+            'branch_id' => $branch->id,
         ]);
 
     $response
@@ -32,18 +35,22 @@ test('admin users can be created with active status by default', function (): vo
     expect($createdUser)->not->toBeNull();
     expect($createdUser?->status)->toBe(UserStatus::Active);
     expect(Hash::check(app(PasswordSettings::class)->default_user_password, (string) $createdUser?->password))->toBeTrue();
-    expect($createdUser?->getRoleNames()->all())->toBe([UserRole::Dispatcher->value]);
+    expect($createdUser?->getRoleNames()->all())->toBe([UserRole::ItAgent->value]);
+    expect($createdUser?->branch_id)->toBe($branch->id);
 });
 
 test('admin users can be updated with unchanged email for the edited user', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
-    Role::findOrCreate(UserRole::FinanceOfficer->value, 'web');
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    Role::findOrCreate(UserRole::Requester->value, 'web');
+    $branch = Branch::factory()->create();
+
     $targetUser = User::factory()->create([
         'email' => 'target-user@example.test',
         'status' => UserStatus::Active,
+        'branch_id' => $branch->id,
     ]);
-    $targetUser->assignRole(UserRole::Dispatcher->value);
+    $targetUser->assignRole(UserRole::ItAgent->value);
 
     $response = $this
         ->actingAs($actor)
@@ -52,7 +59,8 @@ test('admin users can be updated with unchanged email for the edited user', func
             'name' => 'Updated Target',
             'email' => 'target-user@example.test',
             'status' => UserStatus::Suspend->value,
-            'role' => UserRole::FinanceOfficer->value,
+            'role' => UserRole::Requester->value,
+            'branch_id' => $branch->id,
         ]);
 
     $response
@@ -63,13 +71,16 @@ test('admin users can be updated with unchanged email for the edited user', func
 
     expect($targetUser->name)->toBe('Updated Target');
     expect($targetUser->status)->toBe(UserStatus::Suspend);
-    expect($targetUser->getRoleNames()->all())->toBe([UserRole::FinanceOfficer->value]);
+    expect($targetUser->getRoleNames()->all())->toBe([UserRole::Requester->value]);
 });
 
 test('status is required when updating admin users', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    $targetUser = User::factory()->create();
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
+    $branch = Branch::factory()->create();
+    $targetUser = User::factory()->create([
+        'branch_id' => $branch->id,
+    ]);
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
 
     $response = $this
         ->actingAs($actor)
@@ -77,7 +88,8 @@ test('status is required when updating admin users', function (): void {
         ->put(route('admin.master-data.users.update', $targetUser), [
             'name' => 'Updated Target',
             'email' => $targetUser->email,
-            'role' => UserRole::Dispatcher->value,
+            'role' => UserRole::ItAgent->value,
+            'branch_id' => $branch->id,
         ]);
 
     $response
@@ -87,6 +99,7 @@ test('status is required when updating admin users', function (): void {
 
 test('role is required when creating admin users', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
+    $branch = Branch::factory()->create();
 
     $response = $this
         ->actingAs($actor)
@@ -94,6 +107,7 @@ test('role is required when creating admin users', function (): void {
         ->post(route('admin.master-data.users.store'), [
             'name' => 'New User',
             'email' => 'new-user@example.test',
+            'branch_id' => $branch->id,
         ]);
 
     $response
@@ -103,7 +117,10 @@ test('role is required when creating admin users', function (): void {
 
 test('role is required when updating admin users', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    $targetUser = User::factory()->create();
+    $branch = Branch::factory()->create();
+    $targetUser = User::factory()->create([
+        'branch_id' => $branch->id,
+    ]);
 
     $response = $this
         ->actingAs($actor)
@@ -112,6 +129,7 @@ test('role is required when updating admin users', function (): void {
             'name' => 'Updated Target',
             'email' => $targetUser->email,
             'status' => UserStatus::Active->value,
+            'branch_id' => $branch->id,
         ]);
 
     $response
@@ -133,15 +151,15 @@ test('admin users create page exposes role options', function (): void {
 
 test('admin users edit page exposes role options and the active role', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
     $targetUser = User::factory()->create();
-    $targetUser->assignRole(UserRole::Dispatcher->value);
+    $targetUser->assignRole(UserRole::ItAgent->value);
 
     $this->actingAs($actor)
         ->get(route('admin.master-data.users.edit', $targetUser))
         ->assertInertia(fn (Assert $page): Assert => $page
             ->component('admin/master-data/users/Edit')
-            ->where('user.role', UserRole::Dispatcher->value)
+            ->where('user.role', UserRole::ItAgent->value)
             ->has('userRoleOptions', count(UserRole::cases()))
         );
 });
@@ -150,15 +168,15 @@ test('admin users index exposes a single deferred table payload contract', funct
     $actor = grantAdminPermissions(User::factory()->create([
         'created_at' => Date::parse('2026-05-26 09:00:00'),
     ]));
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
-    Role::findOrCreate(UserRole::FinanceOfficer->value, 'web');
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    Role::findOrCreate(UserRole::Requester->value, 'web');
     $alice = User::factory()->create([
         'name' => 'Alice Example',
         'email' => 'alice@example.test',
         'status' => UserStatus::Active,
         'created_at' => Date::parse('2026-05-26 10:00:00'),
     ]);
-    $alice->assignRole(UserRole::Dispatcher->value);
+    $alice->assignRole(UserRole::ItAgent->value);
 
     $bob = User::factory()->create([
         'name' => 'Bob Example',
@@ -166,7 +184,7 @@ test('admin users index exposes a single deferred table payload contract', funct
         'status' => UserStatus::Suspend,
         'created_at' => Date::parse('2026-05-26 11:00:00'),
     ]);
-    $bob->assignRole(UserRole::FinanceOfficer->value);
+    $bob->assignRole(UserRole::Requester->value);
 
     $response = $this
         ->actingAs($actor)
@@ -177,8 +195,8 @@ test('admin users index exposes a single deferred table payload contract', funct
         ->missing('table')
         ->loadDeferredProps(fn (Assert $reload): Assert => $reload
             ->has('table.rows', 3)
-            ->where('table.rows.0.role', UserRole::FinanceOfficer->value)
-            ->where('table.rows.0.roleLabel', UserRole::FinanceOfficer->label())
+            ->where('table.rows.0.role', UserRole::Requester->value)
+            ->where('table.rows.0.roleLabel', UserRole::Requester->label())
             ->where('table.state.filters.search', null)
             ->where('table.state.filters.status', null)
             ->where('table.state.sort', '-created_at')
@@ -195,26 +213,26 @@ test('admin users index exposes a single deferred table payload contract', funct
 
 test('admin users index filters by role through the deferred table payload', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
-    Role::findOrCreate(UserRole::FinanceOfficer->value, 'web');
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    Role::findOrCreate(UserRole::Requester->value, 'web');
 
     $zed = User::factory()->create([
         'name' => 'Zed Example',
         'email' => 'zed@example.test',
     ]);
-    $zed->assignRole(UserRole::FinanceOfficer->value);
+    $zed->assignRole(UserRole::Requester->value);
 
     $alice = User::factory()->create([
         'name' => 'Alice Example',
         'email' => 'alice@example.test',
     ]);
-    $alice->assignRole(UserRole::Dispatcher->value);
+    $alice->assignRole(UserRole::ItAgent->value);
 
     $response = $this
         ->actingAs($actor)
         ->get(route('admin.master-data.users.index', [
             'filter' => [
-                'role' => UserRole::Dispatcher->value,
+                'role' => UserRole::ItAgent->value,
             ],
         ]));
 
@@ -224,22 +242,22 @@ test('admin users index filters by role through the deferred table payload', fun
         ->loadDeferredProps(fn (Assert $reload): Assert => $reload
             ->has('table.rows', 1)
             ->where('table.rows.0.name', 'Alice Example')
-            ->where('table.rows.0.role', UserRole::Dispatcher->value)
-            ->where('table.state.filters.role', UserRole::Dispatcher->value)
+            ->where('table.rows.0.role', UserRole::ItAgent->value)
+            ->where('table.state.filters.role', UserRole::ItAgent->value)
         ));
 });
 
 test('admin users index applies query builder filters and state through the deferred table payload', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
-    Role::findOrCreate(UserRole::Dispatcher->value, 'web');
-    Role::findOrCreate(UserRole::FinanceOfficer->value, 'web');
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    Role::findOrCreate(UserRole::Requester->value, 'web');
     $zed = User::factory()->create([
         'name' => 'Zed Example',
         'email' => 'zed@example.test',
         'status' => UserStatus::Suspend,
         'created_at' => Date::parse('2026-05-26 10:00:00'),
     ]);
-    $zed->assignRole(UserRole::FinanceOfficer->value);
+    $zed->assignRole(UserRole::Requester->value);
 
     $alice = User::factory()->create([
         'name' => 'Alice Example',
@@ -247,7 +265,7 @@ test('admin users index applies query builder filters and state through the defe
         'status' => UserStatus::Active,
         'created_at' => Date::parse('2026-05-26 11:00:00'),
     ]);
-    $alice->assignRole(UserRole::Dispatcher->value);
+    $alice->assignRole(UserRole::ItAgent->value);
 
     $response = $this
         ->actingAs($actor)
@@ -266,8 +284,8 @@ test('admin users index applies query builder filters and state through the defe
         ->loadDeferredProps(fn (Assert $reload): Assert => $reload
             ->has('table.rows', 1)
             ->where('table.rows.0.name', 'Alice Example')
-            ->where('table.rows.0.role', UserRole::Dispatcher->value)
-            ->where('table.rows.0.roleLabel', UserRole::Dispatcher->label())
+            ->where('table.rows.0.role', UserRole::ItAgent->value)
+            ->where('table.rows.0.roleLabel', UserRole::ItAgent->label())
             ->where('table.rows.0.status', UserStatus::Active->value)
             ->where('table.state.filters.search', 'Alice')
             ->where('table.state.filters.status', UserStatus::Active->value)
