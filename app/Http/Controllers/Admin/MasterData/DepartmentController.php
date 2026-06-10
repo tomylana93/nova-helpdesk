@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin\MasterData;
 
+use App\Actions\MasterData\Departments\CreateDepartment;
+use App\Actions\MasterData\Departments\GetDepartmentFormOptions;
+use App\Actions\MasterData\Departments\UpdateDepartment;
 use App\Enums\GeneralStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MasterData\StoreDepartmentRequest;
 use App\Http\Requests\Admin\MasterData\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
-use App\Models\Branch;
 use App\Models\Department;
 use App\Tables\MasterData\DepartmentTable;
 use Illuminate\Http\RedirectResponse;
@@ -25,28 +27,21 @@ class DepartmentController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(GetDepartmentFormOptions $formOptions): Response
     {
         $this->authorize('create', Department::class);
-
-        $branchOptions = Branch::query()
-            ->where('status', GeneralStatus::Active->value)
-            ->select(['id as value', 'name as label'])
-            ->orderBy('name')
-            ->get()
-            ->toArray();
 
         return Inertia::render('admin/master-data/departments/Create', [
             'statusOptions' => GeneralStatus::options(),
-            'branchOptions' => $branchOptions,
+            ...$formOptions->handle(),
         ]);
     }
 
-    public function store(StoreDepartmentRequest $request): RedirectResponse
+    public function store(StoreDepartmentRequest $request, CreateDepartment $createDepartment): RedirectResponse
     {
         $this->authorize('create', Department::class);
 
-        Department::query()->create($request->validated());
+        $createDepartment->handle($request->validated());
 
         Inertia::flash('success', trans('admin.master_data.department.message.created.success'));
 
@@ -62,29 +57,22 @@ class DepartmentController extends Controller
         ]);
     }
 
-    public function edit(Department $department): Response
+    public function edit(Department $department, GetDepartmentFormOptions $formOptions): Response
     {
         $this->authorize('update', $department);
-
-        $branchOptions = Branch::query()
-            ->where('status', GeneralStatus::Active->value)
-            ->select(['id as value', 'name as label'])
-            ->orderBy('name')
-            ->get()
-            ->toArray();
 
         return Inertia::render('admin/master-data/departments/Edit', [
             'department' => DepartmentResource::make($department)->resolve(),
             'statusOptions' => GeneralStatus::options(),
-            'branchOptions' => $branchOptions,
+            ...$formOptions->handle(),
         ]);
     }
 
-    public function update(UpdateDepartmentRequest $request, Department $department): RedirectResponse
+    public function update(UpdateDepartmentRequest $request, Department $department, UpdateDepartment $updateDepartment): RedirectResponse
     {
         $this->authorize('update', $department);
 
-        $department->update($request->validated());
+        $updateDepartment->handle($department, $request->validated());
 
         Inertia::flash('success', trans('admin.master_data.department.message.updated.success'));
 

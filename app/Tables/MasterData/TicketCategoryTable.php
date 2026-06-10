@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tables\MasterData;
 
 use App\Enums\GeneralStatus;
+use App\Http\Resources\TicketCategoryOptionResource;
 use App\Models\TicketCategory;
 use App\Tables\AbstractTable;
 use App\Tables\Filters\GlobalSearchFilter;
@@ -46,12 +47,13 @@ class TicketCategoryTable extends AbstractTable
     protected function filterConfigurations(): array
     {
         $parentCategoryOptions = TicketCategory::query()
-            ->select(['id as value', 'name as label'])
             ->whereNull('parent_id')
-            ->where('status', GeneralStatus::Active->value)
+            ->where('status', GeneralStatus::Active)
             ->orderBy('name')
-            ->get()
-            ->toArray();
+            ->get(['id', 'name'])
+            ->mapInto(TicketCategoryOptionResource::class)
+            ->map->resolve()
+            ->all();
 
         return [
             $this->searchFilter(

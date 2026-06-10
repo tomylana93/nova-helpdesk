@@ -6,6 +6,7 @@ use App\Enums\GeneralStatus;
 use App\Models\Branch;
 use App\Models\Department;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Department>
@@ -21,8 +22,8 @@ class DepartmentFactory extends Factory
     {
         return [
             'branch_id' => Branch::factory(),
-            'code' => strtoupper($this->faker->unique()->lexify('DEPT-????')),
-            'name' => $this->faker->words(2, true).' Department',
+            'code' => Str::upper(fake()->unique()->lexify('DEPT-????')),
+            'name' => fake()->words(2, true).' Department',
             'status' => GeneralStatus::Active,
         ];
     }

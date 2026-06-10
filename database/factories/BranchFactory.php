@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\GeneralStatus;
 use App\Models\Branch;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Branch>
@@ -19,8 +20,8 @@ class BranchFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => strtoupper($this->faker->unique()->lexify('BR-????')),
-            'name' => $this->faker->company().' Branch',
+            'code' => Str::upper(fake()->unique()->lexify('BR-????')),
+            'name' => fake()->company().' Branch',
             'status' => GeneralStatus::Active,
         ];
     }

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\GeneralStatus;
 use App\Models\Queue;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Queue>
@@ -19,8 +20,8 @@ class QueueFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => ucwords($this->faker->unique()->words(2, true)).' Queue',
-            'description' => $this->faker->sentence(),
+            'name' => Str::title(fake()->unique()->words(2, true)).' Queue',
+            'description' => fake()->sentence(),
             'status' => GeneralStatus::Active,
         ];
     }

@@ -341,6 +341,53 @@ return [
                 ],
             ],
         ],
+        'sla_policy' => [
+            'index' => [
+                'title' => 'SLA Policies',
+                'heading' => 'SLA Policy Management',
+                'description' => 'Manage SLA policies for response and resolution targets.',
+            ],
+            'create' => [
+                'title' => 'Create SLA Policy',
+                'heading' => 'Create New SLA Policy',
+                'description' => 'Define an SLA policy for a ticket type and priority.',
+            ],
+            'show' => [
+                'title' => 'SLA Policy Detail',
+                'heading' => 'SLA Policy Detail',
+                'description' => 'View SLA policy details.',
+            ],
+            'edit' => [
+                'title' => 'Edit SLA Policy',
+                'heading' => 'Edit SLA Policy',
+                'description' => 'Update SLA policy targets.',
+            ],
+            'label' => [
+                'name' => 'Name',
+                'ticket_type' => 'Ticket Type',
+                'all_types' => 'All Types',
+                'priority' => 'Priority',
+                'queue' => 'Queue (optional)',
+                'first_response' => 'First Response Target (minutes)',
+                'resolution' => 'Resolution Target (minutes)',
+                'is_active' => 'Active',
+            ],
+            'placeholder' => [
+                'name' => 'Enter policy name',
+                'ticket_type' => 'All ticket types',
+                'priority' => 'Select priority',
+                'queue' => 'Select queue (optional)',
+            ],
+            'action' => [
+                'create' => 'Create Policy',
+                'update' => 'Update Policy',
+                'back' => 'Back to SLA Policies',
+            ],
+            'message' => [
+                'created' => ['success' => 'SLA policy created successfully.'],
+                'updated' => ['success' => 'SLA policy updated successfully.'],
+            ],
+        ],
         'ticket_category' => [
             'index' => [
                 'title' => 'Ticket Categories',

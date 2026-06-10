@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Admin\MasterData;
 
+use App\Actions\MasterData\TicketCategories\CreateTicketCategory;
+use App\Actions\MasterData\TicketCategories\GetTicketCategoryParentOptions;
+use App\Actions\MasterData\TicketCategories\UpdateTicketCategory;
 use App\Enums\GeneralStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MasterData\StoreTicketCategoryRequest;
@@ -24,32 +27,21 @@ class TicketCategoryController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(GetTicketCategoryParentOptions $parentOptionsAction): Response
     {
         $this->authorize('create', TicketCategory::class);
-
-        $parentOptions = TicketCategory::query()
-            ->whereNull('parent_id')
-            ->where('status', GeneralStatus::Active->value)
-            ->orderBy('name')
-            ->get()
-            ->map(fn (TicketCategory $cat): array => [
-                'value' => $cat->id,
-                'label' => $cat->name,
-            ])
-            ->all();
 
         return Inertia::render('admin/master-data/ticket-categories/Create', [
             'statusOptions' => GeneralStatus::options(),
-            'parentOptions' => $parentOptions,
+            'parentOptions' => $parentOptionsAction->handle(),
         ]);
     }
 
-    public function store(StoreTicketCategoryRequest $request): RedirectResponse
+    public function store(StoreTicketCategoryRequest $request, CreateTicketCategory $createCategory): RedirectResponse
     {
         $this->authorize('create', TicketCategory::class);
 
-        TicketCategory::query()->create($request->validated());
+        $createCategory->handle($request->validated());
 
         Inertia::flash('success', trans('admin.master_data.ticket_category.message.created.success'));
 
@@ -67,34 +59,22 @@ class TicketCategoryController extends Controller
         ]);
     }
 
-    public function edit(TicketCategory $ticketCategory): Response
+    public function edit(TicketCategory $ticketCategory, GetTicketCategoryParentOptions $parentOptionsAction): Response
     {
         $this->authorize('update', $ticketCategory);
-
-        $parentOptions = TicketCategory::query()
-            ->whereNull('parent_id')
-            ->where('id', '!=', $ticketCategory->id)
-            ->where('status', GeneralStatus::Active->value)
-            ->orderBy('name')
-            ->get()
-            ->map(fn (TicketCategory $cat): array => [
-                'value' => $cat->id,
-                'label' => $cat->name,
-            ])
-            ->all();
 
         return Inertia::render('admin/master-data/ticket-categories/Edit', [
             'category' => TicketCategoryResource::make($ticketCategory)->resolve(),
             'statusOptions' => GeneralStatus::options(),
-            'parentOptions' => $parentOptions,
+            'parentOptions' => $parentOptionsAction->handle($ticketCategory->id),
         ]);
     }
 
-    public function update(UpdateTicketCategoryRequest $request, TicketCategory $ticketCategory): RedirectResponse
+    public function update(UpdateTicketCategoryRequest $request, TicketCategory $ticketCategory, UpdateTicketCategory $updateCategory): RedirectResponse
     {
         $this->authorize('update', $ticketCategory);
 
-        $ticketCategory->update($request->validated());
+        $updateCategory->handle($ticketCategory, $request->validated());
 
         Inertia::flash('success', trans('admin.master_data.ticket_category.message.updated.success'));
 

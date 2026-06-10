@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\GeneralStatus;
 use App\Models\TicketCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<TicketCategory>
@@ -20,8 +21,8 @@ class TicketCategoryFactory extends Factory
     {
         return [
             'parent_id' => null,
-            'name' => ucwords($this->faker->unique()->words(2, true)),
-            'description' => $this->faker->sentence(),
+            'name' => Str::title(fake()->unique()->words(2, true)),
+            'description' => fake()->sentence(),
             'status' => GeneralStatus::Active,
         ];
     }

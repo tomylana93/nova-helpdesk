@@ -57,26 +57,26 @@ class SyncRolesCommand extends Command
 
     private function syncRolePermissions(): void
     {
-        $adminPermissions = array_map(
+        $allPermissions = array_map(
             static fn (AdminPermission $permission): string => $permission->value,
             AdminPermission::cases(),
         );
 
         Role::findOrCreate(UserRole::SuperAdmin->value, 'web')
-            ->syncPermissions($adminPermissions);
+            ->syncPermissions($allPermissions);
 
-        foreach (UserRole::cases() as $role) {
-            if ($role === UserRole::SuperAdmin) {
-                continue;
-            }
+        Role::findOrCreate(UserRole::ItAgent->value, 'web')
+            ->syncPermissions([
+                AdminPermission::ViewTickets->value,
+                AdminPermission::CreateTickets->value,
+                AdminPermission::UpdateTickets->value,
+                AdminPermission::ManageApprovals->value,
+            ]);
 
-            $roleModel = Role::findOrCreate($role->value, 'web');
-
-            foreach ($adminPermissions as $permission) {
-                if ($roleModel->hasPermissionTo($permission)) {
-                    $roleModel->revokePermissionTo($permission);
-                }
-            }
-        }
+        Role::findOrCreate(UserRole::Requester->value, 'web')
+            ->syncPermissions([
+                AdminPermission::ViewTickets->value,
+                AdminPermission::CreateTickets->value,
+            ]);
     }
 }

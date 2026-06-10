@@ -34,6 +34,11 @@ export type AuthAbilities = {
     manage_departments: boolean;
     manage_queues: boolean;
     manage_categories: boolean;
+    view_tickets: boolean;
+    create_tickets: boolean;
+    update_tickets: boolean;
+    manage_sla_policies: boolean;
+    manage_approvals: boolean;
 };
 
 export type SharedPageProps = {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tables\MasterData;
 
 use App\Enums\GeneralStatus;
+use App\Http\Resources\BranchOptionResource;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Tables\AbstractTable;
@@ -47,11 +48,12 @@ class DepartmentTable extends AbstractTable
     protected function filterConfigurations(): array
     {
         $branchOptions = Branch::query()
-            ->select(['id as value', 'name as label'])
-            ->where('status', GeneralStatus::Active->value)
+            ->where('status', GeneralStatus::Active)
             ->orderBy('name')
-            ->get()
-            ->toArray();
+            ->get(['id', 'name'])
+            ->mapInto(BranchOptionResource::class)
+            ->map->resolve()
+            ->all();
 
         return [
             $this->searchFilter(

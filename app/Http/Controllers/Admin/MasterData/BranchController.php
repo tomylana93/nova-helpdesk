@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\MasterData;
 
+use App\Actions\MasterData\Branches\CreateBranch;
+use App\Actions\MasterData\Branches\UpdateBranch;
 use App\Enums\GeneralStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MasterData\StoreBranchRequest;
@@ -33,11 +35,11 @@ class BranchController extends Controller
         ]);
     }
 
-    public function store(StoreBranchRequest $request): RedirectResponse
+    public function store(StoreBranchRequest $request, CreateBranch $createBranch): RedirectResponse
     {
         $this->authorize('create', Branch::class);
 
-        Branch::query()->create($request->validated());
+        $createBranch->handle($request->validated());
 
         Inertia::flash('success', trans('admin.master_data.branch.message.created.success'));
 
@@ -63,11 +65,11 @@ class BranchController extends Controller
         ]);
     }
 
-    public function update(UpdateBranchRequest $request, Branch $branch): RedirectResponse
+    public function update(UpdateBranchRequest $request, Branch $branch, UpdateBranch $updateBranch): RedirectResponse
     {
         $this->authorize('update', $branch);
 
-        $branch->update($request->validated());
+        $updateBranch->handle($branch, $request->validated());
 
         Inertia::flash('success', trans('admin.master_data.branch.message.updated.success'));
 

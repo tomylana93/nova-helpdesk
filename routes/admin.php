@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\MasterData\BranchController;
 use App\Http\Controllers\Admin\MasterData\DepartmentController;
 use App\Http\Controllers\Admin\MasterData\QueueController;
+use App\Http\Controllers\Admin\MasterData\SlaPolicyController;
 use App\Http\Controllers\Admin\MasterData\TicketCategoryController;
 use App\Http\Controllers\Admin\MasterData\UserController;
 use App\Http\Controllers\Admin\Settings\GeneralSettingsController;
@@ -47,6 +48,9 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
             'index', 'create', 'store', 'show', 'edit', 'update',
         ]);
         Route::resource('ticket-categories', TicketCategoryController::class)->only([
+            'index', 'create', 'store', 'show', 'edit', 'update',
+        ]);
+        Route::resource('sla-policies', SlaPolicyController::class)->only([
             'index', 'create', 'store', 'show', 'edit', 'update',
         ]);
     });

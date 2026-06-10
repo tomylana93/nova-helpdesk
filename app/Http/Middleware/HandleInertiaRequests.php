@@ -78,6 +78,11 @@ class HandleInertiaRequests extends Middleware
                 'manage_departments' => false,
                 'manage_queues' => false,
                 'manage_categories' => false,
+                'view_tickets' => false,
+                'create_tickets' => false,
+                'update_tickets' => false,
+                'manage_sla_policies' => false,
+                'manage_approvals' => false,
             ];
         }
 
@@ -90,6 +95,11 @@ class HandleInertiaRequests extends Middleware
             'manage_departments' => $user->can(AdminPermission::ManageDepartments->value),
             'manage_queues' => $user->can(AdminPermission::ManageQueues->value),
             'manage_categories' => $user->can(AdminPermission::ManageCategories->value),
+            'view_tickets' => $user->can(AdminPermission::ViewTickets->value),
+            'create_tickets' => $user->can(AdminPermission::CreateTickets->value),
+            'update_tickets' => $user->can(AdminPermission::UpdateTickets->value),
+            'manage_sla_policies' => $user->can(AdminPermission::ManageSlaPolicies->value),
+            'manage_approvals' => $user->can(AdminPermission::ManageApprovals->value),
         ];
     }
 }

@@ -333,6 +333,53 @@ return [
                 ],
             ],
         ],
+        'sla_policy' => [
+            'index' => [
+                'title' => 'Kebijakan SLA',
+                'heading' => 'Manajemen Kebijakan SLA',
+                'description' => 'Kelola kebijakan SLA untuk target respons dan penyelesaian.',
+            ],
+            'create' => [
+                'title' => 'Buat Kebijakan SLA',
+                'heading' => 'Buat Kebijakan SLA Baru',
+                'description' => 'Tentukan kebijakan SLA untuk tipe dan prioritas tiket.',
+            ],
+            'show' => [
+                'title' => 'Detail Kebijakan SLA',
+                'heading' => 'Detail Kebijakan SLA',
+                'description' => 'Lihat detail kebijakan SLA.',
+            ],
+            'edit' => [
+                'title' => 'Edit Kebijakan SLA',
+                'heading' => 'Edit Kebijakan SLA',
+                'description' => 'Perbarui target kebijakan SLA.',
+            ],
+            'label' => [
+                'name' => 'Nama',
+                'ticket_type' => 'Tipe Tiket',
+                'all_types' => 'Semua Tipe',
+                'priority' => 'Prioritas',
+                'queue' => 'Antrean (opsional)',
+                'first_response' => 'Target Respons Pertama (menit)',
+                'resolution' => 'Target Penyelesaian (menit)',
+                'is_active' => 'Aktif',
+            ],
+            'placeholder' => [
+                'name' => 'Masukkan nama kebijakan',
+                'ticket_type' => 'Semua tipe tiket',
+                'priority' => 'Pilih prioritas',
+                'queue' => 'Pilih antrean (opsional)',
+            ],
+            'action' => [
+                'create' => 'Buat Kebijakan',
+                'update' => 'Perbarui Kebijakan',
+                'back' => 'Kembali ke Kebijakan SLA',
+            ],
+            'message' => [
+                'created' => ['success' => 'Kebijakan SLA berhasil dibuat.'],
+                'updated' => ['success' => 'Kebijakan SLA berhasil diperbarui.'],
+            ],
+        ],
         'ticket_category' => [
             'index' => [
                 'title' => 'Kategori Tiket',

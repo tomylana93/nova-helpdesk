@@ -8,3 +8,5 @@ export * from './branch';
 export * from './department';
 export * from './queue';
 export * from './ticket-category';
+export * from './ticket';
+export * from './sla-policy';

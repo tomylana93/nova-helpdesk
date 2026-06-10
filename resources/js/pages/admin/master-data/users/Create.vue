@@ -24,7 +24,7 @@ import type { SelectOption, UserRoleName } from '@/types';
 type Props = {
     userRoleOptions: SelectOption[];
     branchOptions: SelectOption[];
-    departmentOptions: (SelectOption & { branchId: string })[];
+    departmentOptions: (SelectOption & { branch_id: string })[];
 };
 
 type CreateUserFormData = {
@@ -55,7 +55,7 @@ const filteredDepartmentOptions = computed(() => {
     }
 
     return props.departmentOptions.filter(
-        (option) => option.branchId === form.branch_id,
+        (option) => option.branch_id === form.branch_id,
     );
 });
 

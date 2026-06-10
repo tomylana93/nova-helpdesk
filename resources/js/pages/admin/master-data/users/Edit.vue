@@ -26,7 +26,7 @@ type Props = {
     userRoleOptions: SelectOption[];
     userStatusOptions: SelectOption[];
     branchOptions: SelectOption[];
-    departmentOptions: (SelectOption & { branchId: string })[];
+    departmentOptions: (SelectOption & { branch_id: string })[];
 };
 
 type EditUserFormData = {
@@ -59,7 +59,7 @@ const filteredDepartmentOptions = computed(() => {
     }
 
     return props.departmentOptions.filter(
-        (option) => option.branchId === form.branch_id,
+        (option) => option.branch_id === form.branch_id,
     );
 });
 
@@ -68,7 +68,8 @@ watch(
     (newBranchId) => {
         // Only reset if branch changes and selected department doesn't belong to new branch
         const matches = props.departmentOptions.find(
-            (d) => d.value === form.department_id && d.branchId === newBranchId,
+            (d) =>
+                d.value === form.department_id && d.branch_id === newBranchId,
         );
 
         if (!matches) {

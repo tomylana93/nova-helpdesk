@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\MasterData;
 
+use App\Actions\MasterData\Queues\CreateQueue;
+use App\Actions\MasterData\Queues\UpdateQueue;
 use App\Enums\GeneralStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\MasterData\StoreQueueRequest;
@@ -33,11 +35,11 @@ class QueueController extends Controller
         ]);
     }
 
-    public function store(StoreQueueRequest $request): RedirectResponse
+    public function store(StoreQueueRequest $request, CreateQueue $createQueue): RedirectResponse
     {
         $this->authorize('create', Queue::class);
 
-        Queue::query()->create($request->validated());
+        $createQueue->handle($request->validated());
 
         Inertia::flash('success', trans('admin.master_data.queue.message.created.success'));
 
@@ -63,11 +65,11 @@ class QueueController extends Controller
         ]);
     }
 
-    public function update(UpdateQueueRequest $request, Queue $queue): RedirectResponse
+    public function update(UpdateQueueRequest $request, Queue $queue, UpdateQueue $updateQueue): RedirectResponse
     {
         $this->authorize('update', $queue);
 
-        $queue->update($request->validated());
+        $updateQueue->handle($queue, $request->validated());
 
         Inertia::flash('success', trans('admin.master_data.queue.message.updated.success'));
 
