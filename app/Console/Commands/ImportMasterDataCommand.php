@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Branch;
 use App\Models\Department;
+use App\Models\SlaPolicy;
 use App\Models\TicketCategory;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -25,6 +26,7 @@ class ImportMasterDataCommand extends Command
             $this->importBranches();
             $this->importDepartments();
             $this->importCategories();
+            $this->importSlaPolicies();
         });
 
         $this->info('Master data import completed successfully!');
@@ -132,5 +134,36 @@ class ImportMasterDataCommand extends Command
 
         $this->output->progressFinish();
         $this->line('Imported ticket categories: '.count($rows));
+    }
+
+    private function importSlaPolicies(): void
+    {
+        $path = database_path('data/sla_policies.csv');
+        if (! file_exists($path)) {
+            return;
+        }
+
+        $rows = $this->parseCsv($path);
+
+        $this->output->progressStart(count($rows));
+
+        foreach ($rows as $row) {
+            $policy = SlaPolicy::query()->find($row['id']) ?: new SlaPolicy;
+            $policy->forceFill([
+                'id' => $row['id'],
+                'name' => $row['name'],
+                'ticket_type' => $row['ticket_type'] ?: null,
+                'priority' => $row['priority'],
+                'first_response_target_minutes' => (int) $row['first_response_target_minutes'],
+                'resolution_target_minutes' => (int) $row['resolution_target_minutes'],
+                'is_active' => filter_var($row['is_active'], FILTER_VALIDATE_BOOLEAN),
+                'created_at' => $row['created_at'] ?: null,
+                'updated_at' => $row['updated_at'] ?: null,
+            ])->save();
+            $this->output->progressAdvance();
+        }
+
+        $this->output->progressFinish();
+        $this->line('Imported SLA policies: '.count($rows));
     }
 }
