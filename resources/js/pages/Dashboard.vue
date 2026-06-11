@@ -45,10 +45,7 @@ import {
 } from '@/components/ui/tooltip';
 import { dashboard } from '@/routes';
 import { index as ticketsIndex, show } from '@/routes/tickets';
-import type {
-    AuthenticatedSharedPageProps,
-    TicketSlaTarget,
-} from '@/types';
+import type { AuthenticatedSharedPageProps, TicketSlaTarget } from '@/types';
 
 defineOptions({
     layout: {
@@ -203,7 +200,6 @@ function slaStateClass(state: TicketSlaTarget['state']): string {
 function slaTitle(target: TicketSlaTarget): string | null {
     return target.dueAt ? new Date(target.dueAt).toLocaleString() : null;
 }
-
 </script>
 
 <template>
