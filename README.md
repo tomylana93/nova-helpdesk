@@ -122,3 +122,71 @@ composer test
 # Run a focused test
 php artisan test --compact --filter=TicketLifecycleTest
 ```
+
+---
+
+## 🔄 Ticket Lifecycle State Machine
+
+Below is the state transition diagram showing how support tickets (Incidents and Service Requests) move through the lifecycle status machine (`TicketStatus`):
+
+```mermaid
+stateDiagram-v2
+    [*] --> PendingApproval : Service Request
+    [*] --> Open : Incident
+
+    PendingApproval --> InProgress : Approved by IT Agent
+    PendingApproval --> Closed : Rejected / Cancelled
+
+    Open --> InProgress : Start Work (IT Agent)
+    Open --> WaitingForRequester : Request Information
+    Open --> Closed : Cancelled
+
+    InProgress --> WaitingForRequester : Request Information
+    InProgress --> Resolved : Resolve Ticket
+    InProgress --> Closed : Cancelled
+
+    WaitingForRequester --> InProgress : Reply from Requester / Resume Work
+    WaitingForRequester --> Resolved : Resolve Ticket
+    WaitingForRequester --> Closed : Cancelled
+
+    Resolved --> Closed : Confirm Resolution (Requester)
+    Resolved --> Reopened : Reopen Ticket
+
+    Closed --> Reopened : Reopen Ticket
+
+    Reopened --> InProgress : Resume Work
+    Reopened --> WaitingForRequester : Request Information
+    Reopened --> Resolved : Resolve Ticket
+```
+
+---
+
+## 💻 Custom Artisan Commands Reference
+
+Nova Helpdesk includes custom Artisan commands to manage application data, setup roles, check SLAs, and accelerate development:
+
+| Command                    | Description                                                                                                        | Example Usage                                           |
+| :------------------------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------ |
+| `init:superadmin`          | Seed the default Super Admin user using details configured in your `.env`.                                         | `php artisan init:superadmin`                           |
+| `app:import-master-data`   | Import initial system master data (users, departments, branches, SLA policies, and categories) from CSV templates. | `php artisan app:import-master-data`                    |
+| `app:check-sla-escalation` | Check for SLA warning/breach conditions and dispatch notifications/alerts. Run this on a cron scheduler.           | `php artisan app:check-sla-escalation`                  |
+| `sync:roles`               | Synchronize the Spatie roles and permissions catalog defined in the backend codebase.                              | `php artisan sync:roles`                                |
+| `app:bump-version {type}`  | Bump SemVer version, update `version.json`, update `CHANGELOG.md`, and create Git tags.                            | `php artisan app:bump-version auto`                     |
+| `make:action`              | Create a new thin action class for business/domain logic under `app/Actions`.                                      | `php artisan make:action Actions/Helpdesk/CreateTicket` |
+| `make:table`               | Create boilerplate schema properties for DataTable client-side integration.                                        | `php artisan make:table TicketTable`                    |
+| `prune:temporary-uploads`  | Prune expired or orphaned temporary media upload attachments from storage.                                         | `php artisan prune:temporary-uploads`                   |
+| `lang:export` (via `pnpm`) | Export backend PHP translations to frontend JSON files.                                                            | `pnpm run lang:export`                                  |
+
+---
+
+## ⚙️ Key Environment Variables (`.env`)
+
+Configure these essential keys in your `.env` to enable specific application systems:
+
+| Variable                | Description                                                                | Default / Recommended      |
+| :---------------------- | :------------------------------------------------------------------------- | :------------------------- |
+| `DB_CONNECTION`         | Backend database driver. Uses SQLite locally for zero-config.              | `sqlite`                   |
+| `BROADCAST_CONNECTION`  | Driver for real-time events. Set to `reverb` for live notifications.       | `reverb` (or `log` in dev) |
+| `QUEUE_CONNECTION`      | Queue worker driver. Ensure `php artisan queue:listen` runs in production. | `database`                 |
+| `NOVA_SUPERADMIN_NAME`  | Default name of the Super Admin user when running `init:superadmin`.       | `"Super Admin"`            |
+| `NOVA_SUPERADMIN_EMAIL` | Default email of the Super Admin user when running `init:superadmin`.      | `"admin@novacore.com"`     |
