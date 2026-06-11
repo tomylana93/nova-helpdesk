@@ -5,6 +5,7 @@ use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Notifications\TicketNotification;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Notification;
 
 function lifecycleTicket(TicketStatus $status, string $requesterId, string $agentId): Ticket
@@ -129,6 +130,19 @@ test('an it agent can approve a pending service request', function (): void {
     expect($ticket->fresh()->status)->toBe(TicketStatus::InProgress);
 });
 
+test('a non-assigned it agent cannot approve a pending service request', function (): void {
+    $assignedAgent = createAgentUser();
+    $otherAgent = createAgentUser();
+    $requester = createRequesterUser();
+    $ticket = lifecycleTicket(TicketStatus::PendingApproval, $requester->id, $assignedAgent->id);
+
+    $this->actingAs($otherAgent)
+        ->post(route('tickets.approve', $ticket), ['decision_note' => 'Approved'])
+        ->assertForbidden();
+
+    expect($ticket->fresh()->status)->toBe(TicketStatus::PendingApproval);
+});
+
 // --- Agent transitions via the dedicated lifecycle endpoint ---
 
 test('an agent transitions a ticket through the lifecycle endpoint and notifies the requester', function (): void {
@@ -144,6 +158,31 @@ test('an agent transitions a ticket through the lifecycle endpoint and notifies 
 
     expect($ticket->fresh()->status)->toBe(TicketStatus::InProgress);
     Notification::assertSentTo($requester, TicketNotification::class, fn ($n): bool => $n->type === 'status_changed');
+});
+
+test('an agent transition to in progress marks first response once', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
+
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $ticket = lifecycleTicket(TicketStatus::Open, $requester->id, $agent->id);
+
+    $this->actingAs($agent)
+        ->post(route('tickets.transition', $ticket), ['status' => TicketStatus::InProgress->value])
+        ->assertRedirect();
+
+    expect($ticket->fresh()->first_responded_at?->toDateTimeString())->toBe('2026-06-11 10:00:00');
+
+    $this->travelTo(Date::parse('2026-06-11 10:10:00'));
+
+    $this->actingAs($agent)
+        ->post(route('tickets.comments.store', $ticket), [
+            'body' => 'Working on this now.',
+            'visibility' => 'public',
+        ])
+        ->assertRedirect();
+
+    expect($ticket->fresh()->first_responded_at?->toDateTimeString())->toBe('2026-06-11 10:00:00');
 });
 
 test('the lifecycle endpoint rejects an illegal status move', function (): void {

@@ -149,19 +149,19 @@ test('adding comment sends notification', function (): void {
 test('approving and rejecting tickets sends notifications', function (): void {
     Notification::fake();
 
-    $admin = User::factory()->create();
-    $admin->syncRoles([UserRole::SuperAdmin->value]);
+    $agent = createAgentUser();
 
     $requester = User::factory()->create();
     $requester->syncRoles([UserRole::Requester->value]);
 
     $ticket1 = Ticket::factory()->create([
+        'assigned_to' => $agent->id,
         'requester_id' => $requester->id,
         'status' => TicketStatus::PendingApproval,
     ]);
 
     // Approve
-    $this->actingAs($admin)
+    $this->actingAs($agent)
         ->post(route('tickets.approve', $ticket1), ['decision_note' => 'Approved'])
         ->assertRedirect();
 
@@ -172,11 +172,12 @@ test('approving and rejecting tickets sends notifications', function (): void {
     // Reject
     Notification::fake();
     $ticket2 = Ticket::factory()->create([
+        'assigned_to' => $agent->id,
         'requester_id' => $requester->id,
         'status' => TicketStatus::PendingApproval,
     ]);
 
-    $this->actingAs($admin)
+    $this->actingAs($agent)
         ->post(route('tickets.reject', $ticket2), ['decision_note' => 'Rejected'])
         ->assertRedirect();
 

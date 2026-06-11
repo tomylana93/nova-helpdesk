@@ -44,7 +44,10 @@ class TicketPolicy
 
     public function approve(User $user, Ticket $ticket): bool
     {
-        return $user->can(AdminPermission::ManageApprovals->value);
+        return $user->can(AdminPermission::ManageApprovals->value)
+            && $user->hasRole(UserRole::ItAgent)
+            && $ticket->assigned_to === $user->id
+            && $ticket->status === TicketStatus::PendingApproval;
     }
 
     public function reopen(User $user, Ticket $ticket): bool

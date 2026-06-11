@@ -52,6 +52,7 @@ return [
             'resolution' => 'Resolution',
             'no_sla' => 'No SLA',
             'completed' => 'Completed',
+            'completed_in' => 'Completed in :duration',
             'remaining' => ':duration left',
             'overdue' => ':duration overdue',
             'minutes' => '{1} :count min|[2,*] :count mins',

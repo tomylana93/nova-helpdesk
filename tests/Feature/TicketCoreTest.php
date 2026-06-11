@@ -9,6 +9,7 @@ use App\Models\Ticket;
 use App\Models\TicketAttachment;
 use App\Models\TicketCategory;
 use App\Models\TicketComment;
+use App\Models\TicketNumberSequence;
 use App\Models\User;
 
 test('it can create a ticket with relationships and casts', function (): void {
@@ -72,6 +73,10 @@ test('it generates sequential ticket numbers based on ticket type', function ():
         'requester_id' => $requester->id,
     ]);
     expect($request2->ticket_number)->toBe('REQ-00002');
+
+    expect(TicketNumberSequence::query()->find(TicketType::Incident->value)?->next_number)->toBe(3)
+        ->and(TicketNumberSequence::query()->find(TicketType::ServiceRequest->value)?->next_number)->toBe(3)
+        ->and(Ticket::query()->pluck('ticket_number')->unique())->toHaveCount(4);
 });
 
 test('it can add comments to a ticket and filter public comments', function (): void {

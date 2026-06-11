@@ -90,7 +90,7 @@ class TicketController extends Controller
                     $ticket->status->agentActionableTransitions(),
                 )
                 : [],
-            'canApprove' => $isAgent && $ticket->status === TicketStatus::PendingApproval,
+            'canApprove' => $isAgent && $user->can('approve', $ticket),
             // Guarded by $isRequester so super_admin's Gate::before bypass never surfaces these controls.
             'canReopen' => $isRequester && $user->can('reopen', $ticket),
             'canConfirm' => $isRequester && $user->can('confirmResolution', $ticket),

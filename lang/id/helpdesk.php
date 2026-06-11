@@ -52,6 +52,7 @@ return [
             'resolution' => 'Penyelesaian',
             'no_sla' => 'Tidak ada SLA',
             'completed' => 'Selesai',
+            'completed_in' => 'Selesai dalam :duration',
             'remaining' => 'Sisa :duration',
             'overdue' => 'Lewat :duration',
             'minutes' => ':count menit',

@@ -9,6 +9,10 @@ use App\Notifications\TicketNotification;
 
 class AddTicketComment
 {
+    public function __construct(
+        private readonly MarkFirstResponse $markFirstResponse,
+    ) {}
+
     public function handle(Ticket $ticket, User $user, string $body, string $visibility = 'public'): TicketComment
     {
         $comment = TicketComment::query()->create([
@@ -17,6 +21,10 @@ class AddTicketComment
             'body' => $body,
             'visibility' => $visibility,
         ]);
+
+        if ($user->id !== $ticket->requester_id) {
+            $this->markFirstResponse->handle($ticket);
+        }
 
         // If commenter is the requester, notify the assigned agent
         if ($user->id === $ticket->requester_id) {

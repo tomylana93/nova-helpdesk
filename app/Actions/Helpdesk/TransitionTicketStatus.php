@@ -12,6 +12,7 @@ class TransitionTicketStatus
 {
     public function __construct(
         private readonly RecordTicketActivity $recordActivity,
+        private readonly MarkFirstResponse $markFirstResponse,
     ) {}
 
     /**
@@ -35,6 +36,10 @@ class TransitionTicketStatus
         }
 
         $ticket->update($this->lifecycleChanges($ticket, $to));
+
+        if ($to === TicketStatus::InProgress && $actor->id !== $ticket->requester_id) {
+            $this->markFirstResponse->handle($ticket);
+        }
 
         $this->recordActivity->handle($ticket, 'status_changed', $actor, [
             'from' => $from->value,
