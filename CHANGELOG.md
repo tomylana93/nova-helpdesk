@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.4] - 2026-06-11
+
+### Other Changes
+- Add Nginx and Supervisor configuration templates for Reverb and Queue deployment
+- Merge branch 'dev' into main
+
 ## [0.13.3] - 2026-06-11
 
 ### Other Changes
