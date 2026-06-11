@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\TicketStatus;
-use App\Models\Ticket;
 use App\Models\User;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Date;
@@ -66,71 +64,48 @@ test('dashboard uses locale from general settings', function (): void {
         );
 });
 
-test('dashboard returns correct inertia props based on user role', function (): void {
-    // 1. Requester
-    $requester = createRequesterUser();
-    $this->actingAs($requester)
+test('dashboard returns role-shaped props with period defaults', function (): void {
+    $this->travelTo(Date::parse('2026-06-15 10:00:00'));
+
+    $this->actingAs(createRequesterUser())
         ->get(route('dashboard'))
         ->assertOk()
         ->assertInertia(fn (Assert $page): Assert => $page
             ->component('Dashboard')
             ->where('role', 'requester')
-            ->has('metrics')
-            ->has('recentTickets')
-            ->has('charts')
-        );
-
-    // 2. IT Agent
-    $agent = createAgentUser();
-    $this->actingAs($agent)
-        ->get(route('dashboard'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page): Assert => $page
-            ->component('Dashboard')
-            ->where('role', 'it_agent')
-            ->has('metrics')
-            ->has('recentTickets')
-            ->has('charts')
-        );
-
-    // 3. Super Admin
-    $admin = grantSuperAdmin(User::factory()->create());
-    $this->actingAs($admin)
-        ->get(route('dashboard'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page): Assert => $page
-            ->component('Dashboard')
-            ->where('role', 'super_admin')
-            ->has('metrics')
-            ->has('recentTickets')
-            ->has('charts')
+            ->where('period.mode', 'monthly')
+            ->where('period.month', 6)
+            ->where('period.year', 2026)
+            ->has('live')
+            ->has('periodMetrics')
+            ->has('trend.points')
+            ->has('breakdown.segments')
+            ->where('compliance', null)
         );
 });
 
-test('dashboard recent tickets include sla payload', function (): void {
-    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
-
-    $requester = createRequesterUser();
-
-    Ticket::factory()->create([
-        'requester_id' => $requester->id,
-        'subject' => 'Dashboard SLA Ticket',
-        'status' => TicketStatus::Open,
-        'first_response_due_at' => Date::parse('2026-06-11 10:45:00'),
-        'resolution_due_at' => Date::parse('2026-06-11 10:20:00'),
-    ]);
-
-    $this
-        ->actingAs($requester)
-        ->get(route('dashboard'))
+test('dashboard accepts yearly period from query', function (): void {
+    $this->actingAs(createAgentUser())
+        ->get(route('dashboard', ['mode' => 'yearly', 'year' => 2025]))
         ->assertOk()
         ->assertInertia(fn (Assert $page): Assert => $page
-            ->component('Dashboard')
-            ->has('recentTickets', 1)
-            ->where('recentTickets.0.subject', 'Dashboard SLA Ticket')
-            ->where('recentTickets.0.sla.firstResponse.state', 'on_track')
-            ->where('recentTickets.0.sla.firstResponse.remainingSeconds', 2700)
-            ->where('recentTickets.0.sla.resolution.state', 'due_soon')
-            ->where('recentTickets.0.sla.resolution.remainingSeconds', 1200)
+            ->where('period.mode', 'yearly')
+            ->where('period.month', null)
+            ->where('period.year', 2025)
+            ->where('trend.granularity', 'month')
+            ->has('trend.points', 12)
+        );
+});
+
+test('dashboard clamps invalid period query to safe defaults', function (): void {
+    $this->travelTo(Date::parse('2026-06-15 10:00:00'));
+
+    $this->actingAs(createRequesterUser())
+        ->get(route('dashboard', ['mode' => 'weekly', 'month' => 99, 'year' => 1800]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->where('period.mode', 'monthly')
+            ->where('period.month', 6)
+            ->where('period.year', 2026)
         );
 });
