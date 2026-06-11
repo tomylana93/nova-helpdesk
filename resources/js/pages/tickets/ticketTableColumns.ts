@@ -15,10 +15,53 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTrans } from '@/composables/useTrans';
 import { edit, show } from '@/routes/tickets';
-import type { SharedPageProps, TicketTableRow } from '@/types';
+import type { SharedPageProps, TicketSlaTarget, TicketTableRow } from '@/types';
 
 const { trans } = useTrans();
 const page = usePage<SharedPageProps>();
+
+function slaStateClass(state: TicketSlaTarget['state']): string {
+    if (state === 'overdue') {
+        return 'text-destructive';
+    }
+
+    if (state === 'due_soon') {
+        return 'text-amber-600 dark:text-amber-400';
+    }
+
+    if (state === 'no_sla' || state === 'completed') {
+        return 'text-muted-foreground';
+    }
+
+    return 'text-foreground';
+}
+
+function slaTitle(target: TicketSlaTarget): string | undefined {
+    return target.dueAt ? new Date(target.dueAt).toLocaleString() : undefined;
+}
+
+function renderSlaTarget(target: TicketSlaTarget) {
+    return h(
+        'div',
+        {
+            class: 'flex items-center justify-between gap-3 text-xs leading-5',
+            title: slaTitle(target),
+        },
+        [
+            h('span', { class: 'text-muted-foreground' }, target.label),
+            h(
+                'span',
+                {
+                    class: [
+                        'max-w-28 truncate text-right font-medium',
+                        slaStateClass(target.state),
+                    ].join(' '),
+                },
+                target.statusLabel,
+            ),
+        ],
+    );
+}
 
 export function ticketTableColumns(): ColumnDef<TicketTableRow>[] {
     const canUpdate = page.props.auth.abilities.update_tickets;
@@ -134,6 +177,21 @@ export function ticketTableColumns(): ColumnDef<TicketTableRow>[] {
                     },
                     () => row.original.priorityLabel,
                 ),
+        },
+        {
+            accessorKey: 'sla',
+            meta: { label: 'SLA' },
+            enableSorting: false,
+            header: ({ column }) =>
+                h(DataTableColumnHeader, {
+                    column,
+                    title: 'SLA',
+                }),
+            cell: ({ row }) =>
+                h('div', { class: 'min-w-44 space-y-0.5' }, [
+                    renderSlaTarget(row.original.sla.firstResponse),
+                    renderSlaTarget(row.original.sla.resolution),
+                ]),
         },
         {
             accessorKey: 'requesterName',

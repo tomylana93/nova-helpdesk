@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2026-06-11
+
+### Added
+- feat(tickets): show remaining sla in ticket table
+
 ## [0.10.2] - 2026-06-11
 
 ### Fixed

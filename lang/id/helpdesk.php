@@ -47,6 +47,17 @@ return [
             'unassigned' => 'Belum ditugaskan',
             'overdue' => 'Terlambat',
         ],
+        'sla' => [
+            'first_response' => 'Respons pertama',
+            'resolution' => 'Penyelesaian',
+            'no_sla' => 'Tidak ada SLA',
+            'completed' => 'Selesai',
+            'remaining' => 'Sisa :duration',
+            'overdue' => 'Lewat :duration',
+            'minutes' => ':count menit',
+            'hours' => ':count jam',
+            'hours_minutes' => ':hours :minutes',
+        ],
         'transition' => [
             'in_progress' => 'Mulai Kerjakan',
             'waiting_for_requester' => 'Tunggu Requester',

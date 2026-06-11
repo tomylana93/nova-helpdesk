@@ -9,6 +9,8 @@ use App\Models\SlaPolicy;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
+use Inertia\Testing\AssertableInertia as Assert;
 
 // --- INDEX ---
 
@@ -30,6 +32,73 @@ test('agent can access ticket index', function (): void {
     $response = $this->actingAs($agent)->get(route('tickets.index'));
 
     $response->assertStatus(200);
+});
+
+test('ticket index exposes remaining sla state in the deferred table payload', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
+
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'subject' => 'Future SLA',
+        'status' => TicketStatus::Open,
+        'first_response_due_at' => Date::parse('2026-06-11 10:45:00'),
+        'resolution_due_at' => Date::parse('2026-06-11 10:20:00'),
+        'created_at' => Date::parse('2026-06-11 09:00:00'),
+    ]);
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'subject' => 'Past SLA',
+        'status' => TicketStatus::Open,
+        'first_response_due_at' => Date::parse('2026-06-11 09:45:00'),
+        'resolution_due_at' => Date::parse('2026-06-11 09:30:00'),
+        'created_at' => Date::parse('2026-06-11 09:01:00'),
+    ]);
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'subject' => 'Completed SLA',
+        'status' => TicketStatus::Resolved,
+        'first_response_due_at' => Date::parse('2026-06-11 10:45:00'),
+        'resolution_due_at' => Date::parse('2026-06-11 11:00:00'),
+        'created_at' => Date::parse('2026-06-11 09:02:00'),
+    ]);
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'subject' => 'No SLA',
+        'status' => TicketStatus::Open,
+        'first_response_due_at' => null,
+        'resolution_due_at' => null,
+        'created_at' => Date::parse('2026-06-11 09:03:00'),
+    ]);
+
+    $this
+        ->actingAs($agent)
+        ->get(route('tickets.index'))
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('tickets/Index')
+            ->missing('table')
+            ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+                ->has('table.rows', 4)
+                ->where('table.rows.0.subject', 'No SLA')
+                ->where('table.rows.0.sla.firstResponse.state', 'no_sla')
+                ->where('table.rows.0.sla.firstResponse.remainingSeconds', null)
+                ->where('table.rows.1.subject', 'Completed SLA')
+                ->where('table.rows.1.sla.firstResponse.state', 'completed')
+                ->where('table.rows.1.sla.resolution.state', 'completed')
+                ->where('table.rows.2.subject', 'Past SLA')
+                ->where('table.rows.2.sla.firstResponse.state', 'overdue')
+                ->where('table.rows.2.sla.resolution.remainingSeconds', -1800)
+                ->where('table.rows.3.subject', 'Future SLA')
+                ->where('table.rows.3.sla.firstResponse.state', 'on_track')
+                ->where('table.rows.3.sla.firstResponse.remainingSeconds', 2700)
+                ->where('table.rows.3.sla.resolution.state', 'due_soon')
+                ->where('table.rows.3.sla.resolution.remainingSeconds', 1200)
+            ));
 });
 
 test('unauthenticated user is redirected from ticket index', function (): void {
