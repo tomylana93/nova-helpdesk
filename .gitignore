@@ -30,3 +30,4 @@ yarn-error.log
 /lang/*.json
 /database/data/*.csv
 
+/deploy.sh

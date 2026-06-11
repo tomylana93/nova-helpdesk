@@ -14,11 +14,15 @@ return new class extends Migration
     {
         Schema::create('ticket_categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('parent_id')->nullable()->constrained('ticket_categories')->nullOnDelete();
+            $table->uuid('parent_id')->nullable();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('status')->default(GeneralStatus::Active->value);
             $table->timestamps();
+        });
+
+        Schema::table('ticket_categories', function (Blueprint $table) {
+            $table->foreign('parent_id')->references('id')->on('ticket_categories')->nullOnDelete();
         });
     }
 
