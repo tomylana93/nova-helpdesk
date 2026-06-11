@@ -89,6 +89,10 @@ class Ticket extends Model
             if (empty($ticket->priority)) {
                 $ticket->priority = TicketPriority::Low;
             }
+
+            if (empty($ticket->submitted_at)) {
+                $ticket->submitted_at = new Carbon;
+            }
         });
     }
 
