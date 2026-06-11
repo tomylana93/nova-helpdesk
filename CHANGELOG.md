@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.1] - 2026-06-11
+
+### Other Changes
+- docs(memory): add git publish handoff workflow
+- Merge pull request #17 from tomylana93/dev
+
 ## [0.11.0] - 2026-06-11
 
 ### Added
