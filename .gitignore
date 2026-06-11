@@ -31,3 +31,4 @@ yarn-error.log
 /database/data/*.csv
 
 /deploy.sh
+/.deploy
