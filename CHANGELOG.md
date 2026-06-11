@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.1] - 2026-06-11
+
+### Other Changes
+- Merge pull request #19 from tomylana93/dev
+- style(frontend): fix prettier formatting on Dashboard.vue
+
 ## [0.12.0] - 2026-06-11
 
 ### Added
