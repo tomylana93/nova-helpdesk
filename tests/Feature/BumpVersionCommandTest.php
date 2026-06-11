@@ -52,8 +52,16 @@ test('it bumps to specific version correctly', function (): void {
     expect($data['version'])->toBe('1.2.3');
 });
 
+test('it handles auto mode bump correctly', function (): void {
+    // This will execute git log on the actual repository
+    // Since the repo has commits, it should detect a bump type (major, minor, or patch)
+    // and successfully bump the version.
+    $this->artisan('app:bump-version auto')
+        ->assertSuccessful();
+});
+
 test('it rejects invalid bump type', function (): void {
     $this->artisan('app:bump-version invalid')
-        ->expectsOutput("Invalid bump type or version format. Use 'major', 'minor', 'patch', or a specific version like '0.8.0'.")
+        ->expectsOutput("Invalid bump type or version format. Use 'major', 'minor', 'patch', 'auto', or a specific version like '0.8.0'.")
         ->assertFailed();
 });

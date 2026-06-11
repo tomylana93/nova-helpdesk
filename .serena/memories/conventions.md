@@ -9,3 +9,4 @@
 - Frontend formatting uses Prettier (single quotes, semicolons, 4-space indentation, Tailwind class sorting).
 - Auth behavior is status-based (`UserStatus` + `active` middleware); Fortify optional feature currently enabled is reset password only.
 - Prefer Pest feature tests (with `RefreshDatabase` where applicable) for behavior-level verification.
+- Follow Conventional Commits and manage Semantic Versioning using `mem:versioning`.
