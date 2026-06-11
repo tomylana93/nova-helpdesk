@@ -2,7 +2,7 @@
 
 namespace App\Actions\Dashboard\Support;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
 
 class DashboardPeriod
@@ -37,28 +37,28 @@ class DashboardPeriod
         return new self('monthly', $month, $year);
     }
 
-    public function start(): Carbon
+    public function start(): CarbonInterface
     {
         return $this->mode === 'yearly'
             ? Date::create($this->year, 1, 1)->startOfDay()
             : Date::create($this->year, $this->month, 1)->startOfMonth();
     }
 
-    public function end(): Carbon
+    public function end(): CarbonInterface
     {
         return $this->mode === 'yearly'
             ? Date::create($this->year, 12, 1)->endOfYear()
             : Date::create($this->year, $this->month, 1)->endOfMonth();
     }
 
-    public function previousStart(): Carbon
+    public function previousStart(): CarbonInterface
     {
         return $this->mode === 'yearly'
             ? $this->start()->copy()->subYear()->startOfYear()
             : $this->start()->copy()->subMonthNoOverflow()->startOfMonth();
     }
 
-    public function previousEnd(): Carbon
+    public function previousEnd(): CarbonInterface
     {
         return $this->mode === 'yearly'
             ? $this->end()->copy()->subYear()->endOfYear()
