@@ -7,9 +7,9 @@ use Spatie\LaravelSettings\Settings;
 
 class GeneralSettings extends Settings
 {
-    public string $site_name = 'Nova Core';
+    public string $site_name = 'Nova Helpdesk';
 
-    public string $site_description = 'A All-in-one logistics management system';
+    public string $site_description = 'Nova Helpdesk is a modern, single-company internal IT Helpdesk system designed to manage and resolve support tickets (incidents and service requests) across multiple company branches.';
 
     public string $site_locale = SiteLocale::English->value;
 

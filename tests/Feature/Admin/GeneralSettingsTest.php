@@ -11,7 +11,7 @@ test('general settings page is displayed', function (): void {
         ->get(route('admin.settings.general.edit'))
         ->assertInertia(fn (Assert $page): Assert => $page
             ->component('admin/settings/general/Edit')
-            ->where('generalSettings.site_name', 'Nova Core')
+            ->where('generalSettings.site_name', 'Nova Helpdesk')
             ->where('generalSettings.site_locale', 'en')
             ->has('localeOptions', 2)
             ->where('localeOptions.0.icon', 'us')
