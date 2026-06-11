@@ -75,6 +75,19 @@ enum TicketStatus: string
     }
 
     /**
+     * Statuses considered "active" (not resolved or closed).
+     *
+     * @return list<self>
+     */
+    public static function activeCases(): array
+    {
+        return array_values(array_filter(
+            self::cases(),
+            static fn (self $status): bool => ! in_array($status, [self::Resolved, self::Closed], true),
+        ));
+    }
+
+    /**
      * Transitions an agent may trigger from the ticket detail UI. Approval moves (from
      * PendingApproval) go through the approve/reject form and Reopened is a requester
      * action, so both are excluded here.

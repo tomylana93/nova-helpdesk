@@ -9,3 +9,4 @@ export * from './department';
 export * from './ticket-category';
 export * from './ticket';
 export * from './sla-policy';
+export * from './dashboard';
