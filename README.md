@@ -13,7 +13,6 @@
   <img src="https://img.shields.io/badge/Vue-3-4fc08d.svg?style=flat&logo=vue.js" alt="Vue Version">
   <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg?style=flat&logo=tailwindcss" alt="Tailwind CSS Version">
   <img src="https://img.shields.io/badge/Tests-Pest_PHP-00b4b6.svg?style=flat&logo=pest" alt="Pest PHP Version">
-  <img src="https://img.shields.io/badge/Code_Style-Laravel_Pint-000000.svg?style=flat" alt="Laravel Pint">
   <img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="License">
 </p>
 
