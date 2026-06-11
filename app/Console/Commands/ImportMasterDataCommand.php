@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Branch;
 use App\Models\Department;
-use App\Models\Queue;
 use App\Models\TicketCategory;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -12,7 +11,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 #[Signature('master-data:import')]
-#[Description('Import master data (branches, departments, queues, categories) from CSV files')]
+#[Description('Import master data (branches, departments, categories) from CSV files')]
 class ImportMasterDataCommand extends Command
 {
     /**
@@ -25,7 +24,6 @@ class ImportMasterDataCommand extends Command
         DB::transaction(function (): void {
             $this->importBranches();
             $this->importDepartments();
-            $this->importQueues();
             $this->importCategories();
         });
 
@@ -109,30 +107,6 @@ class ImportMasterDataCommand extends Command
 
         $this->output->progressFinish();
         $this->line('Imported departments: '.count($rows));
-    }
-
-    private function importQueues(): void
-    {
-        $path = database_path('data/queues.csv');
-        $rows = $this->parseCsv($path);
-
-        $this->output->progressStart(count($rows));
-
-        foreach ($rows as $row) {
-            $queue = Queue::query()->find($row['id']) ?: new Queue;
-            $queue->forceFill([
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'description' => $row['description'] ?: null,
-                'status' => $row['status'],
-                'created_at' => $row['created_at'] ?: null,
-                'updated_at' => $row['updated_at'] ?: null,
-            ])->save();
-            $this->output->progressAdvance();
-        }
-
-        $this->output->progressFinish();
-        $this->line('Imported queues: '.count($rows));
     }
 
     private function importCategories(): void

@@ -296,51 +296,6 @@ return [
                 ],
             ],
         ],
-        'queue' => [
-            'index' => [
-                'title' => 'Queues',
-                'heading' => 'Queue Management',
-                'description' => 'Manage ticket queues.',
-            ],
-            'create' => [
-                'title' => 'Create Queue',
-                'heading' => 'Create New Queue',
-                'description' => 'Add a new ticket queue.',
-            ],
-            'show' => [
-                'title' => 'Queue Detail',
-                'heading' => 'Queue Detail',
-                'description' => 'View queue details.',
-            ],
-            'edit' => [
-                'title' => 'Edit Queue',
-                'heading' => 'Edit Queue',
-                'description' => 'Update queue details.',
-            ],
-            'label' => [
-                'name' => 'Name',
-                'description' => 'Description',
-                'status' => 'Status',
-            ],
-            'placeholder' => [
-                'name' => 'Enter queue name',
-                'description' => 'Enter queue description',
-                'status' => 'Select status',
-            ],
-            'action' => [
-                'create' => 'Create Queue',
-                'update' => 'Update Queue',
-                'back' => 'Back to Queues',
-            ],
-            'message' => [
-                'created' => [
-                    'success' => 'Queue created successfully.',
-                ],
-                'updated' => [
-                    'success' => 'Queue updated successfully.',
-                ],
-            ],
-        ],
         'sla_policy' => [
             'index' => [
                 'title' => 'SLA Policies',
@@ -367,7 +322,6 @@ return [
                 'ticket_type' => 'Ticket Type',
                 'all_types' => 'All Types',
                 'priority' => 'Priority',
-                'queue' => 'Queue (optional)',
                 'first_response' => 'First Response Target (minutes)',
                 'resolution' => 'Resolution Target (minutes)',
                 'is_active' => 'Active',
@@ -376,7 +330,6 @@ return [
                 'name' => 'Enter policy name',
                 'ticket_type' => 'All ticket types',
                 'priority' => 'Select priority',
-                'queue' => 'Select queue (optional)',
             ],
             'action' => [
                 'create' => 'Create Policy',

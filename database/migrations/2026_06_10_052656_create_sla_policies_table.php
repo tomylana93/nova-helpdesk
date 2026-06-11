@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('ticket_type')->nullable();
             $table->string('priority');
-            $table->foreignUuid('queue_id')->nullable()->constrained('queues')->nullOnDelete();
             $table->unsignedInteger('first_response_target_minutes');
             $table->unsignedInteger('resolution_target_minutes');
             $table->boolean('is_active')->default(true);

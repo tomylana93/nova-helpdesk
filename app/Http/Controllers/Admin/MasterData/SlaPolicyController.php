@@ -48,8 +48,6 @@ class SlaPolicyController extends Controller
     {
         $this->authorize('view', $slaPolicy);
 
-        $slaPolicy->load('queue');
-
         return Inertia::render('admin/master-data/sla-policies/Show', [
             'slaPolicy' => SlaPolicyResource::make($slaPolicy)->resolve(),
         ]);
@@ -58,8 +56,6 @@ class SlaPolicyController extends Controller
     public function edit(SlaPolicy $slaPolicy, GetSlaPolicyFormOptions $formOptions): Response
     {
         $this->authorize('update', $slaPolicy);
-
-        $slaPolicy->load('queue');
 
         return Inertia::render('admin/master-data/sla-policies/Edit', [
             'slaPolicy' => SlaPolicyResource::make($slaPolicy)->resolve(),

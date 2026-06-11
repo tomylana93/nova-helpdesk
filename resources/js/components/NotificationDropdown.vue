@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { useEcho, useEchoNotification } from '@laravel/echo-vue';
+import { useEchoNotification } from '@laravel/echo-vue';
 import { Bell, CheckCheck, Inbox } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
@@ -25,14 +25,6 @@ interface EchoNotification {
     ticket_number?: string | null;
     subject?: string | null;
     message?: string;
-}
-
-interface SlaEscalatedEvent {
-    ticket_id: string;
-    ticket_number: string;
-    subject: string;
-    escalation_type: 'warning' | 'breached';
-    message: string;
 }
 
 const page = usePage<AuthenticatedSharedPageProps>();
@@ -122,31 +114,6 @@ if (user) {
             });
         },
     );
-
-    // Shared agent channel for IT Agents and Super Admins.
-    // New unassigned tickets now arrive as a persisted notification on the user's
-    // personal channel (handled by useEchoNotification above), so we only listen
-    // here for SLA escalations, which are broadcast-only.
-    if (user.role === 'it_agent' || user.role === 'super_admin') {
-        useEcho<SlaEscalatedEvent>(
-            'helpdesk.agents',
-            '.App\\Events\\SlaEscalated',
-            (e) => {
-                const alertType =
-                    e.escalation_type === 'breached' ? 'error' : 'warning';
-
-                toast[alertType](`SLA Alert (${e.escalation_type})`, {
-                    description: `${e.ticket_number}: ${e.subject}`,
-                    action: {
-                        label: 'View',
-                        onClick: () => {
-                            router.visit(showTicketRoute(e.ticket_id));
-                        },
-                    },
-                });
-            },
-        );
-    }
 }
 </script>
 

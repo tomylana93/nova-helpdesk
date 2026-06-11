@@ -31,7 +31,6 @@ return [
             'priority' => 'Prioritas',
             'branch' => 'Cabang',
             'department' => 'Departemen',
-            'queue' => 'Antrean',
             'category' => 'Kategori',
             'requester' => 'Pemohon',
             'assignee' => 'Ditugaskan Ke',
@@ -39,6 +38,21 @@ return [
             'resolved_at' => 'Diselesaikan Pada',
             'all_types' => 'Semua Tipe',
             'all_priorities' => 'Semua Prioritas',
+            'view' => 'Tampilan',
+            'actions' => 'Aksi',
+        ],
+        'view' => [
+            'all' => 'Semua tiket',
+            'mine' => 'Ditugaskan ke saya',
+            'unassigned' => 'Belum ditugaskan',
+            'overdue' => 'Terlambat',
+        ],
+        'transition' => [
+            'in_progress' => 'Mulai Kerjakan',
+            'waiting_for_requester' => 'Tunggu Requester',
+            'resolved' => 'Selesaikan',
+            'closed' => 'Tutup',
+            'reopened' => 'Buka Kembali',
         ],
         'placeholder' => [
             'type' => 'Pilih tipe tiket',
@@ -48,7 +62,6 @@ return [
             'priority' => 'Pilih prioritas',
             'branch' => 'Pilih cabang (opsional)',
             'department' => 'Pilih departemen (opsional)',
-            'queue' => 'Pilih antrean (opsional)',
             'category' => 'Pilih kategori',
             'assignee' => 'Pilih petugas (opsional)',
         ],
@@ -58,6 +71,9 @@ return [
             'edit' => 'Edit',
             'back' => 'Kembali ke Tiket',
             'reset' => 'Reset',
+            'reply' => 'Balas',
+            'reopen' => 'Buka Kembali',
+            'confirm_resolved' => 'Konfirmasi Selesai',
         ],
         'message' => [
             'created' => [
@@ -65,6 +81,12 @@ return [
             ],
             'updated' => [
                 'success' => 'Tiket berhasil diperbarui.',
+            ],
+            'reopened' => [
+                'success' => 'Tiket dibuka kembali.',
+            ],
+            'confirmed' => [
+                'success' => 'Tiket dikonfirmasi selesai dan ditutup.',
             ],
         ],
     ],
@@ -89,6 +111,7 @@ return [
             'visibility' => 'Visibilitas',
             'placeholder' => 'Tulis komentar Anda di sini...',
             'no_comments' => 'Belum ada komentar.',
+            'awaiting_reply' => 'Tiket ini menunggu balasan Anda.',
         ],
         'action' => [
             'submit' => 'Kirim Komentar',

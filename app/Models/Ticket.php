@@ -27,7 +27,6 @@ use Illuminate\Support\Str;
  * @property string|null $assigned_to
  * @property string|null $branch_id
  * @property string|null $department_id
- * @property string|null $queue_id
  * @property string|null $category_id
  * @property Carbon $submitted_at
  * @property Carbon|null $first_response_due_at
@@ -38,7 +37,6 @@ use Illuminate\Support\Str;
  * @property Department|null $department
  * @property User $requester
  * @property User|null $assignee
- * @property Queue|null $queue
  * @property TicketCategory|null $category
  * @property TicketApproval|null $approval
  */
@@ -48,7 +46,6 @@ use Illuminate\Support\Str;
     'department_id',
     'requester_id',
     'assigned_to',
-    'queue_id',
     'category_id',
     'priority',
     'status',
@@ -86,7 +83,7 @@ class Ticket extends Model
             }
 
             if (empty($ticket->status)) {
-                $ticket->status = TicketStatus::New;
+                $ticket->status = TicketStatus::Open;
             }
 
             if (empty($ticket->priority)) {
@@ -113,11 +110,6 @@ class Ticket extends Model
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
-    }
-
-    public function queue(): BelongsTo
-    {
-        return $this->belongsTo(Queue::class);
     }
 
     public function category(): BelongsTo

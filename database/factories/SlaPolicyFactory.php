@@ -21,7 +21,6 @@ class SlaPolicyFactory extends Factory
             'name' => $this->faker->words(3, true).' SLA',
             'ticket_type' => $this->faker->optional()->randomElement(['incident', 'service_request']),
             'priority' => $this->faker->randomElement(['low', 'medium', 'high', 'critical']),
-            'queue_id' => null,
             'first_response_target_minutes' => $this->faker->randomElement([30, 60, 120, 240]),
             'resolution_target_minutes' => $this->faker->randomElement([240, 480, 1440, 2880]),
             'is_active' => true,

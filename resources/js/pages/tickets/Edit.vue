@@ -28,7 +28,6 @@ type Props = {
     priorityOptions: SelectOption[];
     branchOptions: SelectOption[];
     departmentOptions: SelectOption[];
-    queueOptions: SelectOption[];
     categoryOptions: { label: string; options: SelectOption[] }[];
     agentOptions: SelectOption[];
 };
@@ -41,7 +40,6 @@ type EditTicketFormData = {
     assigned_to: string;
     branch_id: string;
     department_id: string;
-    queue_id: string;
     category_id: string;
 };
 
@@ -59,7 +57,6 @@ const form = useForm<EditTicketFormData>({
     assigned_to: props.ticket.assigned_to ?? '',
     branch_id: props.ticket.branch_id ?? '',
     department_id: props.ticket.department_id ?? '',
-    queue_id: props.ticket.queue_id ?? '',
     category_id: props.ticket.category_id ?? '',
 });
 
@@ -216,35 +213,6 @@ setLayoutProps({
                         </SelectContent>
                     </Select>
                     <InputError :message="form.errors.assigned_to" />
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="queue_id">{{
-                        trans('helpdesk.ticket.label.queue')
-                    }}</Label>
-                    <Select
-                        id="queue_id"
-                        v-model="form.queue_id"
-                        name="queue_id"
-                    >
-                        <SelectTrigger class="w-full">
-                            <SelectValue
-                                :placeholder="
-                                    trans('helpdesk.ticket.placeholder.queue')
-                                "
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="option in props.queueOptions"
-                                :key="option.value"
-                                :value="option.value"
-                            >
-                                {{ option.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="form.errors.queue_id" />
                 </div>
 
                 <div class="grid gap-2">

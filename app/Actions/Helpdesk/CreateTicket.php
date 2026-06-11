@@ -4,17 +4,15 @@ namespace App\Actions\Helpdesk;
 
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
-use App\Enums\UserRole;
-use App\Events\TicketCreated;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Notifications\TicketNotification;
-use Illuminate\Support\Facades\Notification;
 
 class CreateTicket
 {
     public function __construct(
         private readonly AssignSlaPolicy $assignSla,
+        private readonly AssignTicketToAgent $assignAgent,
         private readonly RecordTicketActivity $recordActivity,
     ) {}
 
@@ -25,22 +23,15 @@ class CreateTicket
     {
         $type = TicketType::from($data['type']);
         $initialStatus = $type === TicketType::ServiceRequest
-            ? TicketStatus::WaitingForApproval
-            : TicketStatus::New;
+            ? TicketStatus::PendingApproval
+            : TicketStatus::Open;
 
-        $isAgent = $requester->hasRole(UserRole::ItAgent->value) || $requester->hasRole(UserRole::SuperAdmin->value);
-        $branchId = $data['branch_id'] ?? null;
-        $departmentId = $data['department_id'] ?? null;
-
-        if (! $isAgent) {
-            $branchId = $branchId ?: $requester->branch_id;
-            $departmentId = $departmentId ?: $requester->department_id;
-        }
-
+        // Organisation context is always inherited from the requester's profile, never asked
+        // on the form. Requester accounts are guaranteed to have branch + department.
         $ticket = Ticket::query()->create([
             ...$data,
-            'branch_id' => $branchId,
-            'department_id' => $departmentId,
+            'branch_id' => $requester->branch_id,
+            'department_id' => $requester->department_id,
             'requester_id' => $requester->id,
             'status' => $initialStatus,
         ]);
@@ -48,37 +39,33 @@ class CreateTicket
         $this->assignSla->handle($ticket);
         $this->recordActivity->handle($ticket, 'created', $requester);
 
-        // 1. Notify Requester
+        // Notify the requester of their submission.
         $requester->notify(new TicketNotification($ticket, 'created', "Your ticket {$ticket->ticket_number} has been created."));
 
-        // 2. Notify Assignee OR fan out to all agents/super admins
-        if (! empty($ticket->assigned_to)) {
-            $assignee = User::query()->find($ticket->assigned_to);
-            if ($assignee) {
-                $assignee->notify(new TicketNotification($ticket, 'assigned', "Ticket {$ticket->ticket_number} has been assigned to you."));
-            }
-        } else {
-            // Persist a notification for every agent/super admin so it survives reloads and
-            // appears in the bell, not just as a transient broadcast. Exclude the requester
-            // to avoid double-notifying an agent who created the ticket themselves.
-            $staff = User::query()
-                ->whereHas('roles', function ($query): void {
-                    $query->whereIn('name', [UserRole::ItAgent->value, UserRole::SuperAdmin->value]);
-                })
-                ->whereKeyNot($requester->id)
-                ->get();
-
-            Notification::send($staff, new TicketNotification($ticket, 'created_unassigned', "New unassigned ticket {$ticket->ticket_number} has been created."));
-
-            event(new TicketCreated($ticket));
-        }
-
-        // 3. Notify Super Admins if approval required
-        if ($ticket->status === TicketStatus::WaitingForApproval) {
-            $superAdmins = User::query()->role(UserRole::SuperAdmin->value)->get();
-            Notification::send($superAdmins, new TicketNotification($ticket, 'approval_request', "Ticket {$ticket->ticket_number} requires approval."));
-        }
+        // Auto-assign to an active agent and notify only that agent. Super admins are never a
+        // target. If no active agent exists the ticket stays unassigned (surfaced in the Unassigned list).
+        $this->assignToAgent($ticket, $requester);
 
         return $ticket;
+    }
+
+    private function assignToAgent(Ticket $ticket, User $actor): void
+    {
+        $assignee = $this->assignAgent->handle($ticket);
+
+        if (! $assignee instanceof User) {
+            return;
+        }
+
+        $ticket->update(['assigned_to' => $assignee->id]);
+        $this->recordActivity->handle($ticket, 'assigned', $actor, ['assigned_to' => $assignee->id]);
+
+        if ($ticket->status === TicketStatus::PendingApproval) {
+            $assignee->notify(new TicketNotification($ticket, 'approval_request', "Service request {$ticket->ticket_number} requires your approval."));
+
+            return;
+        }
+
+        $assignee->notify(new TicketNotification($ticket, 'assigned', "New ticket {$ticket->ticket_number} has been assigned to you."));
     }
 }

@@ -5,7 +5,6 @@ use App\Enums\TicketStatus;
 use App\Enums\TicketType;
 use App\Models\Branch;
 use App\Models\Department;
-use App\Models\Queue;
 use App\Models\Ticket;
 use App\Models\TicketAttachment;
 use App\Models\TicketCategory;
@@ -17,7 +16,6 @@ test('it can create a ticket with relationships and casts', function (): void {
     $department = Department::factory()->create(['branch_id' => $branch->id]);
     $requester = User::factory()->create();
     $assignee = User::factory()->create();
-    $queue = Queue::factory()->create();
     $category = TicketCategory::factory()->create();
 
     $ticket = Ticket::factory()->create([
@@ -26,10 +24,9 @@ test('it can create a ticket with relationships and casts', function (): void {
         'department_id' => $department->id,
         'requester_id' => $requester->id,
         'assigned_to' => $assignee->id,
-        'queue_id' => $queue->id,
         'category_id' => $category->id,
         'priority' => TicketPriority::High,
-        'status' => TicketStatus::New,
+        'status' => TicketStatus::Open,
         'subject' => 'Unable to connect to printer',
         'description' => 'I cannot print from the office wifi',
     ]);
@@ -37,12 +34,11 @@ test('it can create a ticket with relationships and casts', function (): void {
     expect($ticket->ticket_number)->toBe('INC-00001')
         ->and($ticket->type)->toBe(TicketType::Incident)
         ->and($ticket->priority)->toBe(TicketPriority::High)
-        ->and($ticket->status)->toBe(TicketStatus::New)
+        ->and($ticket->status)->toBe(TicketStatus::Open)
         ->and($ticket->branch->id)->toBe($branch->id)
         ->and($ticket->department->id)->toBe($department->id)
         ->and($ticket->requester->id)->toBe($requester->id)
         ->and($ticket->assignee->id)->toBe($assignee->id)
-        ->and($ticket->queue->id)->toBe($queue->id)
         ->and($ticket->category->id)->toBe($category->id);
 });
 

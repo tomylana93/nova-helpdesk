@@ -1,52 +1,13 @@
 <?php
 
-use App\Enums\AdminPermission;
-use App\Enums\GeneralStatus;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
-use App\Enums\UserRole;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\User;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-
-function createAgentUser(): User
-{
-    $role = Role::findOrCreate(UserRole::ItAgent->value, 'web');
-    $permissions = [
-        AdminPermission::ViewTickets->value,
-        AdminPermission::CreateTickets->value,
-        AdminPermission::UpdateTickets->value,
-        AdminPermission::ManageApprovals->value,
-    ];
-    foreach ($permissions as $perm) {
-        Permission::findOrCreate($perm, 'web');
-    }
-
-    $role->syncPermissions($permissions);
-
-    return tap(User::factory()->create(), fn ($u) => $u->syncRoles([UserRole::ItAgent->value]));
-}
-
-function createRequesterUser(): User
-{
-    $role = Role::findOrCreate(UserRole::Requester->value, 'web');
-    $permissions = [
-        AdminPermission::ViewTickets->value,
-        AdminPermission::CreateTickets->value,
-    ];
-    foreach ($permissions as $perm) {
-        Permission::findOrCreate($perm, 'web');
-    }
-
-    $role->syncPermissions($permissions);
-
-    return tap(User::factory()->create(), fn ($u) => $u->syncRoles([UserRole::Requester->value]));
-}
 
 // --- INDEX ---
 
@@ -96,7 +57,7 @@ test('requester can submit an incident ticket', function (): void {
 
     expect($ticket)->not->toBeNull()
         ->and($ticket?->requester_id)->toBe($requester->id)
-        ->and($ticket?->status)->toBe(TicketStatus::New)
+        ->and($ticket?->status)->toBe(TicketStatus::Open)
         ->and($ticket?->ticket_number)->toStartWith('INC-');
 });
 
@@ -114,7 +75,7 @@ test('service_request ticket starts in waiting_for_approval status', function ()
 
     $ticket = Ticket::query()->where('subject', 'Need new laptop')->first();
 
-    expect($ticket?->status)->toBe(TicketStatus::WaitingForApproval);
+    expect($ticket?->status)->toBe(TicketStatus::PendingApproval);
 });
 
 test('ticket submission validates required fields', function (): void {
@@ -157,14 +118,14 @@ test('agent can view any ticket', function (): void {
 test('agent can update a ticket', function (): void {
     $agent = createAgentUser();
     $category = TicketCategory::factory()->create();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::New, 'category_id' => $category->id]);
+    $ticket = Ticket::factory()->create(['status' => TicketStatus::Open, 'category_id' => $category->id]);
 
     $response = $this
         ->actingAs($agent)
         ->patch(route('tickets.update', $ticket), [
             'subject' => 'Updated subject',
             'description' => 'Updated description',
-            'status' => TicketStatus::Triaged->value,
+            'status' => TicketStatus::InProgress->value,
             'priority' => TicketPriority::High->value,
             'category_id' => $category->id,
         ]);
@@ -172,7 +133,7 @@ test('agent can update a ticket', function (): void {
     $response->assertSessionHasNoErrors()->assertRedirect();
 
     $ticket->refresh();
-    expect($ticket->status)->toBe(TicketStatus::Triaged)
+    expect($ticket->status)->toBe(TicketStatus::InProgress)
         ->and($ticket->priority)->toBe(TicketPriority::High);
 });
 
@@ -212,7 +173,7 @@ test('requester can post a public comment on their ticket', function (): void {
 
 test('agent can approve a waiting_for_approval ticket', function (): void {
     $agent = createAgentUser();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::WaitingForApproval]);
+    $ticket = Ticket::factory()->create(['status' => TicketStatus::PendingApproval]);
 
     $this
         ->actingAs($agent)
@@ -228,7 +189,7 @@ test('agent can approve a waiting_for_approval ticket', function (): void {
 
 test('agent can reject a waiting_for_approval ticket', function (): void {
     $agent = createAgentUser();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::WaitingForApproval]);
+    $ticket = Ticket::factory()->create(['status' => TicketStatus::PendingApproval]);
 
     $this
         ->actingAs($agent)
@@ -243,7 +204,7 @@ test('agent can reject a waiting_for_approval ticket', function (): void {
 
 test('user without manage approvals permission cannot approve or reject a ticket', function (): void {
     $userWithoutPerm = createRequesterUser();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::WaitingForApproval]);
+    $ticket = Ticket::factory()->create(['status' => TicketStatus::PendingApproval]);
 
     $this
         ->actingAs($userWithoutPerm)
@@ -288,54 +249,27 @@ test('cannot assign ticket to non-agent user', function (): void {
         ->assertSessionHasErrors(['assigned_to']);
 });
 
-test('cannot create ticket with mismatched department and branch', function (): void {
+test('a submitted ticket inherits branch and department from the requester profile', function (): void {
+    $branch = Branch::factory()->create();
+    $department = Department::factory()->create(['branch_id' => $branch->id]);
     $requester = createRequesterUser();
-    $branchA = Branch::factory()->create();
-    $branchB = Branch::factory()->create();
-    $departmentOfB = Department::factory()->create(['branch_id' => $branchB->id]);
+    $requester->update(['branch_id' => $branch->id, 'department_id' => $department->id]);
+
     $category = TicketCategory::factory()->create();
 
     $this
         ->actingAs($requester)
         ->post(route('tickets.store'), [
             'type' => TicketType::Incident->value,
-            'subject' => 'Test',
+            'subject' => 'Inherit org context',
             'description' => 'Test',
             'priority' => TicketPriority::Low->value,
-            'branch_id' => $branchA->id,
-            'department_id' => $departmentOfB->id,
             'category_id' => $category->id,
         ])
-        ->assertSessionHasErrors(['department_id']);
-});
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
 
-test('cannot create ticket with inactive branch or department', function (): void {
-    $requester = createRequesterUser();
-    $inactiveBranch = Branch::factory()->create(['status' => GeneralStatus::Inactive->value]);
-    $inactiveDepartment = Department::factory()->create(['status' => GeneralStatus::Inactive->value]);
-    $category = TicketCategory::factory()->create();
-
-    $this
-        ->actingAs($requester)
-        ->post(route('tickets.store'), [
-            'type' => TicketType::Incident->value,
-            'subject' => 'Test',
-            'description' => 'Test',
-            'priority' => TicketPriority::Low->value,
-            'branch_id' => $inactiveBranch->id,
-            'category_id' => $category->id,
-        ])
-        ->assertSessionHasErrors(['branch_id']);
-
-    $this
-        ->actingAs($requester)
-        ->post(route('tickets.store'), [
-            'type' => TicketType::Incident->value,
-            'subject' => 'Test',
-            'description' => 'Test',
-            'priority' => TicketPriority::Low->value,
-            'department_id' => $inactiveDepartment->id,
-            'category_id' => $category->id,
-        ])
-        ->assertSessionHasErrors(['department_id']);
+    $ticket = Ticket::query()->latest()->first();
+    expect($ticket?->branch_id)->toBe($branch->id)
+        ->and($ticket?->department_id)->toBe($department->id);
 });
