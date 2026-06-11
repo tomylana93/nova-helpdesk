@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.2] - 2026-06-11
+
+### Other Changes
+- Merge pull request #23 from tomylana93/dev
+- fix deployment migration issues
+- Merge pull request #22 from tomylana93/dev
+
 ## [0.13.1] - 2026-06-11
 
 ### Fixed
