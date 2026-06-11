@@ -7,7 +7,12 @@ export interface DashboardPeriodProp {
 }
 
 export interface DashboardLiveMetric {
-    key: 'active' | 'assigned' | 'unassigned' | 'pending_approval' | 'sla_breached';
+    key:
+        | 'active'
+        | 'assigned'
+        | 'unassigned'
+        | 'pending_approval'
+        | 'sla_breached';
     value: number;
 }
 

@@ -17,6 +17,7 @@ const icon = computed(() => {
     if (props.direction === 'up') {
         return ArrowUp;
     }
+
     if (props.direction === 'down') {
         return ArrowDown;
     }
@@ -52,7 +53,10 @@ const label = computed(() => {
 <template>
     <span
         :class="
-            cn('inline-flex items-center gap-0.5 text-xs font-medium', toneClass)
+            cn(
+                'inline-flex items-center gap-0.5 text-xs font-medium',
+                toneClass,
+            )
         "
     >
         <component :is="icon" class="h-3 w-3" />

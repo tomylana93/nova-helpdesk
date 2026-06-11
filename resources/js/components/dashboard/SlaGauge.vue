@@ -52,7 +52,9 @@ const tooltipText = computed(() =>
                         <CardTitle
                             class="flex items-center gap-1.5 text-sm font-medium text-muted-foreground"
                         >
-                            <ShieldCheck class="h-4 w-4 text-[var(--chart-2)]" />
+                            <ShieldCheck
+                                class="h-4 w-4 text-[var(--chart-2)]"
+                            />
                             {{ trans('dashboard.compliance.title') }}
                         </CardTitle>
                     </CardHeader>

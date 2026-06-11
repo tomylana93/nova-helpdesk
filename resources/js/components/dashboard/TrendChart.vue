@@ -52,7 +52,11 @@ function tickFormat(index: number): string {
             <VisXYContainer v-if="hasData" :data="points" :height="220">
                 <VisLine :x="x" :y="createdY" color="var(--chart-1)" />
                 <VisLine :x="x" :y="resolvedY" color="var(--chart-2)" />
-                <VisAxis type="x" :tick-format="tickFormat" :grid-line="false" />
+                <VisAxis
+                    type="x"
+                    :tick-format="tickFormat"
+                    :grid-line="false"
+                />
                 <VisAxis type="y" :grid-line="true" />
             </VisXYContainer>
             <div

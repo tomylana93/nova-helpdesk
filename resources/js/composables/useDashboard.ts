@@ -58,12 +58,20 @@ export function useDashboard() {
         return String(Number(label));
     }
 
-    return { trans, locale, periodLabel, previousPeriodLabel, periodUrl, trendTick };
+    return {
+        trans,
+        locale,
+        periodLabel,
+        previousPeriodLabel,
+        periodUrl,
+        trendTick,
+    };
 }
 
 /** Years available in the year selector: current year back to 2023. */
 export function availableYears(currentYear: number): number[] {
     const years: number[] = [];
+
     for (let y = currentYear; y >= 2023; y--) {
         years.push(y);
     }
