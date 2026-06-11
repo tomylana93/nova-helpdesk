@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.1] - 2026-06-11
+
+### Fixed
+- fix(dashboard): align SLA gauge card header with other metric cards
+- fix(dashboard): constrain donut size so SLA gauge and breakdown render correctly
+
+### Other Changes
+- Merge pull request #21 from tomylana93/dev
+
 ## [0.13.0] - 2026-06-11
 
 ### Added
