@@ -1,0 +1,56 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [0.8.0] - 2026-06-11
+
+### Added
+- feat(release): implement automated changelog and add README
+- feat(release): add auto mode for bump version and conventions memory
+- feat: add semantic versioning and app:bump-version command
+- feat: implement notification system for unassigned ticket creation and enhance channel authorization
+- feat: enhance ticket creation and management with category and department handling
+- feat: add notifications system with real-time updates
+- feat(audit): add helpdesk audit documentation highlighting approval flow bugs and validation issues
+- feat: streamline SLA policy options and enhance datatable translations for priorities
+- feat(lang): add Indonesian translations for settings section
+- feat: add ticket management features including approval, comments, and ticket details view
+- feat(master-data): add import master data command and ignore csv files
+
+### Fixed
+- fix: update category placeholder text to remove optional indication
+- fix: resolve audit findings and enhance ticket approval process with validations
+- fix: add 'opencode' to agents list in boost.json and format .mcp.json for consistency
+- fix: update shadcnVue command from npx to pnpm for consistency
+- fix: update project name from "nova-core" to "nova-helpdesk"
+
+### Changed & Refactored
+- refactor: make app name dynamic and SSR-safe fallback to Nova Helpdesk
+- refactor: complete IT helpdesk flow refactor (phases 1-8)
+- refactor: remove obsolete mcp.json configuration file
+- refactor(tests): remove ImportMasterDataCommandTest as it is no longer needed
+
+### Other Changes
+- Merge pull request #8 from tomylana93/dev
+- Merge pull request #7 from tomylana93/dev
+- Merge pull request #6 from tomylana93/dev
+- Merge pull request #5 from tomylana93/dev
+- Merge pull request #4 from tomylana93/refactor/helpdesk-flow
+- Merge pull request #3 from tomylana93/dev
+- docs: update backend documentation for admin, core, and helpdesk sections
+- Refactor code structure for improved readability and maintainability
+- Merge pull request #2 from tomylana93/dev
+- Add 'all_parents' label to English and Indonesian datatable language files
+- Fix button layout alignment on master-data and settings index pages
+- Implement Queue and Ticket Category CRUD master data
+- Add serena and shadcn-vue configurations to mcp_config.json
+- Add mcp_config.json for MCP server configuration and update boost.json to include 'antigravity' agent
+- Update composer.lock to reflect dependency version changes for Laravel and Symfony packages
+- Add settings.json for serena-hooks configuration
+- Add PRD, task plan, and technical design documents for internal IT helpdesk project
+- Add new skills for Pest testing, Tailwind CSS development, and Wayfinder integration; update guidelines and configuration files
+- Refactor code structure for improved readability and maintainability
+- remove UserSeederTest as UserSeeder is no longer used
+- remove UserSeeder and update DatabaseSeeder to prevent seeding in production
+- initial commit
+
