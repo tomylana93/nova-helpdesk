@@ -5,6 +5,7 @@ use App\Enums\TicketStatus;
 use App\Enums\TicketType;
 use App\Models\Branch;
 use App\Models\Department;
+use App\Models\SlaPolicy;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\User;
@@ -272,4 +273,37 @@ test('a submitted ticket inherits branch and department from the requester profi
     $ticket = Ticket::query()->latest()->first();
     expect($ticket?->branch_id)->toBe($branch->id)
         ->and($ticket?->department_id)->toBe($department->id);
+});
+
+test('sla due dates are computed correctly using submitted_at when creating a ticket with active SLA policy', function (): void {
+    $requester = createRequesterUser();
+    $category = TicketCategory::factory()->create();
+
+    // Create an active SLA policy for Incident Critical
+    SlaPolicy::factory()->create([
+        'ticket_type' => 'incident',
+        'priority' => 'critical',
+        'first_response_target_minutes' => 15,
+        'resolution_target_minutes' => 120,
+        'is_active' => true,
+    ]);
+
+    $response = $this
+        ->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Critical Incident',
+            'description' => 'System is completely down.',
+            'priority' => TicketPriority::Critical->value,
+            'category_id' => $category->id,
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    $ticket = Ticket::query()->where('subject', 'Critical Incident')->first();
+
+    expect($ticket)->not->toBeNull()
+        ->and($ticket?->submitted_at)->not->toBeNull()
+        ->and($ticket?->first_response_due_at)->not->toBeNull()
+        ->and($ticket?->resolution_due_at)->not->toBeNull();
 });
