@@ -10,6 +10,7 @@ import {
     ArrowUpRight,
     ShieldCheck,
     Sparkles,
+    CircleHelp,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
@@ -115,9 +116,9 @@ function getIcon(label: string) {
 // Chart configuration mapping
 const chartRawData = computed(() => {
     if (props.role === 'it_agent') {
-        return props.charts.status || [];
+        return props.charts?.status || [];
     } else {
-        return props.charts.priority || [];
+        return props.charts?.priority || [];
     }
 });
 
@@ -172,9 +173,8 @@ function formatDate(dateStr: string) {
 </script>
 
 <template>
-    <Head title="Dashboard" />
-
     <div class="flex flex-1 flex-col gap-6 p-6">
+        <Head title="Dashboard" />
         <!-- Welcoming banner with vibrant aesthetics -->
         <div
             class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 p-6 text-white shadow-lg md:p-8"
@@ -348,7 +348,7 @@ function formatDate(dateStr: string) {
             <div class="flex flex-col gap-6">
                 <!-- SLA Compliance Radial Gauge (IT Agent & Super Admin) -->
                 <Card
-                    v-if="props.charts.slaComplianceRate !== undefined"
+                    v-if="props.charts?.slaComplianceRate !== undefined"
                     class="flex flex-col items-center justify-center border-sidebar-border/70 p-6 text-center dark:border-sidebar-border"
                 >
                     <CardHeader class="pb-2">
@@ -386,7 +386,7 @@ function formatDate(dateStr: string) {
                                     Math.PI *
                                     50 *
                                     (1 -
-                                        (props.charts.slaComplianceRate ??
+                                        (props.charts?.slaComplianceRate ??
                                             100) /
                                             100)
                                 "
@@ -496,7 +496,7 @@ function formatDate(dateStr: string) {
                             v-else
                             class="flex flex-col items-center gap-2 py-10 text-center text-sm text-muted-foreground"
                         >
-                            <HelpCircle class="h-8 w-8 text-muted/50" />
+                            <CircleHelp class="h-8 w-8 text-muted/50" />
                             <span>No ticket distribution data available.</span>
                         </div>
                     </CardContent>
