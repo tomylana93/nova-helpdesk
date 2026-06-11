@@ -24,7 +24,6 @@ class UpdateSlaPolicyRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'ticket_type' => ['nullable', Rule::enum(TicketType::class)],
             'priority' => ['required', Rule::enum(TicketPriority::class)],
-            'queue_id' => ['nullable', 'exists:queues,id'],
             'first_response_target_minutes' => ['required', 'integer', 'min:1'],
             'resolution_target_minutes' => ['required', 'integer', 'min:1'],
             'is_active' => ['boolean'],

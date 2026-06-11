@@ -2,6 +2,15 @@
 
 > Status: Draft
 > Last updated: 2026-06-08
+>
+> **Refactor note (2026-06-11) — current delivered scope.** The 1-agent-model refactor
+> (`docs/it-helpdesk-refactor-design.md`, `docs/it-helpdesk-refactor-steps.md`) supersedes parts of this
+> PRD for what is shipped today: **Queue removed** (§4); SLA matches on **type + priority** only (§5);
+> the **assigned IT agent** (not super admin) approves service requests (§6); **super_admin is read-only
+> oversight** — never an assignment/approval/notification target, full access only via `Gate::before`
+> (Personas, §6, §9); statuses are the 7-state machine (`Open, PendingApproval, InProgress,
+> WaitingForRequester, Resolved, Closed, Reopened`). This PRD stays the long-term vision; affected
+> sections below carry inline refactor notes.
 
 ## Table of Contents
 - [Problem Statement](#problem-statement)
@@ -111,6 +120,10 @@ The current codebase should be treated as platform foundation, not as finished p
 - IT Agent: triages, works, updates, assigns, and resolves tickets.
 - Super Admin: governs platform settings, approval-controlled flows, reporting access, and system-wide controls.
 
+> **Refactor note:** In current scope the super admin is **read-only oversight** of tickets — it can view
+> the ticket index/detail but is never an assignment/approval/notification target and the UI surfaces no
+> lifecycle controls. Service-request approval is owned by the **assigned IT agent**.
+
 ### Target Roles
 - `requester`
 - `it_agent`
@@ -139,18 +152,31 @@ The target role model replaces the current non-IT business-role orientation. Exi
 - Tickets must support internal notes and requester-visible updates as separate concepts.
 
 ### 4. Queues, Categories, and Priority
+
+> **Refactor note:** Queues are **removed** in current scope (1-agent model): no queue model, nav, form,
+> or SLA dimension. Tickets auto-assign to the single active agent; org context is branch + department
+> (derived from the requester profile). Categories and priority remain.
+
 - Tickets must be grouped by queue or functional team.
 - Categories and subcategories must classify work.
 - Priority should drive urgency, workload visibility, and SLA behavior.
 - Managers must be able to analyze workload by queue, category, priority, branch, and assignee.
 
 ### 5. SLA and Escalation
+
+> **Refactor note:** SLA matching is **type + priority** only (queue dimension dropped). Escalation
+> notifies the **assigned agent** (persisted notification) — no role broadcast fan-out.
+
 - SLA policies must be configurable by ticket type and priority.
 - The system must calculate response and resolution targets.
 - At-risk and breached tickets must be identifiable in work queues and dashboards.
 - Escalation must support notification or state-based escalation paths.
 
 ### 6. Approval Workflow
+
+> **Refactor note:** In current scope the **assigned IT agent** (not the super admin) approves/rejects
+> service requests from the `PendingApproval` state. Super admin is excluded from the approval flow.
+
 - Selected request types must require approval before fulfillment.
 - Super admins must be able to approve, reject, or request clarification for approval-controlled requests.
 - Approval decisions must be timestamped and auditable.
@@ -168,6 +194,11 @@ The target role model replaces the current non-IT business-role orientation. Exi
 - Asset linkage should support incident diagnosis and service history review.
 
 ### 9. Notifications and Visibility
+
+> **Refactor note:** Current scope targets notifications to the **requester** and the **assigned agent**
+> only, on their personal channels; **super_admin is never a notification target** and the shared
+> `helpdesk.agents` broadcast has been removed.
+
 - Requesters should receive updates for submission, assignment visibility where appropriate, approval outcome, and closure.
 - Agents should receive updates for assignment, mentions, approvals pending, and SLA risk.
 - Super admins should have visibility into backlog, overdue work, branch-level trends, and approval queues.

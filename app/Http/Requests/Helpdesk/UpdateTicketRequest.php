@@ -6,6 +6,7 @@ use App\Enums\GeneralStatus;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\UserRole;
+use App\Models\Ticket;
 use App\Models\User;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -28,7 +29,21 @@ class UpdateTicketRequest extends FormRequest
         return [
             'subject' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'status' => ['required', Rule::enum(TicketStatus::class)],
+            'status' => [
+                'required',
+                Rule::enum(TicketStatus::class),
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    $ticket = $this->route('ticket');
+                    if (! $ticket instanceof Ticket) {
+                        return;
+                    }
+
+                    $target = TicketStatus::from($value);
+                    if ($target !== $ticket->status && ! $ticket->status->canTransitionTo($target)) {
+                        $fail("Cannot change ticket status from {$ticket->status->label()} to {$target->label()}.");
+                    }
+                },
+            ],
             'priority' => ['required', Rule::enum(TicketPriority::class)],
             'assigned_to' => [
                 'nullable',
@@ -60,10 +75,6 @@ class UpdateTicketRequest extends FormRequest
                         }
                     }
                 },
-            ],
-            'queue_id' => [
-                'nullable',
-                Rule::exists('queues', 'id')->where('status', GeneralStatus::Active->value),
             ],
             'category_id' => [
                 'required',

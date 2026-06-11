@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, setLayoutProps, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
 import { store } from '@/actions/App/Http/Controllers/Helpdesk/TicketController';
 import InputError from '@/components/InputError.vue';
 import PageWrapper from '@/components/PageWrapper.vue';
@@ -20,16 +20,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { create, index } from '@/routes/tickets';
-import type { AuthenticatedSharedPageProps, SelectOption } from '@/types';
-
-type DepartmentOption = SelectOption & { branch_id: string | null };
+import type { SelectOption } from '@/types';
 
 type Props = {
     typeOptions: SelectOption[];
     priorityOptions: SelectOption[];
-    branchOptions: SelectOption[];
-    departmentOptions: DepartmentOption[];
-    queueOptions: SelectOption[];
     categoryOptions: { label: string; options: SelectOption[] }[];
 };
 
@@ -38,9 +33,6 @@ type CreateTicketFormData = {
     subject: string;
     description: string;
     priority: string;
-    branch_id: string;
-    department_id: string;
-    queue_id: string;
     category_id: string;
 };
 
@@ -50,19 +42,11 @@ defineOptions({ inheritAttrs: false });
 
 const { trans } = useTrans();
 
-const page = usePage<AuthenticatedSharedPageProps>();
-const isAgent =
-    page.props.auth.user?.role === 'it_agent' ||
-    page.props.auth.user?.role === 'super_admin';
-
 const form = useForm<CreateTicketFormData>({
     type: '',
     subject: '',
     description: '',
     priority: '',
-    branch_id: '',
-    department_id: '',
-    queue_id: '',
     category_id: '',
 });
 
@@ -219,95 +203,6 @@ setLayoutProps({
                         </SelectContent>
                     </Select>
                     <InputError :message="form.errors.category_id" />
-                </div>
-
-                <div v-if="isAgent" class="grid gap-2">
-                    <Label for="branch_id">{{
-                        trans('helpdesk.ticket.label.branch')
-                    }}</Label>
-                    <Select
-                        id="branch_id"
-                        v-model="form.branch_id"
-                        name="branch_id"
-                    >
-                        <SelectTrigger class="w-full">
-                            <SelectValue
-                                :placeholder="
-                                    trans('helpdesk.ticket.placeholder.branch')
-                                "
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="option in props.branchOptions"
-                                :key="option.value"
-                                :value="option.value"
-                            >
-                                {{ option.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="form.errors.branch_id" />
-                </div>
-
-                <div v-if="isAgent" class="grid gap-2">
-                    <Label for="department_id">{{
-                        trans('helpdesk.ticket.label.department')
-                    }}</Label>
-                    <Select
-                        id="department_id"
-                        v-model="form.department_id"
-                        name="department_id"
-                    >
-                        <SelectTrigger class="w-full">
-                            <SelectValue
-                                :placeholder="
-                                    trans(
-                                        'helpdesk.ticket.placeholder.department',
-                                    )
-                                "
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="option in props.departmentOptions"
-                                :key="option.value"
-                                :value="option.value"
-                            >
-                                {{ option.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="form.errors.department_id" />
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="queue_id">{{
-                        trans('helpdesk.ticket.label.queue')
-                    }}</Label>
-                    <Select
-                        id="queue_id"
-                        v-model="form.queue_id"
-                        name="queue_id"
-                    >
-                        <SelectTrigger class="w-full">
-                            <SelectValue
-                                :placeholder="
-                                    trans('helpdesk.ticket.placeholder.queue')
-                                "
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="option in props.queueOptions"
-                                :key="option.value"
-                                :value="option.value"
-                            >
-                                {{ option.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="form.errors.queue_id" />
                 </div>
             </div>
 

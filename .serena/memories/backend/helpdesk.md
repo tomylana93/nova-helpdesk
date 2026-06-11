@@ -1,6 +1,13 @@
 # Backend / Helpdesk
 
-- Routes in `routes/helpdesk.php` under `auth` + `active` middleware.
+- Routes in `routes/helpdesk.php` under `auth` + `active` middleware. Lifecycle endpoints:
+  `tickets.transition` (agent status change, `update` policy), `tickets.approve`/`tickets.reject`
+  (SR approval), `tickets.reopen`/`tickets.confirm-resolved` (requester), `tickets.comments.store`.
+- Role-aware Show (Phase 7): `TicketController@show` passes `viewerRole` + `canAct`/`canReply`/
+  `canSeeInternal`/`availableTransitions`/`canApprove`/`canReopen`/`canConfirm`. super_admin is
+  read-only (canReopen/canConfirm guarded by `$isRequester` to defeat the `Gate::before` bypass).
+  Agent status buttons come from `TicketStatus::agentActionableTransitions()` (excludes approval moves
+  + Reopened). `TicketTable` has an agent-only `view` filter (mine/unassigned/overdue).
 - Ticketing model:
   - `Ticket` (`app/Models/Ticket.php`): Key fields are `ticket_number` (auto-generated in `creating` hook, e.g. `INC-XXXXX` or `REQ-XXXXX` based on `TicketType`), `type` (`TicketType` enum), `status` (`TicketStatus` enum, defaults to `New`), `priority` (`TicketPriority` enum, defaults to `Low`), `subject`, `description`, dates (`submitted_at`, `first_response_due_at`, `resolution_due_at`, `resolved_at`, `closed_at`).
   - `TicketComment` (`app/Models/TicketComment.php`): Stores comments; fields are `ticket_id`, `user_id`, `body`, `visibility` (`public` or `internal`).
@@ -10,7 +17,7 @@
 - Actions (`app/Actions/Helpdesk/`):
   - `CreateTicket`: Stores ticket, runs `AssignSlaPolicy`, and logs activity.
   - `UpdateTicket`: Updates ticket details, changes assignee/status/priority, and logs activity.
-  - `AssignSlaPolicy`: Finds active `SlaPolicy` matching by specificity: (1) `priority` + `type` + `queue_id`, (2) `priority` + `type` + `queue_id IS NULL`, (3) `priority` + `type IS NULL` + `queue_id IS NULL`. Calculates response and resolution due times.
+  - `AssignSlaPolicy`: Finds active `SlaPolicy` by specificity (Phase 5, queue removed): (1) `priority` + `type`, (2) `priority` + `type IS NULL`. Sets `first_response_due_at`/`resolution_due_at` by direct assignment + `save()` (these are NON-fillable system fields — `update([...])` silently drops them).
   - `ApproveTicket`: Sets approval status to `approved` and ticket status to `InProgress`.
   - `RejectTicket`: Sets approval status to `rejected` and ticket status to `Closed`.
   - `AddTicketComment`: Stores a comment on a ticket.

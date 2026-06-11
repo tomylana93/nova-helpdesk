@@ -3,6 +3,7 @@
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\Branch;
+use App\Models\Department;
 use App\Models\User;
 use App\Settings\PasswordSettings;
 use Illuminate\Support\Facades\Date;
@@ -44,6 +45,7 @@ test('admin users can be updated with unchanged email for the edited user', func
     Role::findOrCreate(UserRole::ItAgent->value, 'web');
     Role::findOrCreate(UserRole::Requester->value, 'web');
     $branch = Branch::factory()->create();
+    $department = Department::factory()->create(['branch_id' => $branch->id]);
 
     $targetUser = User::factory()->create([
         'email' => 'target-user@example.test',
@@ -61,6 +63,7 @@ test('admin users can be updated with unchanged email for the edited user', func
             'status' => UserStatus::Suspend->value,
             'role' => UserRole::Requester->value,
             'branch_id' => $branch->id,
+            'department_id' => $department->id,
         ]);
 
     $response
@@ -292,4 +295,35 @@ test('admin users index applies query builder filters and state through the defe
             ->where('table.state.sort', 'name')
             ->where('table.state.perPage', 25)
         ));
+});
+
+test('a requester user requires branch and department', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::Requester->value, 'web');
+
+    $this
+        ->actingAs($actor)
+        ->post(route('admin.master-data.users.store'), [
+            'name' => 'Req User',
+            'email' => 'req-user@example.test',
+            'role' => UserRole::Requester->value,
+        ])
+        ->assertSessionHasErrors(['branch_id', 'department_id']);
+});
+
+test('a staff user does not require branch or department', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+
+    $this
+        ->actingAs($actor)
+        ->post(route('admin.master-data.users.store'), [
+            'name' => 'Agent User',
+            'email' => 'agent-user@example.test',
+            'role' => UserRole::ItAgent->value,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('admin.master-data.users.index'));
+
+    expect(User::query()->where('email', 'agent-user@example.test')->exists())->toBeTrue();
 });

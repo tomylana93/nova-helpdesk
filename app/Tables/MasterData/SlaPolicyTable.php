@@ -25,13 +25,11 @@ class SlaPolicyTable extends AbstractTable
     protected function query(): Builder
     {
         return SlaPolicy::query()
-            ->with('queue:id,name')
             ->select([
                 'id',
                 'name',
                 'ticket_type',
                 'priority',
-                'queue_id',
                 'first_response_target_minutes',
                 'resolution_target_minutes',
                 'is_active',
@@ -108,7 +106,6 @@ class SlaPolicyTable extends AbstractTable
             'ticketTypeLabel' => $policy->ticket_type?->label() ?? '—',
             'priority' => $policy->priority->value,
             'priorityLabel' => $policy->priority->label(),
-            'queueName' => $policy->queue?->name,
             'firstResponseTargetMinutes' => $policy->first_response_target_minutes,
             'resolutionTargetMinutes' => $policy->resolution_target_minutes,
             'isActive' => $policy->is_active,

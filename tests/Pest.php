@@ -75,3 +75,37 @@ function grantSuperAdmin(User $user): User
 
     return $user;
 }
+
+function createAgentUser(): User
+{
+    $role = Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    $permissions = [
+        AdminPermission::ViewTickets->value,
+        AdminPermission::CreateTickets->value,
+        AdminPermission::UpdateTickets->value,
+        AdminPermission::ManageApprovals->value,
+    ];
+    foreach ($permissions as $perm) {
+        Permission::findOrCreate($perm, 'web');
+    }
+
+    $role->syncPermissions($permissions);
+
+    return tap(User::factory()->create(), fn ($u) => $u->syncRoles([UserRole::ItAgent->value]));
+}
+
+function createRequesterUser(): User
+{
+    $role = Role::findOrCreate(UserRole::Requester->value, 'web');
+    $permissions = [
+        AdminPermission::ViewTickets->value,
+        AdminPermission::CreateTickets->value,
+    ];
+    foreach ($permissions as $perm) {
+        Permission::findOrCreate($perm, 'web');
+    }
+
+    $role->syncPermissions($permissions);
+
+    return tap(User::factory()->create(), fn ($u) => $u->syncRoles([UserRole::Requester->value]));
+}

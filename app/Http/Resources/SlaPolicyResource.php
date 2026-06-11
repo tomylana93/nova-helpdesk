@@ -23,8 +23,6 @@ class SlaPolicyResource extends JsonResource
             'ticketTypeLabel' => $policy->ticket_type?->label(),
             'priority' => $policy->priority->value,
             'priorityLabel' => $policy->priority->label(),
-            'queue_id' => $policy->queue_id,
-            'queueName' => $policy->queue?->name,
             'first_response_target_minutes' => $policy->first_response_target_minutes,
             'resolution_target_minutes' => $policy->resolution_target_minutes,
             'is_active' => $policy->is_active,

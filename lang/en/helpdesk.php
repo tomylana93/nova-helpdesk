@@ -31,7 +31,6 @@ return [
             'priority' => 'Priority',
             'branch' => 'Branch',
             'department' => 'Department',
-            'queue' => 'Queue',
             'category' => 'Category',
             'requester' => 'Requester',
             'assignee' => 'Assigned To',
@@ -39,6 +38,21 @@ return [
             'resolved_at' => 'Resolved At',
             'all_types' => 'All Types',
             'all_priorities' => 'All Priorities',
+            'view' => 'View',
+            'actions' => 'Actions',
+        ],
+        'view' => [
+            'all' => 'All tickets',
+            'mine' => 'Assigned to me',
+            'unassigned' => 'Unassigned',
+            'overdue' => 'Overdue',
+        ],
+        'transition' => [
+            'in_progress' => 'Start Work',
+            'waiting_for_requester' => 'Set Waiting',
+            'resolved' => 'Resolve',
+            'closed' => 'Close',
+            'reopened' => 'Reopen',
         ],
         'placeholder' => [
             'type' => 'Select ticket type',
@@ -48,7 +62,6 @@ return [
             'priority' => 'Select priority',
             'branch' => 'Select branch (optional)',
             'department' => 'Select department (optional)',
-            'queue' => 'Select queue (optional)',
             'category' => 'Select category',
             'assignee' => 'Select assignee (optional)',
         ],
@@ -58,6 +71,9 @@ return [
             'edit' => 'Edit',
             'back' => 'Back to Tickets',
             'reset' => 'Reset',
+            'reply' => 'Reply',
+            'reopen' => 'Reopen',
+            'confirm_resolved' => 'Confirm Resolved',
         ],
         'message' => [
             'created' => [
@@ -65,6 +81,12 @@ return [
             ],
             'updated' => [
                 'success' => 'Ticket updated successfully.',
+            ],
+            'reopened' => [
+                'success' => 'Ticket reopened.',
+            ],
+            'confirmed' => [
+                'success' => 'Ticket confirmed resolved and closed.',
             ],
         ],
     ],
@@ -89,6 +111,7 @@ return [
             'visibility' => 'Visibility',
             'placeholder' => 'Write your comment here...',
             'no_comments' => 'No comments yet.',
+            'awaiting_reply' => 'This ticket is waiting for your reply.',
         ],
         'action' => [
             'submit' => 'Post Comment',

@@ -17,7 +17,7 @@ class TicketApprovalController extends Controller
     {
         $this->authorize('approve', $ticket);
 
-        abort_unless($ticket->status === TicketStatus::WaitingForApproval, 422, 'Ticket is not pending approval.');
+        abort_unless($ticket->status === TicketStatus::PendingApproval, 422, 'Ticket is not pending approval.');
 
         $validated = $request->validate([
             'decision_note' => ['nullable', 'string', 'max:1000'],
@@ -34,7 +34,7 @@ class TicketApprovalController extends Controller
     {
         $this->authorize('approve', $ticket);
 
-        abort_unless($ticket->status === TicketStatus::WaitingForApproval, 422, 'Ticket is not pending approval.');
+        abort_unless($ticket->status === TicketStatus::PendingApproval, 422, 'Ticket is not pending approval.');
 
         $validated = $request->validate([
             'decision_note' => ['nullable', 'string', 'max:1000'],

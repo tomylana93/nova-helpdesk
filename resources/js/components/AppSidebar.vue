@@ -60,7 +60,6 @@ const mainNavGroups = computed<NavGroup[]>(() => {
                 ...(abilities.view_users ||
                 abilities.manage_branches ||
                 abilities.manage_departments ||
-                abilities.manage_queues ||
                 abilities.manage_categories ||
                 abilities.manage_sla_policies
                     ? [

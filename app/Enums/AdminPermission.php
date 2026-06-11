@@ -10,7 +10,6 @@ enum AdminPermission: string
     case UpdateUsers = 'update users';
     case ManageBranches = 'manage branches';
     case ManageDepartments = 'manage departments';
-    case ManageQueues = 'manage queues';
     case ManageCategories = 'manage categories';
     case ViewTickets = 'view tickets';
     case CreateTickets = 'create tickets';

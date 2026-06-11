@@ -60,12 +60,9 @@ class TicketTable extends AbstractTable
         return '-created_at';
     }
 
-    /**
-     * @return list<array{key: string, filter: AllowedFilter|string, definition: array<string, mixed>}>
-     */
     protected function filterConfigurations(): array
     {
-        return [
+        $filters = [
             $this->searchFilter(
                 'search',
                 AllowedFilter::custom('search', new GlobalSearchFilter(['subject', 'ticket_number'])),
@@ -96,6 +93,43 @@ class TicketTable extends AbstractTable
                 __('helpdesk.ticket.label.priority'),
             ),
         ];
+
+        // Agent inbox quick-filters (requesters only ever see their own tickets).
+        $user = $this->request->user();
+        if ($user && ($user->hasRole(UserRole::ItAgent) || $user->hasRole(UserRole::SuperAdmin))) {
+            $filters[] = $this->selectFilter(
+                'view',
+                $this->viewFilter($user->id),
+                __('helpdesk.ticket.label.view'),
+                [
+                    ['value' => 'mine', 'label' => __('helpdesk.ticket.view.mine')],
+                    ['value' => 'unassigned', 'label' => __('helpdesk.ticket.view.unassigned')],
+                    ['value' => 'overdue', 'label' => __('helpdesk.ticket.view.overdue')],
+                ],
+                __('helpdesk.ticket.view.all'),
+                __('helpdesk.ticket.label.view'),
+            );
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Inbox scope filter: assigned to me / unassigned / overdue (past SLA and still open).
+     */
+    private function viewFilter(string $userId): AllowedFilter
+    {
+        return AllowedFilter::callback('view', function (Builder $query, mixed $value) use ($userId): void {
+            match ($value) {
+                'mine' => $query->where('assigned_to', $userId),
+                'unassigned' => $query->whereNull('assigned_to'),
+                'overdue' => $query
+                    ->whereNotIn('status', [TicketStatus::Resolved, TicketStatus::Closed])
+                    ->whereNotNull('resolution_due_at')
+                    ->where('resolution_due_at', '<', now()),
+                default => null,
+            };
+        });
     }
 
     /**

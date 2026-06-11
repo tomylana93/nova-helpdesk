@@ -3,7 +3,6 @@ import { Head, Link, setLayoutProps, usePage } from '@inertiajs/vue3';
 import {
     Building2,
     FolderTree,
-    Layers,
     Network,
     ShieldCheck,
     Users,
@@ -18,7 +17,6 @@ import { dashboard } from '@/routes';
 import { index } from '@/routes/admin/master-data';
 import { index as indexBranches } from '@/routes/admin/master-data/branches';
 import { index as indexDepartments } from '@/routes/admin/master-data/departments';
-import { index as indexQueues } from '@/routes/admin/master-data/queues';
 import { index as indexSlaPolicies } from '@/routes/admin/master-data/sla-policies';
 import { index as indexCategories } from '@/routes/admin/master-data/ticket-categories';
 import { index as indexUsers } from '@/routes/admin/master-data/users';
@@ -71,15 +69,6 @@ const masterDataCard = computed<CardItem[]>(() => {
             ),
             href: indexDepartments(),
             icon: Network,
-        });
-    }
-
-    if (page.props.auth.abilities.manage_queues) {
-        cards.push({
-            title: trans('admin.master_data.queue.index.title'),
-            description: trans('admin.master_data.queue.index.description'),
-            href: indexQueues(),
-            icon: Layers,
         });
     }
 

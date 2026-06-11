@@ -32,7 +32,6 @@ export type AuthAbilities = {
     update_users: boolean;
     manage_branches: boolean;
     manage_departments: boolean;
-    manage_queues: boolean;
     manage_categories: boolean;
     view_tickets: boolean;
     create_tickets: boolean;

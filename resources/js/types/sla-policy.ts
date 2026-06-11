@@ -8,8 +8,6 @@ export type SlaPolicy = {
     ticketTypeLabel: string | null;
     priority: TicketPriority;
     priorityLabel: string;
-    queue_id: string | null;
-    queueName: string | null;
     first_response_target_minutes: number;
     resolution_target_minutes: number;
     is_active: boolean;
@@ -24,7 +22,6 @@ export type SlaPolicyTableRow = {
     ticketTypeLabel: string;
     priority: TicketPriority;
     priorityLabel: string;
-    queueName: string | null;
     firstResponseTargetMinutes: number;
     resolutionTargetMinutes: number;
     isActive: boolean;

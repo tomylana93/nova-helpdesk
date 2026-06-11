@@ -6,11 +6,9 @@ use App\Enums\GeneralStatus;
 use App\Enums\UserRole;
 use App\Http\Resources\BranchOptionResource;
 use App\Http\Resources\DepartmentOptionResource;
-use App\Http\Resources\QueueOptionResource;
 use App\Http\Resources\UserOptionResource;
 use App\Models\Branch;
 use App\Models\Department;
-use App\Models\Queue;
 use App\Models\TicketCategory;
 use App\Models\User;
 
@@ -36,14 +34,6 @@ class GetTicketFormOptions
                 ->orderBy('name')
                 ->get(['id', 'name', 'branch_id'])
                 ->mapInto(DepartmentOptionResource::class)
-                ->map->resolve()
-                ->all(),
-
-            'queueOptions' => Queue::query()
-                ->where('status', GeneralStatus::Active)
-                ->orderBy('name')
-                ->get(['id', 'name'])
-                ->mapInto(QueueOptionResource::class)
                 ->map->resolve()
                 ->all(),
 

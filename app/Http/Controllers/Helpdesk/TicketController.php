@@ -58,25 +58,42 @@ class TicketController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        $ticket->load(['requester', 'assignee', 'branch', 'department', 'queue', 'category']);
+        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category']);
 
-        $isAgent = $request->user()?->hasRole(UserRole::ItAgent)
-            || $request->user()?->hasRole(UserRole::SuperAdmin);
+        $user = $request->user();
+        $isAgent = $user?->hasRole(UserRole::ItAgent) ?? false;
+        $isSuperAdmin = $user?->hasRole(UserRole::SuperAdmin) ?? false;
+        $isRequester = ! $isAgent && ! $isSuperAdmin && $user !== null && $ticket->requester_id === $user->id;
+
+        // super_admin is read-only oversight: can see everything (incl. internal notes) but acts on nothing.
+        $canSeeInternal = $isAgent || $isSuperAdmin;
+        $viewerRole = $isAgent ? 'it_agent' : ($isSuperAdmin ? 'super_admin' : 'requester');
 
         $commentsQuery = TicketComment::query()
             ->with('user:id,name')
             ->where('ticket_id', $ticket->id)
             ->latest();
 
-        if (! $isAgent) {
+        if (! $canSeeInternal) {
             $commentsQuery->where('visibility', 'public');
         }
 
         return Inertia::render('tickets/Show', [
             'ticket' => TicketResource::make($ticket)->resolve(),
-            'canUpdate' => $request->user()?->can('update', $ticket),
-            'canComment' => $request->user()?->can('view', $ticket),
-            'isAgent' => $isAgent,
+            'viewerRole' => $viewerRole,
+            'canSeeInternal' => $canSeeInternal,
+            'canAct' => $isAgent,
+            'canReply' => $isAgent || $isRequester,
+            'availableTransitions' => $isAgent
+                ? array_map(
+                    fn (TicketStatus $to): array => ['value' => $to->value, 'label' => $to->label()],
+                    $ticket->status->agentActionableTransitions(),
+                )
+                : [],
+            'canApprove' => $isAgent && $ticket->status === TicketStatus::PendingApproval,
+            // Guarded by $isRequester so super_admin's Gate::before bypass never surfaces these controls.
+            'canReopen' => $isRequester && $user->can('reopen', $ticket),
+            'canConfirm' => $isRequester && $user->can('confirmResolution', $ticket),
             'approval' => $ticket->approval ? [
                 'status' => $ticket->approval->status,
                 'reviewerName' => $ticket->approval->reviewer?->name,
@@ -97,7 +114,7 @@ class TicketController extends Controller
     {
         $this->authorize('update', $ticket);
 
-        $ticket->load(['requester', 'assignee', 'branch', 'department', 'queue', 'category']);
+        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category']);
 
         return Inertia::render('tickets/Edit', [
             'ticket' => TicketResource::make($ticket)->resolve(),

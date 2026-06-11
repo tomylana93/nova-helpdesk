@@ -52,8 +52,6 @@ class TicketResource extends JsonResource
             'requesterEmail' => $ticket->requester->email,
             'assigned_to' => $ticket->assigned_to,
             'assigneeName' => $ticket->assignee?->name,
-            'queue_id' => $ticket->queue_id,
-            'queueName' => $ticket->queue?->name,
             'category_id' => $ticket->category_id,
             'categoryName' => $ticket->category?->name,
             'submitted_at' => $ticket->submitted_at->toJSON(),
