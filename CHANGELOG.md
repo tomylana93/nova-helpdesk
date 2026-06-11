@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.2] - 2026-06-11
+
+### Fixed
+- fix(settings): update site name and description to reflect correct branding
+
 ## [0.12.1] - 2026-06-11
 
 ### Other Changes
