@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.2] - 2026-06-11
+
+### Fixed
+- fix(tickets): auto-populate submitted_at and fix SLA due dates crash
+
+### Other Changes
+- Merge branch 'fix/ticket-submitted-at' into dev
+
 ## [0.10.1] - 2026-06-11
 
 ### Fixed
