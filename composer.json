@@ -77,6 +77,9 @@
         "refactor:check": [
             "rector process --dry-run --no-progress-bar"
         ],
+        "version:bump": [
+            "@php artisan app:bump-version"
+        ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
             "pnpm run lint:check",

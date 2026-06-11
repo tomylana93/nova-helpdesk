@@ -54,6 +54,7 @@ export type NotificationItem = {
 export type SharedPageProps = {
     name: string;
     locale: string;
+    version: string;
     auth: {
         user: User | null;
         abilities: AuthAbilities;

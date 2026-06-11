@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => $generalSettings->site_name,
             'locale' => app()->getLocale(),
+            'version' => $this->appVersion(),
             'auth' => [
                 'user' => $request->user() ? new UserResource($request->user())->resolve($request) : null,
                 'abilities' => $this->abilities($request->user()),
@@ -111,5 +112,19 @@ class HandleInertiaRequests extends Middleware
             'manage_sla_policies' => $user->can(AdminPermission::ManageSlaPolicies->value),
             'manage_approvals' => $user->can(AdminPermission::ManageApprovals->value),
         ];
+    }
+
+    /**
+     * Get the application version from version.json.
+     */
+    private function appVersion(): string
+    {
+        if (file_exists(base_path('version.json'))) {
+            $data = json_decode(file_get_contents(base_path('version.json')), true);
+
+            return $data['version'] ?? '0.8.0';
+        }
+
+        return '0.8.0';
     }
 }
