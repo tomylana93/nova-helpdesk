@@ -10,18 +10,26 @@ configureEcho({
     broadcaster: 'reverb',
 });
 
-const initialPage =
-    typeof document !== 'undefined'
-        ? document.getElementById('app')?.getAttribute('data-page')
-        : null;
-const initialAppName =
-    typeof initialPage === 'string'
-        ? (JSON.parse(initialPage).props.name as string | undefined)
-        : undefined;
-const appName = initialAppName || import.meta.env.VITE_APP_NAME || 'Laravel';
-
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => {
+        let name = import.meta.env.VITE_APP_NAME || 'Nova Helpdesk';
+
+        if (typeof window !== 'undefined') {
+            const pageEl = document.getElementById('app');
+            const pageAttr = pageEl?.getAttribute('data-page');
+
+            if (pageAttr) {
+                try {
+                    const parsed = JSON.parse(pageAttr);
+                    name = parsed.props?.name || name;
+                } catch {
+                    // Keep default fallback
+                }
+            }
+        }
+
+        return title ? `${title} - ${name}` : name;
+    },
     layout: (name) => {
         switch (true) {
             case name.startsWith('auth/'):
