@@ -48,9 +48,13 @@ class BumpVersionCommand extends Command
         file_put_contents($versionFile, json_encode(['version' => $newVersion], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL);
         $this->info("Version bumped from v{$currentVersion} to v{$newVersion}");
 
+        // Update CHANGELOG.md
+        $commitsList = $this->getCommitsSinceLastTag($currentVersion);
+        $this->updateChangelog($newVersion, $commitsList);
+
         // Git commands
         if (! app()->environment('testing')) {
-            exec('git add version.json');
+            exec('git add version.json CHANGELOG.md');
             exec('git commit -m "chore(release): v'.$newVersion.'"');
             exec('git tag v'.$newVersion);
         }
@@ -102,25 +106,13 @@ class BumpVersionCommand extends Command
      */
     private function detectBumpType(string $currentVersion): ?string
     {
-        $tag = 'v'.$currentVersion;
-        $tagExists = false;
-
-        exec('git tag -l '.escapeshellarg($tag), $tagOutput);
-        if ($tagOutput !== [] && trim($tagOutput[0]) === $tag) {
-            $tagExists = true;
-        }
-
-        $commits = [];
-        if ($tagExists) {
-            exec('git log '.escapeshellarg($tag).'..HEAD --oneline', $commits);
-        } else {
-            exec('git log --oneline', $commits);
-        }
+        $commits = $this->getCommitsSinceLastTag($currentVersion);
 
         if ($commits === []) {
             return null;
         }
 
+        $tag = 'v'.$currentVersion;
         $this->info('Analyzing '.count($commits)." commit(s) since last release tag ({$tag}):");
 
         $bumpType = 'patch';
@@ -153,5 +145,108 @@ class BumpVersionCommand extends Command
         }
 
         return $bumpType;
+    }
+
+    /**
+     * Get all commits since the last release tag.
+     */
+    private function getCommitsSinceLastTag(string $currentVersion): array
+    {
+        $tag = 'v'.$currentVersion;
+        $tagExists = false;
+
+        exec('git tag -l '.escapeshellarg($tag), $tagOutput);
+        if ($tagOutput !== [] && trim($tagOutput[0]) === $tag) {
+            $tagExists = true;
+        }
+
+        $commits = [];
+        if ($tagExists) {
+            exec('git log '.escapeshellarg($tag).'..HEAD --oneline', $commits);
+        } else {
+            exec('git log --oneline', $commits);
+        }
+
+        return $commits;
+    }
+
+    /**
+     * Update CHANGELOG.md with the grouped commits since last release.
+     */
+    private function updateChangelog(string $newVersion, array $commits): void
+    {
+        $changelogFile = base_path('CHANGELOG.md');
+        $date = date('Y-m-d');
+
+        $added = [];
+        $fixed = [];
+        $changed = [];
+        $other = [];
+
+        foreach ($commits as $commit) {
+            $message = preg_replace('/^[a-f0-9]+\s+/', '', $commit);
+            $cleanMessage = trim($message);
+
+            if (preg_match('/^feat(?:\([^)]+\))?:/i', $cleanMessage)) {
+                $added[] = $cleanMessage;
+            } elseif (preg_match('/^fix(?:\([^)]+\))?:/i', $cleanMessage)) {
+                $fixed[] = $cleanMessage;
+            } elseif (preg_match('/^(refactor|perf)(?:\([^)]+\))?:/i', $cleanMessage)) {
+                $changed[] = $cleanMessage;
+            } else {
+                $other[] = $cleanMessage;
+            }
+        }
+
+        // Build release entry markdown
+        $entry = '## ['.$newVersion.'] - '.$date."\n";
+
+        if ($commits === []) {
+            $entry .= "\n- Housekeeping / release preparation (no new code commits).\n";
+        } else {
+            if ($added !== []) {
+                $entry .= "\n### Added\n";
+                foreach ($added as $item) {
+                    $entry .= '- '.$item."\n";
+                }
+            }
+
+            if ($fixed !== []) {
+                $entry .= "\n### Fixed\n";
+                foreach ($fixed as $item) {
+                    $entry .= '- '.$item."\n";
+                }
+            }
+
+            if ($changed !== []) {
+                $entry .= "\n### Changed & Refactored\n";
+                foreach ($changed as $item) {
+                    $entry .= '- '.$item."\n";
+                }
+            }
+
+            if ($other !== []) {
+                $entry .= "\n### Other Changes\n";
+                foreach ($other as $item) {
+                    $entry .= '- '.$item."\n";
+                }
+            }
+        }
+
+        $entry .= "\n";
+
+        // Prep header
+        $header = "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n";
+        $content = '';
+
+        if (file_exists($changelogFile)) {
+            $content = file_get_contents($changelogFile);
+            if (str_starts_with($content, '# Changelog')) {
+                $content = substr($content, strlen($header));
+            }
+        }
+
+        file_put_contents($changelogFile, $header.$entry.$content);
+        $this->info("CHANGELOG.md updated for v{$newVersion}");
     }
 }
