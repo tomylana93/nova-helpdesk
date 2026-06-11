@@ -9,11 +9,11 @@
   - **Users:** `UserController`, actions `CreateUser`/`UpdateUser`, table `UserTable` (`app/Tables/MasterData/UserTable`).
   - **Branches:** `BranchController`, actions `CreateBranch`/`UpdateBranch`, table `BranchTable`.
   - **Departments:** `DepartmentController`, actions `CreateDepartment`/`UpdateDepartment`, table `DepartmentTable`.
-  - **Queues:** `QueueController`, actions `CreateQueue`/`UpdateQueue`, table `QueueTable`.
+  - **Queues:** REMOVED in helpdesk refactor Phase 5 (model/controller/actions/table/policy/permission/nav/translations all deleted; `queue_id` dropped from `tickets`+`sla_policies`). See `mem:helpdesk/refactor-plan`.
   - **Ticket Categories:** `TicketCategoryController`, actions `CreateTicketCategory`/`UpdateTicketCategory`, table `TicketCategoryTable`.
   - **SLA Policies:** `SlaPolicyController`, actions `CreateSlaPolicy`/`UpdateSlaPolicy`, table `SlaPolicyTable`.
 - Authorization & Permissions (`app/Enums/AdminPermission.php`):
-  - Permissions: `manage settings`, `view users`, `create users`, `update users`, `manage branches`, `manage departments`, `manage queues`, `manage categories`, `view tickets`, `create tickets`, `update tickets`, `manage sla policies`, `manage approvals`.
+  - Permissions: `manage settings`, `view users`, `create users`, `update users`, `manage branches`, `manage departments`, `manage categories`, `view tickets`, `create tickets`, `update tickets`, `manage sla policies`, `manage approvals`. (`manage queues` removed in Phase 5.)
 - Roles Catalog (`app/Enums/UserRole.php`):
   - Target roles: `super_admin`, `it_agent`, `requester`.
 - Role-Permission Sync Command (`app/Console/Commands/SyncRolesCommand.php` alias `permission:sync-roles`):
@@ -22,5 +22,5 @@
   - `requester`: synced with `view tickets`, `create tickets`.
 - Policies:
   - `Gate::before` in `AppServiceProvider` allows `super_admin` to bypass policy checks.
-  - Policy classes exist for `UserPolicy`, `BranchPolicy`, `DepartmentPolicy`, `QueuePolicy`, `TicketCategoryPolicy`, `SlaPolicyPolicy`.
+  - Policy classes exist for `UserPolicy`, `BranchPolicy`, `DepartmentPolicy`, `TicketCategoryPolicy`, `SlaPolicyPolicy`. (`QueuePolicy` removed in Phase 5.)
 - Frontend auth UI uses shared `auth.abilities` booleans from `HandleInertiaRequests` to toggle UI parts (e.g. settings, users, branches, etc.).

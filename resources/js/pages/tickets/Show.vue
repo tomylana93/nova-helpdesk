@@ -5,6 +5,11 @@ import {
     reject,
 } from '@/actions/App/Http/Controllers/Helpdesk/TicketApprovalController';
 import { store as storeComment } from '@/actions/App/Http/Controllers/Helpdesk/TicketCommentController';
+import {
+    confirm as confirmResolved,
+    reopen,
+    transition,
+} from '@/actions/App/Http/Controllers/Helpdesk/TicketLifecycleController';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,11 +36,21 @@ type Comment = {
     createdAt: string | null;
 };
 
+type TransitionOption = {
+    value: string;
+    label: string;
+};
+
 type Props = {
     ticket: Ticket;
-    canUpdate?: boolean;
-    canComment?: boolean;
-    isAgent?: boolean;
+    viewerRole: 'requester' | 'it_agent' | 'super_admin';
+    canSeeInternal?: boolean;
+    canAct?: boolean;
+    canReply?: boolean;
+    availableTransitions?: TransitionOption[];
+    canApprove?: boolean;
+    canReopen?: boolean;
+    canConfirm?: boolean;
     comments?: Comment[];
     approval?: {
         status: string;
@@ -56,6 +71,13 @@ const approvalForm = useForm({
     decision_note: '',
 });
 
+const transitionForm = useForm({
+    status: '',
+});
+
+// Reopen and confirm-resolved carry no payload; a single empty form tracks their processing state.
+const lifecycleForm = useForm({});
+
 function submitComment(): void {
     commentForm.submit(storeComment(props.ticket.id), {
         onSuccess: () => commentForm.reset(),
@@ -68,6 +90,23 @@ function submitApprove(): void {
 
 function submitReject(): void {
     approvalForm.submit(reject(props.ticket.id));
+}
+
+function applyTransition(status: string): void {
+    transitionForm.status = status;
+    transitionForm.submit(transition(props.ticket.id), {
+        preserveScroll: true,
+    });
+}
+
+function submitReopen(): void {
+    lifecycleForm.submit(reopen(props.ticket.id), { preserveScroll: true });
+}
+
+function submitConfirm(): void {
+    lifecycleForm.submit(confirmResolved(props.ticket.id), {
+        preserveScroll: true,
+    });
 }
 
 const { trans } = useTrans();
@@ -97,9 +136,29 @@ setLayoutProps({
                     {{ ticket.ticket_number }}
                 </p>
             </div>
-            <div class="flex shrink-0 gap-2">
+            <div class="flex shrink-0 flex-wrap gap-2">
                 <Button
-                    v-if="canUpdate"
+                    v-if="canConfirm"
+                    type="button"
+                    size="sm"
+                    :disabled="lifecycleForm.processing"
+                    @click="submitConfirm"
+                >
+                    <Spinner v-if="lifecycleForm.processing" />
+                    {{ trans('helpdesk.ticket.action.confirm_resolved') }}
+                </Button>
+                <Button
+                    v-if="canReopen"
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    :disabled="lifecycleForm.processing"
+                    @click="submitReopen"
+                >
+                    {{ trans('helpdesk.ticket.action.reopen') }}
+                </Button>
+                <Button
+                    v-if="canAct"
                     :as="Link"
                     :href="edit(ticket.id)"
                     size="sm"
@@ -199,15 +258,6 @@ setLayoutProps({
                     <p
                         class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
                     >
-                        {{ trans('helpdesk.ticket.label.queue') }}
-                    </p>
-                    <p class="mt-1 text-sm">{{ ticket.queueName ?? '—' }}</p>
-                </div>
-
-                <div>
-                    <p
-                        class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
-                    >
                         {{ trans('helpdesk.ticket.label.category') }}
                     </p>
                     <p class="mt-1 text-sm">{{ ticket.categoryName ?? '—' }}</p>
@@ -250,9 +300,32 @@ setLayoutProps({
             </p>
         </div>
 
+        <!-- Agent Lifecycle Actions -->
+        <div
+            v-if="canAct && availableTransitions && availableTransitions.length"
+            class="rounded-lg border bg-card p-6 shadow-sm"
+        >
+            <h2 class="mb-3 font-medium">
+                {{ trans('helpdesk.ticket.label.actions') }}
+            </h2>
+            <div class="flex flex-wrap gap-2">
+                <Button
+                    v-for="option in availableTransitions"
+                    :key="option.value"
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    :disabled="transitionForm.processing"
+                    @click="applyTransition(option.value)"
+                >
+                    {{ trans(`helpdesk.ticket.transition.${option.value}`) }}
+                </Button>
+            </div>
+        </div>
+
         <!-- Approval Section -->
         <div
-            v-if="ticket.status === 'waiting_for_approval' && isAgent"
+            v-if="canApprove"
             class="rounded-lg border border-yellow-200 bg-yellow-50 p-6 shadow-sm dark:border-yellow-800 dark:bg-yellow-950/20"
         >
             <h2 class="mb-4 font-medium">
@@ -339,8 +412,18 @@ setLayoutProps({
                 {{ trans('helpdesk.comment.label.no_comments') }}
             </p>
 
+            <p
+                v-if="
+                    viewerRole === 'requester' &&
+                    ticket.status === 'waiting_for_requester'
+                "
+                class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950/20 dark:text-yellow-200"
+            >
+                {{ trans('helpdesk.comment.label.awaiting_reply') }}
+            </p>
+
             <form
-                v-if="canComment"
+                v-if="canReply"
                 class="space-y-4"
                 @submit.prevent="submitComment"
             >
@@ -359,7 +442,7 @@ setLayoutProps({
                     <InputError :message="commentForm.errors.body" />
                 </div>
 
-                <div v-if="isAgent" class="grid gap-2">
+                <div v-if="canAct" class="grid gap-2">
                     <Label for="comment-visibility">{{
                         trans('helpdesk.comment.label.visibility')
                     }}</Label>

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\GeneralStatus;
 use Database\Factories\TicketCategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property GeneralStatus $status
  * @property TicketCategory|null $parent
+ * @property Collection<int, TicketCategory> $subcategories
  */
 #[Fillable(['parent_id', 'name', 'description', 'status'])]
 class TicketCategory extends Model
@@ -23,6 +25,8 @@ class TicketCategory extends Model
 
     /**
      * Get the parent category.
+     *
+     * @return BelongsTo<TicketCategory, $this>
      */
     public function parent(): BelongsTo
     {
@@ -31,6 +35,8 @@ class TicketCategory extends Model
 
     /**
      * Get the subcategories.
+     *
+     * @return HasMany<TicketCategory, $this>
      */
     public function subcategories(): HasMany
     {

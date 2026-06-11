@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router, setLayoutProps, usePage } from '@inertiajs/vue3';
+import { useEchoNotification } from '@laravel/echo-vue';
 import {
     CheckCheck,
     Inbox,
@@ -7,7 +8,7 @@ import {
     ShieldAlert,
     Ticket,
 } from 'lucide-vue-next';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes';
 import {
@@ -136,42 +137,36 @@ const getIconColor = (type: string) => {
     }
 };
 
-// Listen for incoming notifications in real-time to append to the active page
-onMounted(() => {
-    const user = page.props.auth.user;
+// Listen for incoming notifications in real-time to append to the active page.
+// The Echo composable registers its own mount/unmount lifecycle hooks and must
+// be called synchronously during setup; auth state is stable for this
+// component's lifetime, so the conditional call is safe.
+const user = page.props.auth.user;
 
-    if (user && window.Echo) {
-        window.Echo.private(`App.Models.User.${user.id}`).notification(
-            (notification: EchoNotification) => {
-                // Prepend new notification to current view if we are on page 1
-                if (props.notifications.current_page === 1) {
-                    const newItem: NotificationItem = {
-                        id: notification.id,
-                        type: notification.type || 'info',
-                        ticket_id: notification.ticket_id || null,
-                        ticket_number: notification.ticket_number || null,
-                        subject: notification.subject || null,
-                        message: notification.message || '',
-                        created_at: new Date().toISOString(),
-                    };
+if (user) {
+    useEchoNotification<EchoNotification>(
+        `App.Models.User.${user.id}`,
+        (notification) => {
+            // Prepend new notification to current view if we are on page 1
+            if (props.notifications.current_page === 1) {
+                const newItem: NotificationItem = {
+                    id: notification.id,
+                    type: notification.type || 'info',
+                    ticket_id: notification.ticket_id || null,
+                    ticket_number: notification.ticket_number || null,
+                    subject: notification.subject || null,
+                    message: notification.message || '',
+                    created_at: new Date().toISOString(),
+                };
 
-                    localNotifications.value = [
-                        newItem,
-                        ...localNotifications.value,
-                    ];
-                }
-            },
-        );
-    }
-});
-
-onUnmounted(() => {
-    const user = page.props.auth.user;
-
-    if (user && window.Echo) {
-        window.Echo.leave(`App.Models.User.${user.id}`);
-    }
-});
+                localNotifications.value = [
+                    newItem,
+                    ...localNotifications.value,
+                ];
+            }
+        },
+    );
+}
 </script>
 
 <template>

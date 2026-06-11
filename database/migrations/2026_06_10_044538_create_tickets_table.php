@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignUuid('department_id')->nullable()->constrained('departments')->nullOnDelete();
             $table->foreignUuid('requester_id')->constrained('users')->cascadeOnDelete();
             $table->foreignUuid('assigned_to')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignUuid('queue_id')->nullable()->constrained('queues')->nullOnDelete();
             $table->foreignUuid('category_id')->nullable()->constrained('ticket_categories')->nullOnDelete();
             $table->string('priority');
             $table->string('status');

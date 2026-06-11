@@ -111,16 +111,6 @@ setLayoutProps({
                     <dt
                         class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
                     >
-                        {{ trans('admin.master_data.sla_policy.label.queue') }}
-                    </dt>
-                    <dd class="mt-1 text-sm">
-                        {{ slaPolicy.queueName ?? '—' }}
-                    </dd>
-                </div>
-                <div>
-                    <dt
-                        class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
-                    >
                         {{
                             trans(
                                 'admin.master_data.sla_policy.label.is_active',

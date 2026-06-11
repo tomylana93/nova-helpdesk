@@ -1,9 +1,8 @@
 import type { DataTablePayload } from '@/types';
 
 export type TicketStatus =
-    | 'new'
-    | 'triaged'
-    | 'waiting_for_approval'
+    | 'open'
+    | 'pending_approval'
     | 'in_progress'
     | 'waiting_for_requester'
     | 'resolved'
@@ -34,8 +33,6 @@ export type Ticket = {
     requesterEmail: string | null;
     assigned_to: string | null;
     assigneeName: string | null;
-    queue_id: string | null;
-    queueName: string | null;
     category_id: string | null;
     categoryName: string | null;
     submitted_at: string | null;

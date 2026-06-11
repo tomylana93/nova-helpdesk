@@ -24,14 +24,12 @@ import type { SelectOption } from '@/types';
 type Props = {
     typeOptions: SelectOption[];
     priorityOptions: SelectOption[];
-    queueOptions: SelectOption[];
 };
 
 type FormData = {
     name: string;
     ticket_type: string;
     priority: string;
-    queue_id: string;
     first_response_target_minutes: number | string;
     resolution_target_minutes: number | string;
     is_active: boolean;
@@ -46,7 +44,6 @@ const form = useForm<FormData>({
     name: '',
     ticket_type: '',
     priority: '',
-    queue_id: '',
     first_response_target_minutes: '',
     resolution_target_minutes: '',
     is_active: true,
@@ -187,33 +184,6 @@ setLayoutProps({
                     <InputError
                         :message="form.errors.resolution_target_minutes"
                     />
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="queue_id">{{
-                        trans('admin.master_data.sla_policy.label.queue')
-                    }}</Label>
-                    <Select id="queue_id" v-model="form.queue_id">
-                        <SelectTrigger class="w-full">
-                            <SelectValue
-                                :placeholder="
-                                    trans(
-                                        'admin.master_data.sla_policy.placeholder.queue',
-                                    )
-                                "
-                            />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem
-                                v-for="opt in props.queueOptions"
-                                :key="opt.value"
-                                :value="opt.value"
-                            >
-                                {{ opt.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <InputError :message="form.errors.queue_id" />
                 </div>
 
                 <div class="flex items-center gap-3 pt-6">

@@ -294,51 +294,6 @@ return [
                 ],
             ],
         ],
-        'queue' => [
-            'index' => [
-                'title' => 'Antrean',
-                'heading' => 'Manajemen Antrean',
-                'description' => 'Kelola antrean tiket.',
-            ],
-            'create' => [
-                'title' => 'Buat Antrean',
-                'heading' => 'Buat Antrean Baru',
-                'description' => 'Tambahkan antrean tiket baru.',
-            ],
-            'show' => [
-                'title' => 'Detail Antrean',
-                'heading' => 'Detail Antrean',
-                'description' => 'Lihat detail antrean.',
-            ],
-            'edit' => [
-                'title' => 'Ubah Antrean',
-                'heading' => 'Ubah Antrean',
-                'description' => 'Perbarui detail antrean.',
-            ],
-            'label' => [
-                'name' => 'Nama',
-                'description' => 'Deskripsi',
-                'status' => 'Status',
-            ],
-            'placeholder' => [
-                'name' => 'Masukkan nama antrean',
-                'description' => 'Masukkan deskripsi antrean',
-                'status' => 'Pilih status',
-            ],
-            'action' => [
-                'create' => 'Buat Antrean',
-                'update' => 'Perbarui Antrean',
-                'back' => 'Kembali ke Antrean',
-            ],
-            'message' => [
-                'created' => [
-                    'success' => 'Antrean berhasil dibuat.',
-                ],
-                'updated' => [
-                    'success' => 'Antrean berhasil diperbarui.',
-                ],
-            ],
-        ],
         'sla_policy' => [
             'index' => [
                 'title' => 'Kebijakan SLA',
@@ -365,7 +320,6 @@ return [
                 'ticket_type' => 'Tipe Tiket',
                 'all_types' => 'Semua Tipe',
                 'priority' => 'Prioritas',
-                'queue' => 'Antrean (opsional)',
                 'first_response' => 'Target Respons Pertama (menit)',
                 'resolution' => 'Target Penyelesaian (menit)',
                 'is_active' => 'Aktif',
@@ -374,7 +328,6 @@ return [
                 'name' => 'Masukkan nama kebijakan',
                 'ticket_type' => 'Semua tipe tiket',
                 'priority' => 'Pilih prioritas',
-                'queue' => 'Pilih antrean (opsional)',
             ],
             'action' => [
                 'create' => 'Buat Kebijakan',

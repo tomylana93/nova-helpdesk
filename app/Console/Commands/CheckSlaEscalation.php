@@ -3,8 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Enums\TicketStatus;
-use App\Enums\UserRole;
-use App\Events\SlaEscalated;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Notifications\TicketNotification;
@@ -12,7 +10,6 @@ use Carbon\CarbonInterface;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Notification;
 
 #[Signature('helpdesk:check-sla')]
 #[Description('Check open tickets for SLA warnings and breaches and trigger notifications')]
@@ -135,31 +132,25 @@ class CheckSlaEscalation extends Command
 
     private function triggerSlaWarning(Ticket $ticket, string $slaType, string $message): void
     {
-        if (! empty($ticket->assigned_to)) {
-            $assignee = User::query()->find($ticket->assigned_to);
-            if ($assignee) {
-                $assignee->notify(new TicketNotification($ticket, 'sla_warning', $message, ['sla_type' => $slaType]));
-            }
-        } else {
-            // Unassigned ticket: Notify all IT Agents and broadcast to helpdesk.agents channel
-            $agents = User::query()->role(UserRole::ItAgent->value)->get();
-            Notification::send($agents, new TicketNotification($ticket, 'sla_warning', $message, ['sla_type' => $slaType]));
-            event(new SlaEscalated($ticket, 'warning', $message));
-        }
+        $this->notifyAssignee($ticket, 'sla_warning', $message, $slaType);
     }
 
     private function triggerSlaBreach(Ticket $ticket, string $slaType, string $message): void
     {
-        if (! empty($ticket->assigned_to)) {
-            $assignee = User::query()->find($ticket->assigned_to);
-            if ($assignee) {
-                $assignee->notify(new TicketNotification($ticket, 'sla_breached', $message, ['sla_type' => $slaType]));
-            }
-        } else {
-            // Unassigned ticket: Notify all IT Agents and broadcast to helpdesk.agents channel
-            $agents = User::query()->role(UserRole::ItAgent->value)->get();
-            Notification::send($agents, new TicketNotification($ticket, 'sla_breached', $message, ['sla_type' => $slaType]));
-            event(new SlaEscalated($ticket, 'breached', $message));
+        $this->notifyAssignee($ticket, 'sla_breached', $message, $slaType);
+    }
+
+    /**
+     * Notify the assigned agent only. Unassigned tickets have no SLA target — there is no role
+     * fan-out and super admins are never notified; they surface via the agent's Overdue inbox filter.
+     */
+    private function notifyAssignee(Ticket $ticket, string $type, string $message, string $slaType): void
+    {
+        if (empty($ticket->assigned_to)) {
+            return;
         }
+
+        $assignee = User::query()->find($ticket->assigned_to);
+        $assignee?->notify(new TicketNotification($ticket, $type, $message, ['sla_type' => $slaType]));
     }
 }

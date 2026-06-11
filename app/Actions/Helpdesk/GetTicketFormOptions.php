@@ -6,12 +6,9 @@ use App\Enums\GeneralStatus;
 use App\Enums\UserRole;
 use App\Http\Resources\BranchOptionResource;
 use App\Http\Resources\DepartmentOptionResource;
-use App\Http\Resources\QueueOptionResource;
-use App\Http\Resources\TicketCategoryOptionResource;
 use App\Http\Resources\UserOptionResource;
 use App\Models\Branch;
 use App\Models\Department;
-use App\Models\Queue;
 use App\Models\TicketCategory;
 use App\Models\User;
 
@@ -40,20 +37,23 @@ class GetTicketFormOptions
                 ->map->resolve()
                 ->all(),
 
-            'queueOptions' => Queue::query()
-                ->where('status', GeneralStatus::Active)
-                ->orderBy('name')
-                ->get(['id', 'name'])
-                ->mapInto(QueueOptionResource::class)
-                ->map->resolve()
-                ->all(),
-
             'categoryOptions' => TicketCategory::query()
                 ->where('status', GeneralStatus::Active)
-                ->orderBy('name')
-                ->get(['id', 'name'])
-                ->mapInto(TicketCategoryOptionResource::class)
-                ->map->resolve()
+                ->whereNull('parent_id')
+                ->with(['subcategories' => function ($q): void {
+                    $q->where('status', GeneralStatus::Active)->oldest();
+                }])
+                ->oldest()
+                ->get()
+                ->map(fn (TicketCategory $parent): array => [
+                    'label' => $parent->name,
+                    'options' => $parent->subcategories->map(fn (TicketCategory $sub): array => [
+                        'value' => $sub->id,
+                        'label' => $sub->name,
+                    ])->all(),
+                ])
+                ->filter(fn (array $group): bool => ! empty($group['options']))
+                ->values()
                 ->all(),
         ];
 

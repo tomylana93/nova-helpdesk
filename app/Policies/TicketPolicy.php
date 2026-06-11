@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Enums\AdminPermission;
+use App\Enums\TicketStatus;
 use App\Enums\UserRole;
 use App\Models\Ticket;
 use App\Models\User;
@@ -44,5 +45,17 @@ class TicketPolicy
     public function approve(User $user, Ticket $ticket): bool
     {
         return $user->can(AdminPermission::ManageApprovals->value);
+    }
+
+    public function reopen(User $user, Ticket $ticket): bool
+    {
+        return $ticket->requester_id === $user->id
+            && in_array($ticket->status, [TicketStatus::Resolved, TicketStatus::Closed], true);
+    }
+
+    public function confirmResolution(User $user, Ticket $ticket): bool
+    {
+        return $ticket->requester_id === $user->id
+            && $ticket->status === TicketStatus::Resolved;
     }
 }

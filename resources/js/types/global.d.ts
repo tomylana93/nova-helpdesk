@@ -1,6 +1,5 @@
 import '@inertiajs/core';
 import type { createHeadManager, Page, router } from '@inertiajs/core';
-import type Echo from 'laravel-echo';
 import type { SharedPageProps } from '@/types/auth';
 
 // Extend ImportMeta interface for Vite...
@@ -26,11 +25,5 @@ declare module 'vue' {
         $inertia: typeof router;
         $page: Page<SharedPageProps>;
         $headManager: ReturnType<typeof createHeadManager>;
-    }
-}
-
-declare global {
-    interface Window {
-        Echo: Echo;
     }
 }
