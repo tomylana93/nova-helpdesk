@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tomylana93/nova-helpdesk/actions/workflows/tests.yml"><img src="https://github.com/tomylana93/nova-helpdesk/actions/workflows/tests.yml/badge.svg" alt="Tests Status"></a>
+  <a href="https://github.com/tomylana93/nova-helpdesk/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/tomylana93/nova-helpdesk/tests.yml?style=flat-square&logo=github&label=build" alt="Tests Status"></a>
   <img src="https://img.shields.io/badge/PHP-%3E%3D_8.5-777bb4.svg?style=flat-square&logo=php" alt="PHP Version">
   <img src="https://img.shields.io/badge/Laravel-13-ff2d20.svg?style=flat-square&logo=laravel" alt="Laravel Version">
   <img src="https://img.shields.io/badge/Vue-3-4fc08d.svg?style=flat-square&logo=vue.js" alt="Vue Version">
