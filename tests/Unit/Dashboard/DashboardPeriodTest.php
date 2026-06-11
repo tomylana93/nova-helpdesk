@@ -1,14 +1,14 @@
 <?php
 
 use App\Actions\Dashboard\Support\DashboardPeriod;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 
 beforeEach(function (): void {
-    Carbon::setTestNow(Carbon::parse('2026-06-11 10:00:00'));
+    Date::setTestNow(Date::parse('2026-06-11 10:00:00'));
 });
 
 afterEach(function (): void {
-    Carbon::setTestNow();
+    Date::setTestNow();
 });
 
 test('monthly period spans the calendar month and previous month', function (): void {
