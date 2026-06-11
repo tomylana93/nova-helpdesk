@@ -58,11 +58,14 @@ function colorAt(index: number): string {
                 v-if="total > 0"
                 class="flex w-full flex-col items-center gap-4"
             >
-                <div class="aspect-square w-full max-w-[180px]">
-                    <VisSingleContainer :data="data">
+                <div class="h-44 w-44">
+                    <VisSingleContainer :data="data" :height="176" :width="176">
                         <VisDonut
                             :value="(d: number) => d"
+                            :radius="80"
                             :arc-width="20"
+                            :pad-angle="0.02"
+                            :corner-radius="4"
                             :color="(_: number, i: number) => colorAt(i)"
                             :central-label="String(total)"
                             :central-sub-label="

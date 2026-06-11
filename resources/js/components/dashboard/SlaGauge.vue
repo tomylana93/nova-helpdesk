@@ -58,15 +58,19 @@ const tooltipText = computed(() =>
                             {{ trans('dashboard.compliance.title') }}
                         </CardTitle>
                     </CardHeader>
-                    <CardContent
-                        class="relative flex items-center justify-center py-2"
-                    >
-                        <div class="relative h-32 w-32">
-                            <VisSingleContainer :data="data">
+                    <CardContent class="flex items-center justify-center py-2">
+                        <div class="relative h-40 w-40">
+                            <VisSingleContainer
+                                :data="data"
+                                :height="160"
+                                :width="160"
+                            >
                                 <VisDonut
                                     :value="(d: number) => d"
-                                    :arc-width="12"
+                                    :radius="72"
+                                    :arc-width="14"
                                     :pad-angle="0.02"
+                                    :corner-radius="7"
                                     :color="
                                         (_: number, i: number) =>
                                             i === 0
@@ -76,7 +80,7 @@ const tooltipText = computed(() =>
                                 />
                             </VisSingleContainer>
                             <div
-                                class="absolute inset-0 flex flex-col items-center justify-center"
+                                class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
                             >
                                 <span
                                     class="text-3xl font-extrabold tracking-tight"
