@@ -62,3 +62,44 @@ test('dashboard uses locale from general settings', function (): void {
             ->where('locale', 'id'),
         );
 });
+
+test('dashboard returns correct inertia props based on user role', function (): void {
+    // 1. Requester
+    $requester = createRequesterUser();
+    $this->actingAs($requester)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('Dashboard')
+            ->where('role', 'requester')
+            ->has('metrics')
+            ->has('recentTickets')
+            ->has('charts')
+        );
+
+    // 2. IT Agent
+    $agent = createAgentUser();
+    $this->actingAs($agent)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('Dashboard')
+            ->where('role', 'it_agent')
+            ->has('metrics')
+            ->has('recentTickets')
+            ->has('charts')
+        );
+
+    // 3. Super Admin
+    $admin = grantSuperAdmin(User::factory()->create());
+    $this->actingAs($admin)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('Dashboard')
+            ->where('role', 'super_admin')
+            ->has('metrics')
+            ->has('recentTickets')
+            ->has('charts')
+        );
+});

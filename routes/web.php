@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TemporaryUploadController;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'active'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::post('temporary-uploads', [TemporaryUploadController::class, 'store'])
         ->middleware('throttle:temporary-uploads')
         ->name('temporary-uploads.store');

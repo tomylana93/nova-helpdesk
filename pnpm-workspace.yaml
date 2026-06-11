@@ -9,5 +9,6 @@ ignoredBuiltDependencies:
   - vue-demi
 
 allowBuilds:
+  maplibre-gl: true
   unrs-resolver: false
   vue-demi: false
