@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.1] - 2026-06-11
+
+### Fixed
+- fix(dashboard): resolve HelpCircle warning and missing SLA compliance props crash
+
+### Other Changes
+- Merge branch 'fix/dashboard-errors' into dev
+
 ## [0.10.0] - 2026-06-11
 
 ### Added
