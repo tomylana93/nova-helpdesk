@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-06-11
+
+### Added
+- feat(dashboard): implement role-based dashboard with charts, metrics, and SLA compliance radial gauge
+
+### Changed & Refactored
+- refactor(dashboard): extract query and metrics compilation to GetDashboardMetrics Action
+
+### Other Changes
+- Merge pull request #15 from tomylana93/dev
+- Merge pull request #14 from tomylana93/dev
+- docs: add ticket lifecycle flow, env documentation, CONTRIBUTING.md, and SECURITY.md
+- Merge pull request #13 from tomylana93/dev
+- docs: remove Laravel Pint badge and add MIT License
+- Merge pull request #12 from tomylana93/dev
+- docs: use slightly rounded style for all badges
+- Merge pull request #11 from tomylana93/dev
+- docs: make GitHub Actions status badge style uniform
+- Merge pull request #10 from tomylana93/dev
+- docs: add dark-mode responsive logo and badges to README
+- Merge pull request #9 from tomylana93/dev
+
 ## [0.8.0] - 2026-06-11
 
 ### Added
