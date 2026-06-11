@@ -7,14 +7,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tomylana93/nova-helpdesk/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/tomylana93/nova-helpdesk/tests.yml?style=flat-square&logo=github&label=build" alt="Tests Status"></a>
-  <img src="https://img.shields.io/badge/PHP-%3E%3D_8.5-777bb4.svg?style=flat-square&logo=php" alt="PHP Version">
-  <img src="https://img.shields.io/badge/Laravel-13-ff2d20.svg?style=flat-square&logo=laravel" alt="Laravel Version">
-  <img src="https://img.shields.io/badge/Vue-3-4fc08d.svg?style=flat-square&logo=vue.js" alt="Vue Version">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg?style=flat-square&logo=tailwindcss" alt="Tailwind CSS Version">
-  <img src="https://img.shields.io/badge/Tests-Pest_PHP-00b4b6.svg?style=flat-square&logo=pest" alt="Pest PHP Version">
-  <img src="https://img.shields.io/badge/Code_Style-Laravel_Pint-000000.svg?style=flat-square" alt="Laravel Pint">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat-square" alt="License">
+  <a href="https://github.com/tomylana93/nova-helpdesk/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/tomylana93/nova-helpdesk/tests.yml?style=flat&logo=github&label=build" alt="Tests Status"></a>
+  <img src="https://img.shields.io/badge/PHP-%3E%3D_8.5-777bb4.svg?style=flat&logo=php" alt="PHP Version">
+  <img src="https://img.shields.io/badge/Laravel-13-ff2d20.svg?style=flat&logo=laravel" alt="Laravel Version">
+  <img src="https://img.shields.io/badge/Vue-3-4fc08d.svg?style=flat&logo=vue.js" alt="Vue Version">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8.svg?style=flat&logo=tailwindcss" alt="Tailwind CSS Version">
+  <img src="https://img.shields.io/badge/Tests-Pest_PHP-00b4b6.svg?style=flat&logo=pest" alt="Pest PHP Version">
+  <img src="https://img.shields.io/badge/Code_Style-Laravel_Pint-000000.svg?style=flat" alt="Laravel Pint">
+  <img src="https://img.shields.io/badge/License-MIT-green.svg?style=flat" alt="License">
 </p>
 
 # Nova Helpdesk
