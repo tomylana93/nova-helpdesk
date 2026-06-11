@@ -13,6 +13,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useTrans } from '@/composables/useTrans';
 import { edit, show } from '@/routes/tickets';
 import type { SharedPageProps, TicketSlaTarget, TicketTableRow } from '@/types';
@@ -41,26 +47,41 @@ function slaTitle(target: TicketSlaTarget): string | undefined {
 }
 
 function renderSlaTarget(target: TicketSlaTarget) {
-    return h(
-        'div',
+    const dueAtLabel = slaTitle(target);
+    const content = h(
+        'span',
         {
-            class: 'flex items-center justify-between gap-3 text-xs leading-5',
-            title: slaTitle(target),
+            class: 'flex w-full items-start justify-between gap-3 text-xs leading-5',
         },
         [
-            h('span', { class: 'text-muted-foreground' }, target.label),
+            h(
+                'span',
+                { class: 'shrink-0 text-muted-foreground' },
+                target.label,
+            ),
             h(
                 'span',
                 {
                     class: [
-                        'max-w-28 truncate text-right font-medium',
+                        'text-right font-medium',
                         slaStateClass(target.state),
-                    ].join(' '),
+                    ],
                 },
-                target.statusLabel,
+                [target.statusLabel],
             ),
         ],
     );
+
+    if (!dueAtLabel) {
+        return content;
+    }
+
+    return h(Tooltip, {}, () => [
+        h(TooltipTrigger, { asChild: true }, () => content),
+        h(TooltipContent, { side: 'top', align: 'end' }, () =>
+            h('p', { class: 'text-xs' }, dueAtLabel),
+        ),
+    ]);
 }
 
 export function ticketTableColumns(): ColumnDef<TicketTableRow>[] {
@@ -115,17 +136,8 @@ export function ticketTableColumns(): ColumnDef<TicketTableRow>[] {
                     column,
                     title: trans('helpdesk.ticket.label.subject'),
                 }),
-            cell: ({ row }) => {
-                const ticket = row.original;
-
-                return canUpdate
-                    ? h(
-                          TextLink,
-                          { href: edit(ticket.id), prefetch: true },
-                          () => ticket.subject,
-                      )
-                    : h('span', { class: 'font-medium' }, ticket.subject);
-            },
+            cell: ({ row }) =>
+                h('span', { class: 'font-medium' }, row.original.subject),
         },
         {
             accessorKey: 'type',
@@ -188,10 +200,12 @@ export function ticketTableColumns(): ColumnDef<TicketTableRow>[] {
                     title: 'SLA',
                 }),
             cell: ({ row }) =>
-                h('div', { class: 'min-w-44 space-y-0.5' }, [
-                    renderSlaTarget(row.original.sla.firstResponse),
-                    renderSlaTarget(row.original.sla.resolution),
-                ]),
+                h(TooltipProvider, { delayDuration: 150 }, () =>
+                    h('div', { class: 'flex min-w-64 flex-col gap-0.5' }, [
+                        renderSlaTarget(row.original.sla.firstResponse),
+                        renderSlaTarget(row.original.sla.resolution),
+                    ]),
+                ),
         },
         {
             accessorKey: 'requesterName',

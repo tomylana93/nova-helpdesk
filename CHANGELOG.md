@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0] - 2026-06-11
+
+### Added
+- feat(helpdesk): add ticket number sequencing and first response tracking
+
+### Other Changes
+- Merge pull request #18 from tomylana93/dev
+
 ## [0.11.1] - 2026-06-11
 
 ### Other Changes

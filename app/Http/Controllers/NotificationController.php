@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -36,7 +37,7 @@ class NotificationController extends Controller
     /**
      * Mark a specific notification as read.
      */
-    public function markAsRead(Request $request, string $id): RedirectResponse
+    public function markAsRead(Request $request, string $id): JsonResponse
     {
         $notification = $request->user()
             ->notifications()
@@ -44,7 +45,7 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
-        return back();
+        return response()->json(['success' => true]);
     }
 
     /**

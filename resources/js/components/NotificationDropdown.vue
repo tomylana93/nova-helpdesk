@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router, useHttp, usePage } from '@inertiajs/vue3';
 import { useEchoNotification } from '@laravel/echo-vue';
 import { Bell, CheckCheck, Inbox } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
@@ -61,14 +61,17 @@ const handleMarkAllAsRead = () => {
     );
 };
 
+const markHttp = useHttp({});
+
 const handleMarkAsRead = (id: string) => {
-    router.post(
-        read(id).url,
-        {},
-        {
-            preserveScroll: true,
+    markHttp.post(read(id).url, {
+        onSuccess: () => {
+            notificationsList.value = notificationsList.value.filter(
+                (item) => item.id !== id,
+            );
+            unreadCount.value = Math.max(0, unreadCount.value - 1);
         },
-    );
+    });
 };
 
 const user = page.props.auth.user;

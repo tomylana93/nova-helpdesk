@@ -1,7 +1,10 @@
 <?php
 
+use App\Enums\TicketStatus;
+use App\Models\Ticket;
 use App\Models\User;
 use App\Settings\GeneralSettings;
+use Illuminate\Support\Facades\Date;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to the login page', function (): void {
@@ -101,5 +104,33 @@ test('dashboard returns correct inertia props based on user role', function (): 
             ->has('metrics')
             ->has('recentTickets')
             ->has('charts')
+        );
+});
+
+test('dashboard recent tickets include sla payload', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
+
+    $requester = createRequesterUser();
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'subject' => 'Dashboard SLA Ticket',
+        'status' => TicketStatus::Open,
+        'first_response_due_at' => Date::parse('2026-06-11 10:45:00'),
+        'resolution_due_at' => Date::parse('2026-06-11 10:20:00'),
+    ]);
+
+    $this
+        ->actingAs($requester)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('Dashboard')
+            ->has('recentTickets', 1)
+            ->where('recentTickets.0.subject', 'Dashboard SLA Ticket')
+            ->where('recentTickets.0.sla.firstResponse.state', 'on_track')
+            ->where('recentTickets.0.sla.firstResponse.remainingSeconds', 2700)
+            ->where('recentTickets.0.sla.resolution.state', 'due_soon')
+            ->where('recentTickets.0.sla.resolution.remainingSeconds', 1200)
         );
 });

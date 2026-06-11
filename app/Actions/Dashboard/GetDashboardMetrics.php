@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dashboard;
 
+use App\Actions\Helpdesk\FormatTicketSla;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\UserRole;
@@ -11,6 +12,10 @@ use Illuminate\Support\Facades\Date;
 
 class GetDashboardMetrics
 {
+    public function __construct(
+        private readonly FormatTicketSla $formatTicketSla,
+    ) {}
+
     /**
      * Get dashboard metrics and charts data based on the authenticated user.
      *
@@ -55,29 +60,11 @@ class GetDashboardMetrics
             ];
 
             $recentTickets = (clone $baseQuery)
-                ->with(['category', 'assignee'])
+                ->with(['category', 'requester', 'assignee'])
                 ->latest()
                 ->limit(5)
                 ->get()
-                ->map(fn (Ticket $t): array => [
-                    'id' => $t->id,
-                    'ticket_number' => $t->ticket_number,
-                    'subject' => $t->subject,
-                    'type' => $t->type->label(),
-                    'priority' => [
-                        'value' => $t->priority->value,
-                        'label' => $t->priority->label(),
-                        'variant' => $t->priority->variant(),
-                    ],
-                    'status' => [
-                        'value' => $t->status->value,
-                        'label' => $t->status->label(),
-                        'variant' => $t->status->variant(),
-                    ],
-                    'requester_name' => $t->requester->name,
-                    'assignee_name' => $t->assignee !== null ? $t->assignee->name : 'Unassigned',
-                    'created_at' => $t->created_at?->toJSON(),
-                ])
+                ->map(fn (Ticket $ticket): array => $this->recentTicket($ticket))
                 ->all();
 
             // Breakdown by priority
@@ -142,29 +129,11 @@ class GetDashboardMetrics
                     $q->where('assigned_to', $user->id)
                         ->orWhereNull('assigned_to');
                 })
-                ->with(['category', 'requester'])
+                ->with(['category', 'requester', 'assignee'])
                 ->latest()
                 ->limit(5)
                 ->get()
-                ->map(fn (Ticket $t): array => [
-                    'id' => $t->id,
-                    'ticket_number' => $t->ticket_number,
-                    'subject' => $t->subject,
-                    'type' => $t->type->label(),
-                    'priority' => [
-                        'value' => $t->priority->value,
-                        'label' => $t->priority->label(),
-                        'variant' => $t->priority->variant(),
-                    ],
-                    'status' => [
-                        'value' => $t->status->value,
-                        'label' => $t->status->label(),
-                        'variant' => $t->status->variant(),
-                    ],
-                    'requester_name' => $t->requester->name,
-                    'assignee_name' => $t->assignee !== null ? $t->assignee->name : 'Unassigned',
-                    'created_at' => $t->created_at?->toJSON(),
-                ])
+                ->map(fn (Ticket $ticket): array => $this->recentTicket($ticket))
                 ->all();
 
             // SLA Compliance rate calculation
@@ -240,25 +209,7 @@ class GetDashboardMetrics
                 ->latest()
                 ->limit(5)
                 ->get()
-                ->map(fn (Ticket $t): array => [
-                    'id' => $t->id,
-                    'ticket_number' => $t->ticket_number,
-                    'subject' => $t->subject,
-                    'type' => $t->type->label(),
-                    'priority' => [
-                        'value' => $t->priority->value,
-                        'label' => $t->priority->label(),
-                        'variant' => $t->priority->variant(),
-                    ],
-                    'status' => [
-                        'value' => $t->status->value,
-                        'label' => $t->status->label(),
-                        'variant' => $t->status->variant(),
-                    ],
-                    'requester_name' => $t->requester->name,
-                    'assignee_name' => $t->assignee !== null ? $t->assignee->name : 'Unassigned',
-                    'created_at' => $t->created_at?->toJSON(),
-                ])
+                ->map(fn (Ticket $ticket): array => $this->recentTicket($ticket))
                 ->all();
 
             // SLA Compliance rate calculation
@@ -298,6 +249,33 @@ class GetDashboardMetrics
             'metrics' => $metrics,
             'recentTickets' => $recentTickets,
             'charts' => $charts,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function recentTicket(Ticket $ticket): array
+    {
+        return [
+            'id' => $ticket->id,
+            'ticket_number' => $ticket->ticket_number,
+            'subject' => $ticket->subject,
+            'type' => $ticket->type->label(),
+            'priority' => [
+                'value' => $ticket->priority->value,
+                'label' => $ticket->priority->label(),
+                'variant' => $ticket->priority->variant(),
+            ],
+            'status' => [
+                'value' => $ticket->status->value,
+                'label' => $ticket->status->label(),
+                'variant' => $ticket->status->variant(),
+            ],
+            'requester_name' => $ticket->requester->name,
+            'assignee_name' => $ticket->assignee !== null ? $ticket->assignee->name : 'Unassigned',
+            'sla' => $this->formatTicketSla->handle($ticket),
+            'created_at' => $ticket->created_at?->toJSON(),
         ];
     }
 }

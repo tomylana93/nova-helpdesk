@@ -37,9 +37,15 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { dashboard } from '@/routes';
 import { index as ticketsIndex, show } from '@/routes/tickets';
-import type { AuthenticatedSharedPageProps } from '@/types';
+import type { AuthenticatedSharedPageProps, TicketSlaTarget } from '@/types';
 
 defineOptions({
     layout: {
@@ -76,6 +82,10 @@ const props = defineProps<{
         };
         requester_name: string;
         assignee_name: string;
+        sla: {
+            firstResponse: TicketSlaTarget;
+            resolution: TicketSlaTarget;
+        };
         created_at: string;
     }>;
     charts: {
@@ -169,6 +179,26 @@ function formatDate(dateStr: string) {
         day: 'numeric',
         year: 'numeric',
     });
+}
+
+function slaStateClass(state: TicketSlaTarget['state']): string {
+    if (state === 'overdue') {
+        return 'text-destructive';
+    }
+
+    if (state === 'due_soon') {
+        return 'text-amber-600 dark:text-amber-400';
+    }
+
+    if (state === 'no_sla' || state === 'completed') {
+        return 'text-muted-foreground';
+    }
+
+    return 'text-foreground';
+}
+
+function slaTitle(target: TicketSlaTarget): string | null {
+    return target.dueAt ? new Date(target.dueAt).toLocaleString() : null;
 }
 </script>
 
@@ -274,66 +304,117 @@ function formatDate(dateStr: string) {
                                     >Requester</TableHead
                                 >
                                 <TableHead v-else>Assignee</TableHead>
+                                <TableHead>SLA</TableHead>
                                 <TableHead>Date</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow
-                                v-for="ticket in props.recentTickets"
-                                :key="ticket.id"
-                            >
-                                <TableCell
-                                    class="font-medium whitespace-nowrap"
+                            <TooltipProvider>
+                                <TableRow
+                                    v-for="ticket in props.recentTickets"
+                                    :key="ticket.id"
                                 >
-                                    <Link
-                                        :href="show({ ticket: ticket.id })"
-                                        class="text-primary hover:underline"
+                                    <TableCell
+                                        class="font-medium whitespace-nowrap"
                                     >
-                                        {{ ticket.ticket_number }}
-                                    </Link>
-                                </TableCell>
-                                <TableCell class="max-w-[200px] truncate">{{
-                                    ticket.subject
-                                }}</TableCell>
-                                <TableCell class="capitalize">{{
-                                    ticket.type
-                                }}</TableCell>
-                                <TableCell>
-                                    <Badge
-                                        :variant="
-                                            ticket.priority.variant as 'default'
-                                        "
-                                        class="font-normal"
+                                        <Link
+                                            :href="show({ ticket: ticket.id })"
+                                            class="text-primary hover:underline"
+                                        >
+                                            {{ ticket.ticket_number }}
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell class="max-w-[220px]">
+                                        <span class="font-medium">
+                                            {{ ticket.subject }}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell class="capitalize">{{
+                                        ticket.type
+                                    }}</TableCell>
+                                    <TableCell>
+                                        <Badge
+                                            :variant="
+                                                ticket.priority
+                                                    .variant as 'default'
+                                            "
+                                            class="font-normal"
+                                        >
+                                            {{ ticket.priority.label }}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge
+                                            :variant="
+                                                ticket.status
+                                                    .variant as 'default'
+                                            "
+                                            class="font-normal"
+                                        >
+                                            {{ ticket.status.label }}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell
+                                        v-if="props.role !== 'requester'"
+                                        class="whitespace-nowrap"
                                     >
-                                        {{ ticket.priority.label }}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge
-                                        :variant="
-                                            ticket.status.variant as 'default'
-                                        "
-                                        class="font-normal"
-                                    >
-                                        {{ ticket.status.label }}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell
-                                    v-if="props.role !== 'requester'"
-                                    class="whitespace-nowrap"
-                                >
-                                    {{ ticket.requester_name }}
-                                </TableCell>
-                                <TableCell v-else class="whitespace-nowrap">
-                                    {{ ticket.assignee_name }}
-                                </TableCell>
-                                <TableCell class="whitespace-nowrap">
-                                    {{ formatDate(ticket.created_at) }}
-                                </TableCell>
-                            </TableRow>
+                                        {{ ticket.requester_name }}
+                                    </TableCell>
+                                    <TableCell v-else class="whitespace-nowrap">
+                                        {{ ticket.assignee_name }}
+                                    </TableCell>
+                                    <TableCell class="min-w-64">
+                                        <div class="flex flex-col gap-0.5">
+                                            <Tooltip
+                                                v-for="target in [
+                                                    ticket.sla.firstResponse,
+                                                    ticket.sla.resolution,
+                                                ]"
+                                                :key="target.label"
+                                            >
+                                                <TooltipTrigger as-child>
+                                                    <span
+                                                        class="flex w-full items-start justify-between gap-3 text-xs leading-5"
+                                                    >
+                                                        <span
+                                                            class="shrink-0 text-muted-foreground"
+                                                        >
+                                                            {{ target.label }}
+                                                        </span>
+                                                        <span
+                                                            class="text-right font-medium"
+                                                            :class="
+                                                                slaStateClass(
+                                                                    target.state,
+                                                                )
+                                                            "
+                                                        >
+                                                            {{
+                                                                target.statusLabel
+                                                            }}
+                                                        </span>
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent
+                                                    v-if="slaTitle(target)"
+                                                    side="top"
+                                                    align="end"
+                                                >
+                                                    <p class="text-xs">
+                                                        {{ slaTitle(target) }}
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell class="whitespace-nowrap">
+                                        {{ formatDate(ticket.created_at) }}
+                                    </TableCell>
+                                </TableRow>
+                            </TooltipProvider>
                             <TableRow v-if="props.recentTickets.length === 0">
                                 <TableCell
-                                    colspan="8"
+                                    colspan="9"
                                     class="py-8 text-center text-muted-foreground"
                                 >
                                     No recent tickets found.

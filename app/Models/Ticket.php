@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\Helpdesk\GenerateTicketNumber;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
@@ -14,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Str;
 
 /**
  * @property TicketType $type
@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
  * @property string|null $category_id
  * @property Carbon $submitted_at
  * @property Carbon|null $first_response_due_at
+ * @property Carbon|null $first_responded_at
  * @property Carbon|null $resolution_due_at
  * @property Carbon|null $resolved_at
  * @property Carbon|null $closed_at
@@ -52,6 +53,7 @@ use Illuminate\Support\Str;
     'subject',
     'description',
     'submitted_at',
+    'first_responded_at',
     'resolved_at',
     'closed_at',
 ])]
@@ -64,22 +66,7 @@ class Ticket extends Model
     {
         static::creating(function (Ticket $ticket): void {
             if (empty($ticket->ticket_number)) {
-                $prefix = $ticket->type->prefix();
-
-                // Find the latest ticket of this type to determine the next number
-                $lastTicket = self::query()
-                    ->where('type', $ticket->type)
-                    ->orderByDesc('ticket_number')
-                    ->first();
-
-                $nextNumber = 1;
-                if ($lastTicket) {
-                    $parts = Str::of($lastTicket->ticket_number)->explode('-');
-                    $lastNum = isset($parts[1]) ? (int) $parts[1] : 0;
-                    $nextNumber = $lastNum + 1;
-                }
-
-                $ticket->ticket_number = sprintf('%s-%05d', $prefix, $nextNumber);
+                $ticket->ticket_number = app(GenerateTicketNumber::class)->handle($ticket->type);
             }
 
             if (empty($ticket->status)) {
@@ -152,6 +139,7 @@ class Ticket extends Model
             'priority' => TicketPriority::class,
             'submitted_at' => 'datetime',
             'first_response_due_at' => 'datetime',
+            'first_responded_at' => 'datetime',
             'resolution_due_at' => 'datetime',
             'resolved_at' => 'datetime',
             'closed_at' => 'datetime',

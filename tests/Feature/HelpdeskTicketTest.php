@@ -101,6 +101,73 @@ test('ticket index exposes remaining sla state in the deferred table payload', f
             ));
 });
 
+test('ticket index marks first response completed while resolution remains active', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
+
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'assigned_to' => $agent->id,
+        'subject' => 'Responded SLA',
+        'status' => TicketStatus::InProgress,
+        'submitted_at' => Date::parse('2026-06-11 10:00:00'),
+        'first_response_due_at' => Date::parse('2026-06-11 10:45:00'),
+        'first_responded_at' => Date::parse('2026-06-11 10:05:00'),
+        'resolution_due_at' => Date::parse('2026-06-11 10:20:00'),
+    ]);
+
+    $this
+        ->actingAs($agent)
+        ->get(route('tickets.index'))
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('tickets/Index')
+            ->missing('table')
+            ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+                ->has('table.rows', 1)
+                ->where('table.rows.0.sla.firstResponse.state', 'completed')
+                ->where('table.rows.0.sla.firstResponse.statusLabel', 'Completed in 5 mins')
+                ->where('table.rows.0.sla.resolution.state', 'due_soon')
+                ->where('table.rows.0.sla.resolution.remainingSeconds', 1200)
+            ));
+});
+
+test('ticket index exposes completed sla durations for first response and resolution', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 12:00:00'));
+
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+
+    Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'assigned_to' => $agent->id,
+        'subject' => 'Completed duration SLA',
+        'status' => TicketStatus::Resolved,
+        'submitted_at' => Date::parse('2026-06-11 10:00:00'),
+        'first_response_due_at' => Date::parse('2026-06-11 10:30:00'),
+        'first_responded_at' => Date::parse('2026-06-11 10:05:00'),
+        'resolution_due_at' => Date::parse('2026-06-11 12:00:00'),
+        'resolved_at' => Date::parse('2026-06-11 11:30:00'),
+    ]);
+
+    $this
+        ->actingAs($agent)
+        ->get(route('tickets.index'))
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('tickets/Index')
+            ->missing('table')
+            ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+                ->has('table.rows', 1)
+                ->where('table.rows.0.sla.firstResponse.state', 'completed')
+                ->where('table.rows.0.sla.firstResponse.statusLabel', 'Completed in 5 mins')
+                ->where('table.rows.0.sla.firstResponse.remainingSeconds', 1500)
+                ->where('table.rows.0.sla.resolution.state', 'completed')
+                ->where('table.rows.0.sla.resolution.statusLabel', 'Completed in 1 hr 30 mins')
+                ->where('table.rows.0.sla.resolution.remainingSeconds', 1800)
+            ));
+});
+
 test('unauthenticated user is redirected from ticket index', function (): void {
     $this->get(route('tickets.index'))->assertRedirect(route('login'));
 });
@@ -239,11 +306,58 @@ test('requester can post a public comment on their ticket', function (): void {
     expect($ticket->comments()->where('body', 'I still have the issue.')->exists())->toBeTrue();
 });
 
+test('an agent comment marks first response for a ticket', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
+
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $ticket = Ticket::factory()->create([
+        'assigned_to' => $agent->id,
+        'requester_id' => $requester->id,
+        'first_responded_at' => null,
+    ]);
+
+    $this
+        ->actingAs($agent)
+        ->post(route('tickets.comments.store', $ticket), [
+            'body' => 'I am checking this now.',
+            'visibility' => 'public',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect($ticket->fresh()->first_responded_at?->toDateTimeString())->toBe('2026-06-11 10:00:00');
+});
+
+test('a requester comment does not mark first response for a ticket', function (): void {
+    $this->travelTo(Date::parse('2026-06-11 10:00:00'));
+
+    $requester = createRequesterUser();
+    $ticket = Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'first_responded_at' => null,
+    ]);
+
+    $this
+        ->actingAs($requester)
+        ->post(route('tickets.comments.store', $ticket), [
+            'body' => 'Any update?',
+            'visibility' => 'public',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect($ticket->fresh()->first_responded_at)->toBeNull();
+});
+
 // --- APPROVAL ---
 
 test('agent can approve a waiting_for_approval ticket', function (): void {
     $agent = createAgentUser();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::PendingApproval]);
+    $ticket = Ticket::factory()->create([
+        'assigned_to' => $agent->id,
+        'status' => TicketStatus::PendingApproval,
+    ]);
 
     $this
         ->actingAs($agent)
@@ -259,7 +373,10 @@ test('agent can approve a waiting_for_approval ticket', function (): void {
 
 test('agent can reject a waiting_for_approval ticket', function (): void {
     $agent = createAgentUser();
-    $ticket = Ticket::factory()->create(['status' => TicketStatus::PendingApproval]);
+    $ticket = Ticket::factory()->create([
+        'assigned_to' => $agent->id,
+        'status' => TicketStatus::PendingApproval,
+    ]);
 
     $this
         ->actingAs($agent)
@@ -285,6 +402,27 @@ test('user without manage approvals permission cannot approve or reject a ticket
         ->actingAs($userWithoutPerm)
         ->post(route('tickets.reject', $ticket), ['decision_note' => 'Not justified'])
         ->assertStatus(403);
+});
+
+test('an agent cannot approve or reject a ticket assigned to another agent', function (): void {
+    $assignedAgent = createAgentUser();
+    $otherAgent = createAgentUser();
+    $ticket = Ticket::factory()->create([
+        'assigned_to' => $assignedAgent->id,
+        'status' => TicketStatus::PendingApproval,
+    ]);
+
+    $this
+        ->actingAs($otherAgent)
+        ->post(route('tickets.approve', $ticket), ['decision_note' => 'Looks good'])
+        ->assertForbidden();
+
+    $this
+        ->actingAs($otherAgent)
+        ->post(route('tickets.reject', $ticket), ['decision_note' => 'Not justified'])
+        ->assertForbidden();
+
+    expect($ticket->fresh()->status)->toBe(TicketStatus::PendingApproval);
 });
 
 test('non-agent cannot post internal comment', function (): void {

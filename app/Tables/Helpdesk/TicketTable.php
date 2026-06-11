@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tables\Helpdesk;
 
+use App\Actions\Helpdesk\FormatTicketSla;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
@@ -11,7 +12,6 @@ use App\Enums\UserRole;
 use App\Models\Ticket;
 use App\Tables\AbstractTable;
 use App\Tables\Filters\GlobalSearchFilter;
-use Carbon\CarbonInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -47,7 +47,10 @@ class TicketTable extends AbstractTable
                 'branch_id',
                 'submitted_at',
                 'first_response_due_at',
+                'first_responded_at',
                 'resolution_due_at',
+                'resolved_at',
+                'closed_at',
                 'created_at',
             ]);
 
@@ -194,96 +197,9 @@ class TicketTable extends AbstractTable
             'requesterName' => $ticket->requester->name,
             'assigneeName' => $ticket->assignee?->name,
             'branchName' => $ticket->branch?->name,
-            'sla' => [
-                'firstResponse' => $this->slaTarget(
-                    __('helpdesk.ticket.sla.first_response'),
-                    $ticket->first_response_due_at,
-                    $status,
-                ),
-                'resolution' => $this->slaTarget(
-                    __('helpdesk.ticket.sla.resolution'),
-                    $ticket->resolution_due_at,
-                    $status,
-                ),
-            ],
+            'sla' => app(FormatTicketSla::class)->handle($ticket),
             'submittedAt' => $ticket->submitted_at->toJSON(),
             'createdAt' => $ticket->created_at?->toJSON(),
         ];
-    }
-
-    /**
-     * @return array{
-     *     label: string,
-     *     statusLabel: string,
-     *     dueAt: string|null,
-     *     remainingSeconds: int|null,
-     *     state: 'no_sla'|'completed'|'on_track'|'due_soon'|'overdue'
-     * }
-     */
-    private function slaTarget(string $label, ?CarbonInterface $dueAt, TicketStatus $status): array
-    {
-        if (! $dueAt instanceof CarbonInterface) {
-            return [
-                'label' => $label,
-                'statusLabel' => __('helpdesk.ticket.sla.no_sla'),
-                'dueAt' => null,
-                'remainingSeconds' => null,
-                'state' => 'no_sla',
-            ];
-        }
-
-        $remainingSeconds = $dueAt->getTimestamp() - now()->getTimestamp();
-
-        if (! $status->isOpen()) {
-            return [
-                'label' => $label,
-                'statusLabel' => __('helpdesk.ticket.sla.completed'),
-                'dueAt' => $dueAt->toJSON(),
-                'remainingSeconds' => $remainingSeconds,
-                'state' => 'completed',
-            ];
-        }
-
-        if ($remainingSeconds < 0) {
-            return [
-                'label' => $label,
-                'statusLabel' => __('helpdesk.ticket.sla.overdue', [
-                    'duration' => $this->durationLabel(abs($remainingSeconds)),
-                ]),
-                'dueAt' => $dueAt->toJSON(),
-                'remainingSeconds' => $remainingSeconds,
-                'state' => 'overdue',
-            ];
-        }
-
-        return [
-            'label' => $label,
-            'statusLabel' => __('helpdesk.ticket.sla.remaining', [
-                'duration' => $this->durationLabel($remainingSeconds),
-            ]),
-            'dueAt' => $dueAt->toJSON(),
-            'remainingSeconds' => $remainingSeconds,
-            'state' => $remainingSeconds <= 1800 ? 'due_soon' : 'on_track',
-        ];
-    }
-
-    private function durationLabel(int $seconds): string
-    {
-        $minutes = max(1, (int) ceil($seconds / 60));
-        $hours = intdiv($minutes, 60);
-        $remainingMinutes = $minutes % 60;
-
-        if ($hours === 0) {
-            return trans_choice('helpdesk.ticket.sla.minutes', $minutes, ['count' => $minutes]);
-        }
-
-        if ($remainingMinutes === 0) {
-            return trans_choice('helpdesk.ticket.sla.hours', $hours, ['count' => $hours]);
-        }
-
-        return __('helpdesk.ticket.sla.hours_minutes', [
-            'hours' => trans_choice('helpdesk.ticket.sla.hours', $hours, ['count' => $hours]),
-            'minutes' => trans_choice('helpdesk.ticket.sla.minutes', $remainingMinutes, ['count' => $remainingMinutes]),
-        ]);
     }
 }
