@@ -54,3 +54,12 @@ test('rejects illegal transitions', function (TicketStatus $from, TicketStatus $
     'pending -> resolved' => [TicketStatus::PendingApproval, TicketStatus::Resolved],
     'same state' => [TicketStatus::InProgress, TicketStatus::InProgress],
 ]);
+
+test('activeCases excludes resolved and closed', function (): void {
+    $active = TicketStatus::activeCases();
+
+    expect($active)->not->toContain(TicketStatus::Resolved)
+        ->and($active)->not->toContain(TicketStatus::Closed)
+        ->and($active)->toContain(TicketStatus::Open)
+        ->and($active)->toContain(TicketStatus::InProgress);
+});
