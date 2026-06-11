@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.0] - 2026-06-11
+
+### Added
+- feat(dashboard): rebuild dashboard page with period zones
+- feat(dashboard): add TrendChart and PeriodControl components
+- feat(dashboard): add BreakdownDonut component
+- feat(dashboard): add MetricCard and SlaGauge components
+- feat(dashboard): add DeltaBadge component
+- feat(dashboard): add useDashboard composable
+- feat(dashboard): add dashboard prop types
+- feat(dashboard): add dashboard i18n keys (en/id)
+- feat(dashboard): validate period query and render new payload
+- feat(dashboard): add GetDashboardData orchestrator
+- feat(dashboard): add AdminDashboard builder
+- feat(dashboard): add AgentDashboard builder
+- feat(dashboard): add RequesterDashboard builder
+- feat(dashboard): add driver-aware TicketMetricQueries
+- feat(dashboard): add Delta calculator
+- feat(dashboard): add DashboardPeriod value object
+- feat(dashboard): add TicketStatus::activeCases helper
+
+### Other Changes
+- test(dashboard): use Date facade for test-now per rector
+- Merge pull request #20 from tomylana93/dev
+
 ## [0.12.2] - 2026-06-11
 
 ### Fixed
