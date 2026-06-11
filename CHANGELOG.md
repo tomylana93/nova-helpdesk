@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2026-06-11
+
+### Added
+- feat(master-data): add SLA policy import support
+
+### Other Changes
+- Merge branch 'feat/import-sla-policies' into dev
+- Merge pull request #16 from tomylana93/dev
+
 ## [0.9.0] - 2026-06-11
 
 ### Added
