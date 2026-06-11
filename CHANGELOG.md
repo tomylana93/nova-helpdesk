@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.5] - 2026-06-11
+
+### Other Changes
+- Untrack .deploy directory and add it to .gitignore
+- Merge branch 'dev' into main
+
 ## [0.13.4] - 2026-06-11
 
 ### Other Changes
