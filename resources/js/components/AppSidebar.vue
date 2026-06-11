@@ -98,6 +98,11 @@ const mainNavGroups = computed<NavGroup[]>(() => {
 
         <SidebarFooter>
             <NavUser />
+            <div
+                class="mt-1 border-t border-sidebar-border/30 px-4 py-2 text-center text-[10px] font-medium tracking-wider text-muted-foreground/40 group-data-[state=collapsed]:hidden"
+            >
+                v{{ page.props.version }}
+            </div>
         </SidebarFooter>
     </Sidebar>
     <slot />
