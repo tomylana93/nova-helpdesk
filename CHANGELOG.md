@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.3] - 2026-06-11
+
+### Other Changes
+- Convert notifications table notifiable morph to uuid
+- Merge pull request #25 from tomylana93/dev
+- fix media morph ids for uuid models
+- Merge pull request #24 from tomylana93/dev
+
 ## [0.13.2] - 2026-06-11
 
 ### Other Changes
