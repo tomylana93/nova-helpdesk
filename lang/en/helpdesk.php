@@ -47,6 +47,17 @@ return [
             'unassigned' => 'Unassigned',
             'overdue' => 'Overdue',
         ],
+        'sla' => [
+            'first_response' => 'First response',
+            'resolution' => 'Resolution',
+            'no_sla' => 'No SLA',
+            'completed' => 'Completed',
+            'remaining' => ':duration left',
+            'overdue' => ':duration overdue',
+            'minutes' => '{1} :count min|[2,*] :count mins',
+            'hours' => '{1} :count hr|[2,*] :count hrs',
+            'hours_minutes' => ':hours :minutes',
+        ],
         'transition' => [
             'in_progress' => 'Start Work',
             'waiting_for_requester' => 'Set Waiting',

@@ -10,6 +10,20 @@ export type TicketStatus =
     | 'reopened';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 export type TicketType = 'incident' | 'service_request';
+export type TicketSlaState =
+    | 'no_sla'
+    | 'completed'
+    | 'on_track'
+    | 'due_soon'
+    | 'overdue';
+
+export type TicketSlaTarget = {
+    label: string;
+    statusLabel: string;
+    dueAt: string | null;
+    remainingSeconds: number | null;
+    state: TicketSlaState;
+};
 
 export type Ticket = {
     id: string;
@@ -57,6 +71,10 @@ export type TicketTableRow = {
     requesterName: string | null;
     assigneeName: string | null;
     branchName: string | null;
+    sla: {
+        firstResponse: TicketSlaTarget;
+        resolution: TicketSlaTarget;
+    };
     submittedAt: string | null;
     createdAt: string;
 };
