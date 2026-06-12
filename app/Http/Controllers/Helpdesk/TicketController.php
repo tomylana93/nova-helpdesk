@@ -13,12 +13,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Helpdesk\StoreTicketRequest;
 use App\Http\Requests\Helpdesk\UpdateTicketRequest;
 use App\Http\Resources\TicketResource;
+use App\Models\Asset;
 use App\Models\Ticket;
 use App\Models\TicketAttachment;
 use App\Models\TicketComment;
 use App\Tables\Helpdesk\TicketTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,7 +61,7 @@ class TicketController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category', 'attachments']);
+        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category', 'attachments', 'assets']);
 
         $user = $request->user();
         $isAgent = $user?->hasRole(UserRole::ItAgent) ?? false;
@@ -86,6 +88,14 @@ class TicketController extends Controller
 
         return Inertia::render('tickets/Show', [
             'ticket' => TicketResource::make($ticket)->resolve(),
+            'assetOptions' => Asset::query()
+                ->where('user_id', $ticket->requester_id)
+                ->get(['id', 'name', 'asset_tag'])
+                ->map(fn ($asset): array => [
+                    'value' => $asset->id,
+                    'label' => "[{$asset->asset_tag}] {$asset->name}",
+                ])
+                ->all(),
             'viewerRole' => $viewerRole,
             'canSeeInternal' => $canSeeInternal,
             'canAct' => $isAgent,
@@ -127,13 +137,13 @@ class TicketController extends Controller
     {
         $this->authorize('update', $ticket);
 
-        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category']);
+        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category', 'assets']);
 
         return Inertia::render('tickets/Edit', [
             'ticket' => TicketResource::make($ticket)->resolve(),
             'statusOptions' => TicketStatus::options(),
             'priorityOptions' => TicketPriority::options(),
-            ...$formOptions->handle(includeAgents: true),
+            ...$formOptions->handle(includeAgents: true, requesterId: $ticket->requester_id),
         ]);
     }
 
@@ -146,5 +156,25 @@ class TicketController extends Controller
         Inertia::flash('success', trans('helpdesk.ticket.message.updated.success'));
 
         return to_route('tickets.show', $ticket);
+    }
+
+    public function syncAssets(Request $request, Ticket $ticket): RedirectResponse
+    {
+        $this->authorize('update', $ticket);
+
+        $validated = $request->validate([
+            'asset_ids' => ['nullable', 'array'],
+            'asset_ids.*' => [
+                'required',
+                'uuid',
+                Rule::exists('assets', 'id')->where('user_id', $ticket->requester_id),
+            ],
+        ]);
+
+        $ticket->assets()->sync($validated['asset_ids'] ?? []);
+
+        Inertia::flash('success', trans('helpdesk.ticket.message.assets_synced.success'));
+
+        return back();
     }
 }

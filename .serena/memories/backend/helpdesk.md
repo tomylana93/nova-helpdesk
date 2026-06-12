@@ -23,6 +23,7 @@
   - `TicketApproval` (`app/Models/TicketApproval.php`): Stores approval details; fields are `ticket_id`, `reviewer_id`, `status` (`pending`, `approved`, `rejected`), `decided_at`, `decision_note`).
   - `TicketAttachment` (`app/Models/TicketAttachment.php`): Associates uploaded files with tickets.
   - `TicketActivity` (`app/Models/TicketActivity.php`): Records ticket lifecycle events (e.g. created, assigned, updated).
+  - `Asset` (`app/Models/Asset.php`): Master-data inventory item linked to tickets through explicit pivot table `ticket_asset`; ticket asset validation is scoped to the ticket requester's assets.
 - Actions (`app/Actions/Helpdesk/`):
   - `CreateTicket`: Stores ticket, runs `AssignSlaPolicy`, and logs activity. Org context (`branch_id`/`department_id`)
     is ALWAYS inherited from the creator's profile, never asked on the form — requester AND auditor accounts are

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
+import { Head, Link, setLayoutProps, useForm, usePage } from '@inertiajs/vue3';
 import { Paperclip } from 'lucide-vue-next';
 import { ref } from 'vue';
 import {
@@ -7,6 +7,7 @@ import {
     reject,
 } from '@/actions/App/Http/Controllers/Helpdesk/TicketApprovalController';
 import { store as storeComment } from '@/actions/App/Http/Controllers/Helpdesk/TicketCommentController';
+import { syncAssets } from '@/actions/App/Http/Controllers/Helpdesk/TicketController';
 import {
     confirm as confirmResolved,
     reopen,
@@ -19,6 +20,7 @@ import {
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -33,6 +35,7 @@ import { Uploader } from '@/components/uploader';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { edit, index, show } from '@/routes/tickets';
+import type { SharedPageProps, SelectOption } from '@/types';
 import type { Ticket, TicketAttachment } from '@/types/ticket';
 
 type Comment = {
@@ -66,9 +69,53 @@ type Props = {
         decidedAt: string | null;
         decisionNote: string | null;
     } | null;
+    assetOptions?: SelectOption[];
 };
 
 const props = defineProps<Props>();
+
+const page = usePage<SharedPageProps>();
+const canManageAssets =
+    (props.viewerRole === 'it_agent' || props.viewerRole === 'super_admin') &&
+    page.props.auth.abilities.manage_assets;
+
+const isEditingAssets = ref(false);
+const syncAssetsForm = useForm({
+    asset_ids: props.ticket.assets ? props.ticket.assets.map((a) => a.id) : [],
+});
+
+function submitSyncAssets(): void {
+    syncAssetsForm.submit(syncAssets(props.ticket.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            isEditingAssets.value = false;
+        },
+    });
+}
+
+function cancelEditAssets(): void {
+    syncAssetsForm.asset_ids = props.ticket.assets
+        ? props.ticket.assets.map((a) => a.id)
+        : [];
+    isEditingAssets.value = false;
+}
+
+function setSyncAssetSelection(
+    assetId: string,
+    checked: boolean | 'indeterminate',
+): void {
+    if (checked === true) {
+        if (!syncAssetsForm.asset_ids.includes(assetId)) {
+            syncAssetsForm.asset_ids.push(assetId);
+        }
+
+        return;
+    }
+
+    syncAssetsForm.asset_ids = syncAssetsForm.asset_ids.filter(
+        (id) => id !== assetId,
+    );
+}
 
 type CommentFormData = {
     body: string;
@@ -371,6 +418,134 @@ setLayoutProps({
                         </a>
                     </li>
                 </ul>
+            </div>
+        </div>
+
+        <!-- Associated Assets -->
+        <div class="rounded-lg border bg-card p-6 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-base font-medium">
+                    {{ trans('helpdesk.ticket.label.assets') }}
+                </h2>
+                <Button
+                    v-if="
+                        canManageAssets &&
+                        assetOptions &&
+                        assetOptions.length > 0
+                    "
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    @click="
+                        isEditingAssets
+                            ? cancelEditAssets()
+                            : (isEditingAssets = true)
+                    "
+                >
+                    {{
+                        isEditingAssets
+                            ? trans('helpdesk.ticket.action.cancel')
+                            : trans('helpdesk.ticket.action.manage_assets')
+                    }}
+                </Button>
+            </div>
+
+            <!-- Read-only View -->
+            <div v-if="!isEditingAssets">
+                <div
+                    v-if="ticket.assets && ticket.assets.length > 0"
+                    class="grid gap-4 sm:grid-cols-2"
+                >
+                    <div
+                        v-for="asset in ticket.assets"
+                        :key="asset.id"
+                        class="flex flex-col justify-between rounded-lg border border-border bg-accent/10 p-4 transition-colors hover:bg-accent/20"
+                    >
+                        <div>
+                            <div
+                                class="mb-2 flex items-center justify-between gap-2"
+                            >
+                                <span
+                                    class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                                >
+                                    {{ asset.asset_tag }}
+                                </span>
+                                <Badge
+                                    :variant="asset.statusVariant as any"
+                                    class="px-1.5 py-0 text-[10px] font-normal"
+                                >
+                                    {{ asset.statusLabel }}
+                                </Badge>
+                            </div>
+                            <h3
+                                class="mb-1 text-sm font-semibold text-foreground"
+                            >
+                                {{ asset.name }}
+                            </h3>
+                            <p class="text-xs text-muted-foreground">
+                                {{ asset.categoryLabel }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p v-else class="text-sm text-muted-foreground">
+                    {{ trans('helpdesk.ticket.message.no_assets') }}
+                </p>
+            </div>
+
+            <!-- Inline Sync/Edit View -->
+            <div v-else>
+                <form @submit.prevent="submitSyncAssets" class="space-y-4">
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        <label
+                            v-for="option in props.assetOptions"
+                            :key="option.value"
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-accent/50"
+                        >
+                            <Checkbox
+                                :checked="
+                                    syncAssetsForm.asset_ids.includes(
+                                        option.value,
+                                    )
+                                "
+                                @update:checked="
+                                    (checked: boolean | 'indeterminate') =>
+                                        setSyncAssetSelection(
+                                            option.value,
+                                            checked,
+                                        )
+                                "
+                            />
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium">{{
+                                    option.label
+                                }}</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            :disabled="syncAssetsForm.processing"
+                            @click="cancelEditAssets"
+                        >
+                            {{ trans('helpdesk.ticket.action.cancel') }}
+                        </Button>
+                        <Button
+                            type="submit"
+                            size="sm"
+                            :disabled="syncAssetsForm.processing"
+                        >
+                            <Spinner
+                                v-if="syncAssetsForm.processing"
+                                class="mr-2"
+                            />
+                            {{ trans('helpdesk.ticket.action.save_assets') }}
+                        </Button>
+                    </div>
+                </form>
             </div>
         </div>
 

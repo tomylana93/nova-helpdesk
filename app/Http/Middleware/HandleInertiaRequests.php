@@ -96,6 +96,7 @@ class HandleInertiaRequests extends Middleware
                 'manage_sla_policies' => false,
                 'manage_approvals' => false,
                 'view_reports' => false,
+                'manage_assets' => false,
             ];
         }
 
@@ -113,6 +114,7 @@ class HandleInertiaRequests extends Middleware
             'manage_sla_policies' => $user->can(AdminPermission::ManageSlaPolicies->value),
             'manage_approvals' => $user->can(AdminPermission::ManageApprovals->value),
             'view_reports' => $user->can(AdminPermission::ViewReports->value),
+            'manage_assets' => $user->can(AdminPermission::ManageAssets->value),
         ];
     }
 

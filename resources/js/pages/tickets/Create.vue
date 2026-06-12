@@ -9,6 +9,7 @@ import {
 import InputError from '@/components/InputError.vue';
 import PageWrapper from '@/components/PageWrapper.vue';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -32,6 +33,7 @@ type Props = {
     typeOptions: SelectOption[];
     priorityOptions: SelectOption[];
     categoryOptions: { label: string; options: SelectOption[] }[];
+    assetOptions?: SelectOption[];
 };
 
 type CreateTicketFormData = {
@@ -41,6 +43,7 @@ type CreateTicketFormData = {
     priority: string;
     category_id: string;
     attachment_upload_ids: string[];
+    asset_ids: string[];
 };
 
 const props = defineProps<Props>();
@@ -56,6 +59,7 @@ const form = useForm<CreateTicketFormData>({
     priority: '',
     category_id: '',
     attachment_upload_ids: [],
+    asset_ids: [],
 });
 
 const temporaryUploadUrl = storeUpload().url;
@@ -76,6 +80,21 @@ function submit(): void {
 function reset(): void {
     form.resetAndClearErrors();
     attachmentUploadIds.value = [];
+}
+
+function setAssetSelection(
+    assetId: string,
+    checked: boolean | 'indeterminate',
+): void {
+    if (checked === true) {
+        if (!form.asset_ids.includes(assetId)) {
+            form.asset_ids.push(assetId);
+        }
+
+        return;
+    }
+
+    form.asset_ids = form.asset_ids.filter((id) => id !== assetId);
 }
 
 setLayoutProps({
@@ -224,6 +243,34 @@ setLayoutProps({
                     </Select>
                     <InputError :message="form.errors.category_id" />
                 </div>
+            </div>
+
+            <div
+                v-if="props.assetOptions && props.assetOptions.length > 0"
+                class="grid gap-2"
+            >
+                <Label>{{ trans('helpdesk.ticket.label.assets') }}</Label>
+                <div class="grid gap-2 sm:grid-cols-2">
+                    <label
+                        v-for="option in props.assetOptions"
+                        :key="option.value"
+                        class="flex cursor-pointer items-center gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-accent/50"
+                    >
+                        <Checkbox
+                            :checked="form.asset_ids.includes(option.value)"
+                            @update:checked="
+                                (checked: boolean | 'indeterminate') =>
+                                    setAssetSelection(option.value, checked)
+                            "
+                        />
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium">{{
+                                option.label
+                            }}</span>
+                        </div>
+                    </label>
+                </div>
+                <InputError :message="form.errors.asset_ids" />
             </div>
 
             <div class="grid gap-2">

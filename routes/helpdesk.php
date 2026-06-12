@@ -14,6 +14,9 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('tickets/{ticket}/comments', [TicketCommentController::class, 'store'])
         ->name('tickets.comments.store');
 
+    Route::post('tickets/{ticket}/sync-assets', [TicketController::class, 'syncAssets'])
+        ->name('tickets.sync-assets');
+
     Route::post('tickets/{ticket}/approve', [TicketApprovalController::class, 'approve'])
         ->name('tickets.approve');
     Route::post('tickets/{ticket}/reject', [TicketApprovalController::class, 'reject'])

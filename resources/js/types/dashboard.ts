@@ -1,3 +1,5 @@
+import type { Asset } from './asset';
+
 export type DashboardRole =
     | 'requester'
     | 'it_agent'
@@ -63,4 +65,5 @@ export interface DashboardProps {
         type: 'priority' | 'status';
         segments: DashboardBreakdownSegment[];
     };
+    myAssets?: Asset[];
 }

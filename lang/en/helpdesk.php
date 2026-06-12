@@ -41,6 +41,7 @@ return [
             'view' => 'View',
             'actions' => 'Actions',
             'attachments' => 'Attachments',
+            'assets' => 'Associated Assets',
         ],
         'view' => [
             'all' => 'All tickets',
@@ -88,6 +89,9 @@ return [
             'reply' => 'Reply',
             'reopen' => 'Reopen',
             'confirm_resolved' => 'Confirm Resolved',
+            'cancel' => 'Cancel',
+            'manage_assets' => 'Manage Assets',
+            'save_assets' => 'Save Assets',
         ],
         'message' => [
             'created' => [
@@ -102,6 +106,10 @@ return [
             'confirmed' => [
                 'success' => 'Ticket confirmed resolved and closed.',
             ],
+            'assets_synced' => [
+                'success' => 'Linked assets updated successfully.',
+            ],
+            'no_assets' => 'No assets linked to this ticket.',
         ],
     ],
     'approval' => [

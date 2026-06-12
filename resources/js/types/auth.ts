@@ -39,6 +39,7 @@ export type AuthAbilities = {
     manage_sla_policies: boolean;
     manage_approvals: boolean;
     view_reports: boolean;
+    manage_assets: boolean;
 };
 
 export type NotificationItem = {

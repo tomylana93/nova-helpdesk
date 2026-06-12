@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use App\Http\Resources\BranchOptionResource;
 use App\Http\Resources\DepartmentOptionResource;
 use App\Http\Resources\UserOptionResource;
+use App\Models\Asset;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\TicketCategory;
@@ -16,9 +17,10 @@ class GetTicketFormOptions
 {
     /**
      * @param  bool  $includeAgents  Whether to include agent options (for edit forms)
+     * @param  string|null  $requesterId  The requester's user ID (to filter assets)
      * @return array<string, list<array<string, mixed>>>
      */
-    public function handle(bool $includeAgents = false): array
+    public function handle(bool $includeAgents = false, ?string $requesterId = null): array
     {
         $options = [
             'branchOptions' => Branch::query()
@@ -66,6 +68,18 @@ class GetTicketFormOptions
                 ->map->resolve()
                 ->all();
         }
+
+        $targetRequesterId = $requesterId ?? auth()->id();
+        $options['assetOptions'] = $targetRequesterId
+            ? Asset::query()
+                ->where('user_id', $targetRequesterId)
+                ->get(['id', 'name', 'asset_tag'])
+                ->map(fn ($asset): array => [
+                    'value' => $asset->id,
+                    'label' => "[{$asset->asset_tag}] {$asset->name}",
+                ])
+                ->all()
+            : [];
 
         return $options;
     }

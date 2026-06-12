@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MasterData\AssetController;
 use App\Http\Controllers\Admin\MasterData\BranchController;
 use App\Http\Controllers\Admin\MasterData\DepartmentController;
 use App\Http\Controllers\Admin\MasterData\SlaPolicyController;
@@ -49,5 +50,6 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
         Route::resource('sla-policies', SlaPolicyController::class)->only([
             'index', 'create', 'store', 'show', 'edit', 'update',
         ]);
+        Route::resource('assets', AssetController::class);
     });
 });

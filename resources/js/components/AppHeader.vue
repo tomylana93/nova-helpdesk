@@ -88,7 +88,8 @@ const mainNavItems = computed<NavItem[]>(() => {
         abilities.manage_branches ||
         abilities.manage_departments ||
         abilities.manage_categories ||
-        abilities.manage_sla_policies
+        abilities.manage_sla_policies ||
+        abilities.manage_assets
             ? [
                   {
                       title: 'Master Data',

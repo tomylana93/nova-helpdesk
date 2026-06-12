@@ -386,5 +386,85 @@ return [
                 ],
             ],
         ],
+        'asset' => [
+            'index' => [
+                'title' => 'Aset',
+                'heading' => 'Manajemen Aset',
+                'description' => 'Kelola aset perangkat keras dan lunak perusahaan.',
+            ],
+            'create' => [
+                'title' => 'Buat Aset',
+                'heading' => 'Buat Aset Baru',
+                'description' => 'Tambahkan aset baru ke inventaris.',
+            ],
+            'show' => [
+                'title' => 'Detail Aset',
+                'heading' => 'Detail Aset',
+                'description' => 'Lihat informasi aset.',
+            ],
+            'edit' => [
+                'title' => 'Ubah Aset',
+                'heading' => 'Ubah Aset',
+                'description' => 'Perbarui informasi aset.',
+            ],
+            'label' => [
+                'asset_tag' => 'Label Aset',
+                'name' => 'Nama Aset',
+                'category' => 'Kategori',
+                'status' => 'Status',
+                'branch' => 'Lokasi Cabang',
+                'user' => 'Penerima Tugas',
+            ],
+            'placeholder' => [
+                'asset_tag' => 'Masukkan label aset (mis. AST-10001)',
+                'name' => 'Masukkan nama aset (mis. Laptop Lenovo)',
+                'category' => 'Pilih kategori',
+                'status' => 'Pilih status',
+                'branch' => 'Pilih cabang',
+                'branch_unassigned' => 'Tanpa cabang / Penyimpanan',
+                'user' => 'Pilih penerima tugas',
+                'user_unassigned' => 'Belum ditugaskan',
+            ],
+            'action' => [
+                'create' => 'Buat Aset',
+                'update' => 'Ubah Aset',
+                'back' => 'Kembali ke Aset',
+                'delete' => 'Hapus',
+                'confirm_delete' => 'Anda yakin ingin menghapus aset ini?',
+            ],
+            'history' => [
+                'title' => 'Riwayat Dukungan',
+                'empty' => 'Belum ada tiket yang terhubung dengan aset ini.',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Aset berhasil dibuat.',
+                ],
+                'updated' => [
+                    'success' => 'Aset berhasil diperbarui.',
+                ],
+                'deleted' => [
+                    'success' => 'Aset berhasil dihapus.',
+                ],
+            ],
+            'validation' => [
+                'user_branch' => 'Penerima tugas yang dipilih harus berada di cabang yang dipilih.',
+            ],
+        ],
+    ],
+    'asset' => [
+        'category' => [
+            'laptop' => 'Laptop',
+            'monitor' => 'Monitor',
+            'device' => 'Perangkat Mobile',
+            'license' => 'Lisensi Perangkat Lunak',
+            'other' => 'Lainnya',
+        ],
+        'status' => [
+            'in_use' => 'Sedang Digunakan',
+            'in_storage' => 'Di Penyimpanan',
+            'under_repair' => 'Sedang Diperbaiki',
+            'retired' => 'Sudah Dihapus/Pensiun',
+        ],
     ],
 ];

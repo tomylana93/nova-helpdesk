@@ -23,6 +23,9 @@ class UpdateTicket
         $attachmentUploadIds = $data['attachment_upload_ids'] ?? [];
         unset($data['attachment_upload_ids']);
 
+        $assetIds = $data['asset_ids'] ?? null;
+        unset($data['asset_ids']);
+
         $oldAssignee = $ticket->assigned_to;
 
         // Status is owned by the state machine, not a blind column write.
@@ -30,6 +33,10 @@ class UpdateTicket
         unset($data['status']);
 
         $ticket->update($data);
+
+        if ($assetIds !== null) {
+            $ticket->assets()->sync($assetIds);
+        }
 
         // Promote and attach files
         $this->attachFiles->handle($ticket, $attachmentUploadIds);

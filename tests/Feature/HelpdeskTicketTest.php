@@ -3,6 +3,7 @@
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
+use App\Models\Asset;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\SlaPolicy;
@@ -201,6 +202,51 @@ test('requester can submit an incident ticket', function (): void {
         ->and($ticket?->ticket_number)->toStartWith('INC-');
 });
 
+test('requester can submit a ticket linked to their asset', function (): void {
+    $requester = createRequesterUser();
+    $category = TicketCategory::factory()->create();
+    $asset = Asset::factory()->create(['user_id' => $requester->id]);
+
+    $response = $this
+        ->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Laptop battery issue',
+            'description' => 'Battery drains quickly.',
+            'priority' => TicketPriority::Medium->value,
+            'category_id' => $category->id,
+            'asset_ids' => [$asset->id],
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    $ticket = Ticket::query()->where('subject', 'Laptop battery issue')->first();
+
+    expect($ticket)->not->toBeNull()
+        ->and($ticket?->assets()->pluck('assets.id')->all())->toBe([$asset->id]);
+});
+
+test('requester cannot submit a ticket linked to another users asset', function (): void {
+    $requester = createRequesterUser();
+    $other = createRequesterUser();
+    $category = TicketCategory::factory()->create();
+    $asset = Asset::factory()->create(['user_id' => $other->id]);
+
+    $this
+        ->actingAs($requester)
+        ->from(route('tickets.create'))
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Wrong asset link',
+            'description' => 'Trying to link another user asset.',
+            'priority' => TicketPriority::Medium->value,
+            'category_id' => $category->id,
+            'asset_ids' => [$asset->id],
+        ])
+        ->assertSessionHasErrors('asset_ids.0')
+        ->assertRedirect(route('tickets.create'));
+});
+
 test('a ticket opened by an auditor inherits their organisation context', function (): void {
     $branch = Branch::factory()->create();
     $department = Department::factory()->create(['branch_id' => $branch->id]);
@@ -300,6 +346,78 @@ test('agent can update a ticket', function (): void {
     $ticket->refresh();
     expect($ticket->status)->toBe(TicketStatus::InProgress)
         ->and($ticket->priority)->toBe(TicketPriority::High);
+});
+
+test('agent can update requester asset links on a ticket', function (): void {
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $category = TicketCategory::factory()->create();
+    $ticket = Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'status' => TicketStatus::Open,
+        'category_id' => $category->id,
+    ]);
+    $asset = Asset::factory()->create(['user_id' => $requester->id]);
+
+    $response = $this
+        ->actingAs($agent)
+        ->patch(route('tickets.update', $ticket), [
+            'subject' => 'Updated subject',
+            'description' => 'Updated description',
+            'status' => TicketStatus::InProgress->value,
+            'priority' => TicketPriority::High->value,
+            'category_id' => $category->id,
+            'asset_ids' => [$asset->id],
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    expect($ticket->assets()->pluck('assets.id')->all())->toBe([$asset->id]);
+});
+
+test('agent cannot update a ticket with assets from another requester', function (): void {
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $other = createRequesterUser();
+    $category = TicketCategory::factory()->create();
+    $ticket = Ticket::factory()->create([
+        'requester_id' => $requester->id,
+        'status' => TicketStatus::Open,
+        'category_id' => $category->id,
+    ]);
+    $asset = Asset::factory()->create(['user_id' => $other->id]);
+
+    $this
+        ->actingAs($agent)
+        ->from(route('tickets.edit', $ticket))
+        ->patch(route('tickets.update', $ticket), [
+            'subject' => 'Updated subject',
+            'description' => 'Updated description',
+            'status' => TicketStatus::InProgress->value,
+            'priority' => TicketPriority::High->value,
+            'category_id' => $category->id,
+            'asset_ids' => [$asset->id],
+        ])
+        ->assertSessionHasErrors('asset_ids.0')
+        ->assertRedirect(route('tickets.edit', $ticket));
+});
+
+test('agent can sync requester asset links from ticket show', function (): void {
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $ticket = Ticket::factory()->create(['requester_id' => $requester->id]);
+    $asset = Asset::factory()->create(['user_id' => $requester->id]);
+
+    $this
+        ->actingAs($agent)
+        ->from(route('tickets.show', $ticket))
+        ->post(route('tickets.sync-assets', $ticket), [
+            'asset_ids' => [$asset->id],
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('tickets.show', $ticket));
+
+    expect($ticket->assets()->pluck('assets.id')->all())->toBe([$asset->id]);
 });
 
 test('requester cannot update a ticket', function (): void {

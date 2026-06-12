@@ -41,6 +41,7 @@ return [
             'view' => 'Tampilan',
             'actions' => 'Aksi',
             'attachments' => 'Lampiran',
+            'assets' => 'Aset Terkait',
         ],
         'view' => [
             'all' => 'Semua tiket',
@@ -88,6 +89,9 @@ return [
             'reply' => 'Balas',
             'reopen' => 'Buka Kembali',
             'confirm_resolved' => 'Konfirmasi Selesai',
+            'cancel' => 'Batal',
+            'manage_assets' => 'Kelola Aset',
+            'save_assets' => 'Simpan Aset',
         ],
         'message' => [
             'created' => [
@@ -102,6 +106,10 @@ return [
             'confirmed' => [
                 'success' => 'Tiket dikonfirmasi selesai dan ditutup.',
             ],
+            'assets_synced' => [
+                'success' => 'Aset terkait berhasil diperbarui.',
+            ],
+            'no_assets' => 'Belum ada aset yang terhubung dengan tiket ini.',
         ],
     ],
     'approval' => [
