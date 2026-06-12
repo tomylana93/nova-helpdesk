@@ -4,9 +4,14 @@ namespace App\Actions\Helpdesk;
 
 use App\Models\SlaPolicy;
 use App\Models\Ticket;
+use App\Support\SlaCalculator;
 
 class AssignSlaPolicy
 {
+    public function __construct(
+        private readonly SlaCalculator $slaCalculator
+    ) {}
+
     public function handle(Ticket $ticket): void
     {
         $policy = $this->findPolicy($ticket);
@@ -17,8 +22,8 @@ class AssignSlaPolicy
 
         // These columns are system-computed, not part of the mass-assignable set,
         // so they are assigned directly rather than through update().
-        $ticket->first_response_due_at = $ticket->submitted_at->addMinutes($policy->first_response_target_minutes);
-        $ticket->resolution_due_at = $ticket->submitted_at->addMinutes($policy->resolution_target_minutes);
+        $ticket->first_response_due_at = $this->slaCalculator->addWorkingMinutes($ticket->submitted_at, $policy->first_response_target_minutes)->toMutable();
+        $ticket->resolution_due_at = $this->slaCalculator->addWorkingMinutes($ticket->submitted_at, $policy->resolution_target_minutes)->toMutable();
         $ticket->save();
     }
 
