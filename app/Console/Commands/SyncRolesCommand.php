@@ -74,6 +74,13 @@ class SyncRolesCommand extends Command
                 AdminPermission::ViewReports->value,
             ]);
 
+        Role::findOrCreate(UserRole::Auditor->value, 'web')
+            ->syncPermissions([
+                AdminPermission::ViewTickets->value,
+                AdminPermission::CreateTickets->value,
+                AdminPermission::ViewReports->value,
+            ]);
+
         Role::findOrCreate(UserRole::Requester->value, 'web')
             ->syncPermissions([
                 AdminPermission::ViewTickets->value,

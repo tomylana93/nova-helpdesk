@@ -260,312 +260,334 @@ function optionLabel(options: ReportOption[], value: string | null): string {
                     {{ trans('reports.description') }}
                 </CardDescription>
             </CardHeader>
-            <CardContent class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <div class="flex items-center gap-2">
-                    <Button
-                        v-for="mode in ['monthly', 'yearly'] as const"
-                        :key="mode"
-                        size="sm"
-                        :variant="filters.mode === mode ? 'default' : 'outline'"
-                        @click="setMode(mode)"
+            <CardContent class="space-y-4">
+                <div
+                    class="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4"
+                >
+                    <div class="flex shrink-0 items-center gap-2">
+                        <Button
+                            v-for="mode in ['monthly', 'yearly'] as const"
+                            :key="mode"
+                            size="sm"
+                            :variant="
+                                filters.mode === mode ? 'default' : 'outline'
+                            "
+                            @click="setMode(mode)"
+                        >
+                            {{ trans(`reports.filters.${mode}`) }}
+                        </Button>
+                    </div>
+
+                    <div
+                        class="grid w-full gap-3 sm:grid-cols-2 lg:max-w-md lg:grid-cols-[minmax(10rem,1fr)_minmax(8rem,10rem)]"
                     >
-                        {{ trans(`reports.filters.${mode}`) }}
-                    </Button>
+                        <Select
+                            v-if="filters.mode === 'monthly'"
+                            :model-value="String(filters.month)"
+                            @update:model-value="setMonth"
+                        >
+                            <SelectTrigger class="w-full justify-between">
+                                <SelectValue
+                                    :placeholder="
+                                        trans('reports.filters.month')
+                                    "
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="month in months"
+                                    :key="month.value"
+                                    :value="String(month.value)"
+                                >
+                                    {{ month.label }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        <Select
+                            :model-value="String(filters.year)"
+                            @update:model-value="setYear"
+                        >
+                            <SelectTrigger class="w-full justify-between">
+                                <SelectValue
+                                    :placeholder="trans('reports.filters.year')"
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="year in years"
+                                    :key="year"
+                                    :value="String(year)"
+                                >
+                                    {{ year }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
-                <Select
-                    v-if="filters.mode === 'monthly'"
-                    :model-value="String(filters.month)"
-                    @update:model-value="setMonth"
+                <div
+                    class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
                 >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.month')"
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem
-                            v-for="month in months"
-                            :key="month.value"
-                            :value="String(month.value)"
-                        >
-                            {{ month.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.branch_id ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter('branch_id', selectValue(value))
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.branch')"
+                            >
+                                {{
+                                    optionLabel(
+                                        options.branches,
+                                        filters.branch_id,
+                                    ) || trans('reports.filters.all')
+                                }}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.branches"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    :model-value="String(filters.year)"
-                    @update:model-value="setYear"
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.year')"
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem
-                            v-for="year in years"
-                            :key="year"
-                            :value="String(year)"
-                        >
-                            {{ year }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.department_id ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter(
+                                    'department_id',
+                                    selectValue(value),
+                                )
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="
+                                    trans('reports.filters.department')
+                                "
+                            >
+                                {{
+                                    optionLabel(
+                                        options.departments,
+                                        filters.department_id,
+                                    ) || trans('reports.filters.all')
+                                }}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.departments"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    :model-value="filters.branch_id ?? '__all'"
-                    @update:model-value="
-                        (value) => updateFilter('branch_id', selectValue(value))
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.branch')"
-                        >
-                            {{
-                                optionLabel(
-                                    options.branches,
-                                    filters.branch_id,
-                                ) || trans('reports.filters.all')
-                            }}
-                        </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.branches"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.category_id ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter('category_id', selectValue(value))
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.category')"
+                            >
+                                {{
+                                    optionLabel(
+                                        options.categories,
+                                        filters.category_id,
+                                    ) || trans('reports.filters.all')
+                                }}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.categories"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    :model-value="filters.department_id ?? '__all'"
-                    @update:model-value="
-                        (value) =>
-                            updateFilter('department_id', selectValue(value))
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.department')"
-                        >
-                            {{
-                                optionLabel(
-                                    options.departments,
-                                    filters.department_id,
-                                ) || trans('reports.filters.all')
-                            }}
-                        </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.departments"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        v-if="options.assignees.length > 0"
+                        :model-value="filters.assignee_id ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter('assignee_id', selectValue(value))
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.assignee')"
+                            >
+                                {{
+                                    optionLabel(
+                                        options.assignees,
+                                        filters.assignee_id,
+                                    ) || trans('reports.filters.all')
+                                }}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.assignees"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    :model-value="filters.category_id ?? '__all'"
-                    @update:model-value="
-                        (value) =>
-                            updateFilter('category_id', selectValue(value))
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.category')"
-                        >
-                            {{
-                                optionLabel(
-                                    options.categories,
-                                    filters.category_id,
-                                ) || trans('reports.filters.all')
-                            }}
-                        </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.categories"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.status ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter(
+                                    'status',
+                                    selectOptionValue<TicketStatus>(
+                                        value,
+                                        options.statuses,
+                                    ),
+                                )
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.status')"
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.statuses"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    v-if="options.assignees.length > 0"
-                    :model-value="filters.assignee_id ?? '__all'"
-                    @update:model-value="
-                        (value) =>
-                            updateFilter('assignee_id', selectValue(value))
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.assignee')"
-                        >
-                            {{
-                                optionLabel(
-                                    options.assignees,
-                                    filters.assignee_id,
-                                ) || trans('reports.filters.all')
-                            }}
-                        </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.assignees"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.priority ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter(
+                                    'priority',
+                                    selectOptionValue<TicketPriority>(
+                                        value,
+                                        options.priorities,
+                                    ),
+                                )
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.priority')"
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.priorities"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    :model-value="filters.status ?? '__all'"
-                    @update:model-value="
-                        (value) =>
-                            updateFilter(
-                                'status',
-                                selectOptionValue<TicketStatus>(
-                                    value,
-                                    options.statuses,
-                                ),
-                            )
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.status')"
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.statuses"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.type ?? '__all'"
+                        @update:model-value="
+                            (value) =>
+                                updateFilter(
+                                    'type',
+                                    selectOptionValue<TicketType>(
+                                        value,
+                                        options.types,
+                                    ),
+                                )
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.type')"
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in options.types"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    :model-value="filters.priority ?? '__all'"
-                    @update:model-value="
-                        (value) =>
-                            updateFilter(
-                                'priority',
-                                selectOptionValue<TicketPriority>(
-                                    value,
-                                    options.priorities,
-                                ),
-                            )
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.priority')"
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.priorities"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-
-                <Select
-                    :model-value="filters.type ?? '__all'"
-                    @update:model-value="
-                        (value) =>
-                            updateFilter(
-                                'type',
-                                selectOptionValue<TicketType>(
-                                    value,
-                                    options.types,
-                                ),
-                            )
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.type')"
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in options.types"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-
-                <Select
-                    :model-value="filters.event ?? '__all'"
-                    @update:model-value="
-                        (value) => updateFilter('event', selectValue(value))
-                    "
-                >
-                    <SelectTrigger>
-                        <SelectValue
-                            :placeholder="trans('reports.filters.event')"
-                        />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__all">
-                            {{ trans('reports.filters.all') }}
-                        </SelectItem>
-                        <SelectItem
-                            v-for="option in audit.events"
-                            :key="option.value"
-                            :value="option.value"
-                        >
-                            {{ option.label }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+                    <Select
+                        :model-value="filters.event ?? '__all'"
+                        @update:model-value="
+                            (value) => updateFilter('event', selectValue(value))
+                        "
+                    >
+                        <SelectTrigger class="w-full justify-between">
+                            <SelectValue
+                                :placeholder="trans('reports.filters.event')"
+                            />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all">
+                                {{ trans('reports.filters.all') }}
+                            </SelectItem>
+                            <SelectItem
+                                v-for="option in audit.events"
+                                :key="option.value"
+                                :value="option.value"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </CardContent>
         </Card>
 

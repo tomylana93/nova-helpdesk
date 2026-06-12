@@ -201,6 +201,31 @@ test('requester can submit an incident ticket', function (): void {
         ->and($ticket?->ticket_number)->toStartWith('INC-');
 });
 
+test('a ticket opened by an auditor inherits their organisation context', function (): void {
+    $branch = Branch::factory()->create();
+    $department = Department::factory()->create(['branch_id' => $branch->id]);
+    $auditor = createAuditorUser(['branch_id' => $branch->id, 'department_id' => $department->id]);
+    $category = TicketCategory::factory()->create();
+
+    $this->actingAs($auditor)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'Audit workstation issue',
+            'description' => 'Reporting on behalf of compliance.',
+            'priority' => TicketPriority::Low->value,
+            'category_id' => $category->id,
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    $ticket = Ticket::query()->where('subject', 'Audit workstation issue')->first();
+
+    expect($ticket)->not->toBeNull()
+        ->and($ticket?->requester_id)->toBe($auditor->id)
+        ->and($ticket?->branch_id)->toBe($branch->id)
+        ->and($ticket?->department_id)->toBe($department->id);
+});
+
 test('service_request ticket starts in waiting_for_approval status', function (): void {
     $requester = createRequesterUser();
     $category = TicketCategory::factory()->create();

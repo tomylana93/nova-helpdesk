@@ -1,4 +1,8 @@
-export type DashboardRole = 'requester' | 'it_agent' | 'super_admin';
+export type DashboardRole =
+    | 'requester'
+    | 'it_agent'
+    | 'auditor'
+    | 'super_admin';
 
 export interface DashboardPeriodProp {
     mode: 'monthly' | 'yearly';

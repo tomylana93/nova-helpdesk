@@ -133,6 +133,40 @@ test('agents only report on assigned tickets', function (): void {
         );
 });
 
+test('auditors can report across all tickets', function (): void {
+    $this->travelTo(Date::parse('2026-06-15 10:00:00'));
+
+    $auditor = createAuditorUser();
+    $agent = createAgentUser();
+    $otherAgent = createAgentUser();
+
+    Ticket::factory()->create([
+        'assigned_to' => $agent->id,
+        'status' => TicketStatus::Open,
+        'created_at' => Date::parse('2026-06-10 09:00:00'),
+        'submitted_at' => Date::parse('2026-06-10 09:00:00'),
+    ]);
+
+    Ticket::factory()->create([
+        'assigned_to' => $otherAgent->id,
+        'status' => TicketStatus::Open,
+        'created_at' => Date::parse('2026-06-10 09:00:00'),
+        'submitted_at' => Date::parse('2026-06-10 09:00:00'),
+    ]);
+
+    $this->actingAs($auditor)
+        ->get(route('reports.index', [
+            'mode' => 'monthly',
+            'month' => 6,
+            'year' => 2026,
+        ]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->where('summary.created', 2)
+            ->where('summary.active', 2)
+        );
+});
+
 test('reports can be exported as xlsx downloads', function (): void {
     $agent = createAgentUser();
     Ticket::factory()->create([
@@ -150,11 +184,12 @@ test('reports can be exported as xlsx downloads', function (): void {
         ->assertDownload('audit-report-yearly-2026.xlsx');
 });
 
-test('role sync grants report access to super admins and agents only', function (): void {
+test('role sync grants report access to super admins agents and auditors only', function (): void {
     $this->artisan('permission:sync-roles')
         ->assertSuccessful();
 
     expect(Role::findByName(UserRole::SuperAdmin->value)->hasPermissionTo(AdminPermission::ViewReports->value))->toBeTrue()
         ->and(Role::findByName(UserRole::ItAgent->value)->hasPermissionTo(AdminPermission::ViewReports->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::Auditor->value)->hasPermissionTo(AdminPermission::ViewReports->value))->toBeTrue()
         ->and(Role::findByName(UserRole::Requester->value)->hasPermissionTo(AdminPermission::ViewReports->value))->toBeFalse();
 });

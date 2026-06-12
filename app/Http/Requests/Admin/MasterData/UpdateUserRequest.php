@@ -43,16 +43,17 @@ class UpdateUserRequest extends FormRequest
                 Rule::exists(config('permission.table_names.roles'), 'name')
                     ->where('guard_name', 'web'),
             ],
-            'branch_id' => [Rule::requiredIf($this->isRequester()), 'nullable', 'exists:branches,id'],
-            'department_id' => [Rule::requiredIf($this->isRequester()), 'nullable', 'exists:departments,id'],
+            'branch_id' => [Rule::requiredIf($this->requiresOrganisation()), 'nullable', 'exists:branches,id'],
+            'department_id' => [Rule::requiredIf($this->requiresOrganisation()), 'nullable', 'exists:departments,id'],
         ];
     }
 
     /**
-     * Requester accounts must belong to a branch and department; staff accounts need neither.
+     * Requester and auditor accounts must belong to a branch and department: tickets they open
+     * inherit their organisation context. Agent and super_admin accounts need neither.
      */
-    private function isRequester(): bool
+    private function requiresOrganisation(): bool
     {
-        return $this->input('role') === UserRole::Requester->value;
+        return in_array($this->input('role'), [UserRole::Requester->value, UserRole::Auditor->value], true);
     }
 }

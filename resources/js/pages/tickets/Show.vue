@@ -51,7 +51,7 @@ type TransitionOption = {
 
 type Props = {
     ticket: Ticket;
-    viewerRole: 'requester' | 'it_agent' | 'super_admin';
+    viewerRole: 'requester' | 'it_agent' | 'auditor' | 'super_admin';
     canSeeInternal?: boolean;
     canAct?: boolean;
     canReply?: boolean;
@@ -520,7 +520,8 @@ setLayoutProps({
 
             <p
                 v-if="
-                    viewerRole === 'requester' &&
+                    canReply &&
+                    !canAct &&
                     ticket.status === 'waiting_for_requester'
                 "
                 class="mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950/20 dark:text-yellow-200"

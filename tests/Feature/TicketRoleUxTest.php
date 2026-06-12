@@ -60,6 +60,51 @@ test('the show page is read-only oversight for a super admin', function (): void
         );
 });
 
+test('the show page is read-only oversight for an auditor on a ticket they do not own', function (): void {
+    $auditor = createAuditorUser();
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $ticket = roleUxTicket(TicketStatus::Resolved, $requester->id, $agent->id);
+
+    $this->actingAs($auditor)
+        ->get(route('tickets.show', $ticket))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('tickets/Show')
+            ->where('viewerRole', 'auditor')
+            ->where('canAct', false)
+            ->where('canReply', false)
+            // Auditors keep full oversight visibility, including internal notes.
+            ->where('canSeeInternal', true)
+            ->where('canApprove', false)
+            // Oversight access must never surface requester controls on tickets the auditor does not own.
+            ->where('canReopen', false)
+            ->where('canConfirm', false)
+            ->where('availableTransitions', [])
+        );
+});
+
+test('the show page gives an auditor requester controls on their own resolved ticket', function (): void {
+    $auditor = createAuditorUser();
+    $agent = createAgentUser();
+    $ticket = roleUxTicket(TicketStatus::Resolved, $auditor->id, $agent->id);
+
+    $this->actingAs($auditor)
+        ->get(route('tickets.show', $ticket))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->component('tickets/Show')
+            ->where('viewerRole', 'auditor')
+            ->where('canAct', false)
+            // As the ticket owner, the auditor may reply, confirm, and reopen their own ticket.
+            ->where('canReply', true)
+            ->where('canSeeInternal', true)
+            ->where('canConfirm', true)
+            ->where('canReopen', true)
+            ->where('availableTransitions', [])
+        );
+});
+
 test('the show page gives a requester confirm and reopen controls on a resolved ticket', function (): void {
     $agent = createAgentUser();
     $requester = createRequesterUser();
@@ -95,3 +140,12 @@ test('ticket pages render for the agent, requester, and super admin roles', func
     'requester' => [createRequesterUser(...)],
     'super admin' => [fn (): User => grantSuperAdmin(User::factory()->create())],
 ]);
+
+test('auditor can render ticket index, show, and create tickets like a requester', function (): void {
+    $auditor = createAuditorUser();
+    $ticket = roleUxTicket(TicketStatus::Open, createRequesterUser()->id, createAgentUser()->id);
+
+    $this->actingAs($auditor)->get(route('tickets.index'))->assertOk();
+    $this->actingAs($auditor)->get(route('tickets.show', $ticket))->assertOk();
+    $this->actingAs($auditor)->get(route('tickets.create'))->assertOk();
+});

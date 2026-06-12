@@ -102,7 +102,7 @@ class TicketTable extends AbstractTable
 
         // Agent inbox quick-filters (requesters only ever see their own tickets).
         $user = $this->request->user();
-        if ($user && ($user->hasRole(UserRole::ItAgent) || $user->hasRole(UserRole::SuperAdmin))) {
+        if ($user && ($user->hasRole(UserRole::ItAgent) || $user->hasRole(UserRole::Auditor) || $user->hasRole(UserRole::SuperAdmin))) {
             $filters[] = $this->selectFilter(
                 'view',
                 $this->viewFilter($user->id),

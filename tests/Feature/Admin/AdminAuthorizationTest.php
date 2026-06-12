@@ -18,6 +18,18 @@ test('users without admin permissions cannot access master data users', function
         ->assertForbidden();
 });
 
+test('auditors cannot access admin settings or master data', function (): void {
+    $user = createAuditorUser();
+
+    $this->actingAs($user)
+        ->get(route('admin.settings.general.edit'))
+        ->assertForbidden();
+
+    $this->actingAs($user)
+        ->get(route('admin.master-data.users.index'))
+        ->assertForbidden();
+});
+
 test('admin users can access current admin surfaces', function (): void {
     $user = grantAdminPermissions(User::factory()->create());
 

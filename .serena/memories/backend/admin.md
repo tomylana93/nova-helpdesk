@@ -12,15 +12,21 @@
   - **Queues:** REMOVED in helpdesk refactor Phase 5 (model/controller/actions/table/policy/permission/nav/translations all deleted; `queue_id` dropped from `tickets`+`sla_policies`). See `mem:helpdesk/refactor-plan`.
   - **Ticket Categories:** `TicketCategoryController`, actions `CreateTicketCategory`/`UpdateTicketCategory`, table `TicketCategoryTable`.
   - **SLA Policies:** `SlaPolicyController`, actions `CreateSlaPolicy`/`UpdateSlaPolicy`, table `SlaPolicyTable`.
+- User org-context validation (`StoreUserRequest`/`UpdateUserRequest`): `branch_id`+`department_id` REQUIRED when role is `requester` OR `auditor` (method `requiresOrganisation()`); agents/super_admin need neither. Guarantees tickets opened by requesters/auditors inherit org context in `CreateTicket`.
 - Authorization & Permissions (`app/Enums/AdminPermission.php`):
-  - Permissions: `manage settings`, `view users`, `create users`, `update users`, `manage branches`, `manage departments`, `manage categories`, `view tickets`, `create tickets`, `update tickets`, `manage sla policies`, `manage approvals`. (`manage queues` removed in Phase 5.)
-- Roles Catalog (`app/Enums/UserRole.php`):
-  - Target roles: `super_admin`, `it_agent`, `requester`.
+  - Permissions: `manage settings`, `view users`, `create users`, `update users`, `manage branches`, `manage departments`, `manage categories`, `view tickets`, `create tickets`, `update tickets`, `manage sla policies`, `manage approvals`, `view reports`. (`manage queues` removed in Phase 5.)
+- Roles Catalog (`app/Enums/UserRole.php`): `super_admin`, `it_agent`, `auditor`, `requester`.
 - Role-Permission Sync Command (`app/Console/Commands/SyncRolesCommand.php` alias `permission:sync-roles`):
-  - `super_admin`: synced with all permissions.
-  - `it_agent`: synced with `view tickets`, `create tickets`, `update tickets`, `manage approvals`.
-  - `requester`: synced with `view tickets`, `create tickets`.
+  - `super_admin`: all permissions.
+  - `it_agent`: `view tickets`, `create tickets`, `update tickets`, `manage approvals`, `view reports`.
+  - `auditor`: `view tickets`, `create tickets`, `view reports` (NO `update tickets`/approvals/settings/master-data).
+  - `requester`: `view tickets`, `create tickets`.
+- **Auditor role** = read-only org-wide oversight + reports, that can ALSO open tickets like a requester:
+  - Sees ALL tickets incl. internal notes everywhere (`TicketPolicy@view` allows; `TicketController@show` sets `canSeeInternal` for auditor); reports show all tickets (non-agent path in `ReportTicketQuery`/`GetReportData`); dashboard = admin builder (`GetDashboardData`).
+  - NOT a lifecycle actor: `canAct`/`availableTransitions`/`canApprove` false; cannot transition/update tickets it does not own (no `update tickets` perm).
+  - On tickets it OWNS (it opened): treated as requester — `canReply` (public), `canReopen`, `canConfirm` via `$isRequesterActor = $isOwner && !$isAgent && !$isSuperAdmin` in `TicketController@show`.
+  - Cannot access settings/master-data (no perms). Never an auto-assign/approval/notification target.
 - Policies:
   - `Gate::before` in `AppServiceProvider` allows `super_admin` to bypass policy checks.
   - Policy classes exist for `UserPolicy`, `BranchPolicy`, `DepartmentPolicy`, `TicketCategoryPolicy`, `SlaPolicyPolicy`. (`QueuePolicy` removed in Phase 5.)
-- Frontend auth UI uses shared `auth.abilities` booleans from `HandleInertiaRequests` to toggle UI parts (e.g. settings, users, branches, etc.).
+- Frontend auth UI uses shared `auth.abilities` booleans from `HandleInertiaRequests` to toggle UI parts (e.g. settings, users, branches, reports). Nav (`AppSidebar`) gates Tickets by `view_tickets` and Reports by `view_reports`, so auditor sees both automatically.

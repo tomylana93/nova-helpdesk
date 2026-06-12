@@ -318,6 +318,20 @@ test('a requester user requires branch and department', function (): void {
         ->assertSessionHasErrors(['branch_id', 'department_id']);
 });
 
+test('an auditor user requires branch and department', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::Auditor->value, 'web');
+
+    $this
+        ->actingAs($actor)
+        ->post(route('admin.master-data.users.store'), [
+            'name' => 'Auditor User',
+            'email' => 'auditor-user@example.test',
+            'role' => UserRole::Auditor->value,
+        ])
+        ->assertSessionHasErrors(['branch_id', 'department_id']);
+});
+
 test('a staff user does not require branch or department', function (): void {
     $actor = grantAdminPermissions(User::factory()->create());
     Role::findOrCreate(UserRole::ItAgent->value, 'web');

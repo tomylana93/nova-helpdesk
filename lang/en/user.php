@@ -20,6 +20,7 @@ return [
     'role' => [
         'super_admin' => 'Super Admin',
         'it_agent' => 'IT Agent',
+        'auditor' => 'Auditor',
         'requester' => 'Requester',
     ],
     'action' => [

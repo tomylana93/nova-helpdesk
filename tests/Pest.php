@@ -95,6 +95,26 @@ function createAgentUser(): User
     return tap(User::factory()->create(), fn ($u) => $u->syncRoles([UserRole::ItAgent->value]));
 }
 
+/**
+ * @param  array<string, mixed>  $attributes
+ */
+function createAuditorUser(array $attributes = []): User
+{
+    $role = Role::findOrCreate(UserRole::Auditor->value, 'web');
+    $permissions = [
+        AdminPermission::ViewTickets->value,
+        AdminPermission::CreateTickets->value,
+        AdminPermission::ViewReports->value,
+    ];
+    foreach ($permissions as $perm) {
+        Permission::findOrCreate($perm, 'web');
+    }
+
+    $role->syncPermissions($permissions);
+
+    return tap(User::factory()->create($attributes), fn ($u) => $u->syncRoles([UserRole::Auditor->value]));
+}
+
 function createRequesterUser(): User
 {
     $role = Role::findOrCreate(UserRole::Requester->value, 'web');
