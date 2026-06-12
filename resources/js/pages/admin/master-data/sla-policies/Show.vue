@@ -48,7 +48,7 @@ setLayoutProps({
         </div>
 
         <div class="rounded-lg border bg-card p-6 shadow-sm">
-            <dl class="grid grid-cols-2 gap-x-8 gap-y-4">
+            <dl class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
                 <div>
                     <dt
                         class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
