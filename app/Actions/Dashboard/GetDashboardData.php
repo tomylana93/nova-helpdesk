@@ -27,7 +27,11 @@ class GetDashboardData
         }
 
         if ($user->hasRole(UserRole::SuperAdmin->value)) {
-            return ['role' => 'super_admin', 'period' => $period->toArray(), ...$this->admin->handle($period)];
+            return ['role' => UserRole::SuperAdmin->value, 'period' => $period->toArray(), ...$this->admin->handle($period)];
+        }
+
+        if ($user->hasRole(UserRole::Auditor->value)) {
+            return ['role' => UserRole::Auditor->value, 'period' => $period->toArray(), ...$this->admin->handle($period)];
         }
 
         return ['role' => 'requester', 'period' => $period->toArray(), ...$this->requester->handle($user, $period)];

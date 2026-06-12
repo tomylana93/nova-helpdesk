@@ -29,6 +29,10 @@ class TicketPolicy
             return true;
         }
 
+        if ($user->hasRole(UserRole::Auditor)) {
+            return true;
+        }
+
         return $ticket->requester_id === $user->id;
     }
 

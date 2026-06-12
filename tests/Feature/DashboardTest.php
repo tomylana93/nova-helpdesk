@@ -48,6 +48,32 @@ test('dashboard shares auth abilities for super admins', function (): void {
         );
 });
 
+test('auditors see admin-shaped dashboard without master data abilities', function (): void {
+    $user = createAuditorUser();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page): Assert => $page
+            ->where('role', 'auditor')
+            ->where('auth.abilities.view_tickets', true)
+            ->where('auth.abilities.create_tickets', true)
+            ->where('auth.abilities.update_tickets', false)
+            ->where('auth.abilities.view_reports', true)
+            ->where('auth.abilities.manage_settings', false)
+            ->where('auth.abilities.view_users', false)
+            ->where('auth.abilities.manage_branches', false)
+            ->where('auth.abilities.manage_departments', false)
+            ->where('auth.abilities.manage_categories', false)
+            ->where('auth.abilities.manage_sla_policies', false)
+            ->has('live')
+            ->has('periodMetrics')
+            ->has('trend.points')
+            ->has('breakdown.segments')
+            ->has('compliance')
+        );
+});
+
 test('dashboard uses locale from general settings', function (): void {
     $settings = app(GeneralSettings::class);
     $settings->site_locale = 'id';

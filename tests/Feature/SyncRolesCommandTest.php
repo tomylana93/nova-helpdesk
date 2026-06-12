@@ -9,6 +9,7 @@ test('it syncs all application roles from the enum', function (): void {
     $this->artisan('permission:sync-roles')
         ->expectsOutputToContain(UserRole::SuperAdmin->value)
         ->expectsOutputToContain(UserRole::ItAgent->value)
+        ->expectsOutputToContain(UserRole::Auditor->value)
         ->expectsOutputToContain(UserRole::Requester->value)
         ->expectsOutputToContain(AdminPermission::ManageSettings->value)
         ->assertSuccessful();
@@ -22,6 +23,18 @@ test('it syncs all application roles from the enum', function (): void {
             static fn (AdminPermission $permission): string => $permission->value,
             AdminPermission::cases(),
         ));
+
+    expect(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ViewTickets->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::CreateTickets->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::UpdateTickets->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageApprovals->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ViewReports->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageSettings->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ViewUsers->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageBranches->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageDepartments->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageCategories->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageSlaPolicies->value))->toBeFalse();
 });
 
 test('it is safe to rerun the sync roles command', function (): void {
@@ -39,5 +52,6 @@ test('user role labels translate correctly for indonesian locale', function (): 
     app()->setLocale('id');
 
     expect(UserRole::ItAgent->label())->toBe('Agen IT');
+    expect(UserRole::Auditor->label())->toBe('Auditor');
     expect(UserRole::Requester->label())->toBe('Pemohon');
 });

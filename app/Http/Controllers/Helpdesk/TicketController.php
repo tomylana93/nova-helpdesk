@@ -63,12 +63,17 @@ class TicketController extends Controller
 
         $user = $request->user();
         $isAgent = $user?->hasRole(UserRole::ItAgent) ?? false;
+        $isAuditor = $user?->hasRole(UserRole::Auditor) ?? false;
         $isSuperAdmin = $user?->hasRole(UserRole::SuperAdmin) ?? false;
-        $isRequester = ! $isAgent && ! $isSuperAdmin && $user !== null && $ticket->requester_id === $user->id;
+        $isOwner = $user !== null && $ticket->requester_id === $user->id;
+        // The ticket owner acts as a requester for their own ticket. An auditor who opened a ticket
+        // gets requester-style controls on it; on every other ticket they are read-only oversight.
+        $isRequesterActor = $isOwner && ! $isAgent && ! $isSuperAdmin;
 
-        // super_admin is read-only oversight: can see everything (incl. internal notes) but acts on nothing.
-        $canSeeInternal = $isAgent || $isSuperAdmin;
-        $viewerRole = $isAgent ? 'it_agent' : ($isSuperAdmin ? 'super_admin' : 'requester');
+        // super_admin and auditor are read-only oversight: they can see everything (incl. internal
+        // notes) but act on nothing they do not own.
+        $canSeeInternal = $isAgent || $isSuperAdmin || $isAuditor;
+        $viewerRole = $isAgent ? UserRole::ItAgent->value : ($isAuditor ? UserRole::Auditor->value : ($isSuperAdmin ? UserRole::SuperAdmin->value : UserRole::Requester->value));
 
         $commentsQuery = TicketComment::query()
             ->with(['user:id,name', 'attachments'])
@@ -84,7 +89,7 @@ class TicketController extends Controller
             'viewerRole' => $viewerRole,
             'canSeeInternal' => $canSeeInternal,
             'canAct' => $isAgent,
-            'canReply' => $isAgent || $isRequester,
+            'canReply' => $isAgent || $isRequesterActor,
             'availableTransitions' => $isAgent
                 ? array_map(
                     fn (TicketStatus $to): array => ['value' => $to->value, 'label' => $to->label()],
@@ -92,9 +97,9 @@ class TicketController extends Controller
                 )
                 : [],
             'canApprove' => $isAgent && $user->can('approve', $ticket),
-            // Guarded by $isRequester so super_admin's Gate::before bypass never surfaces these controls.
-            'canReopen' => $isRequester && $user->can('reopen', $ticket),
-            'canConfirm' => $isRequester && $user->can('confirmResolution', $ticket),
+            // Guarded by $isRequesterActor so super_admin's/auditor's Gate::before or oversight access never surfaces these controls on tickets they do not own.
+            'canReopen' => $isRequesterActor && $user->can('reopen', $ticket),
+            'canConfirm' => $isRequesterActor && $user->can('confirmResolution', $ticket),
             'approval' => $ticket->approval ? [
                 'status' => $ticket->approval->status,
                 'reviewerName' => $ticket->approval->reviewer?->name,

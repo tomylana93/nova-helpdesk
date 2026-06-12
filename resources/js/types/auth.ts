@@ -1,7 +1,7 @@
 import type { BrandingAssets, SharedStyleSettings } from './settings';
 
 export type UserStatus = 'active' | 'disable' | 'suspend';
-export type UserRoleName = 'super_admin' | 'it_agent' | 'requester';
+export type UserRoleName = 'super_admin' | 'it_agent' | 'auditor' | 'requester';
 
 export type User = {
     id: string;

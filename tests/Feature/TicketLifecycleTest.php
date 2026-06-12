@@ -160,6 +160,19 @@ test('an agent transitions a ticket through the lifecycle endpoint and notifies 
     Notification::assertSentTo($requester, TicketNotification::class, fn ($n): bool => $n->type === 'status_changed');
 });
 
+test('an auditor cannot transition a ticket they do not own', function (): void {
+    $auditor = createAuditorUser();
+    $agent = createAgentUser();
+    $requester = createRequesterUser();
+    $ticket = lifecycleTicket(TicketStatus::Open, $requester->id, $agent->id);
+
+    $this->actingAs($auditor)
+        ->post(route('tickets.transition', $ticket), ['status' => TicketStatus::InProgress->value])
+        ->assertForbidden();
+
+    expect($ticket->fresh()->status)->toBe(TicketStatus::Open);
+});
+
 test('an agent transition to in progress marks first response once', function (): void {
     $this->travelTo(Date::parse('2026-06-11 10:00:00'));
 
