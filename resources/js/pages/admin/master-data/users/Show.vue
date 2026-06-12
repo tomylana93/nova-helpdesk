@@ -103,9 +103,7 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span
-                            class="text-sm font-medium text-muted-foreground"
-                        >
+                        <span class="text-sm font-medium text-muted-foreground">
                             {{ trans('admin.master_data.user.label.status') }}
                         </span>
                         <UserStatusBadge
@@ -117,9 +115,7 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span
-                            class="text-sm font-medium text-muted-foreground"
-                        >
+                        <span class="text-sm font-medium text-muted-foreground">
                             {{ trans('admin.master_data.user.label.role') }}
                         </span>
                         <Badge
@@ -137,9 +133,7 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span
-                            class="text-sm font-medium text-muted-foreground"
-                        >
+                        <span class="text-sm font-medium text-muted-foreground">
                             {{ trans('admin.master_data.user.label.branch') }}
                         </span>
                         <span class="text-sm">
@@ -150,9 +144,7 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span
-                            class="text-sm font-medium text-muted-foreground"
-                        >
+                        <span class="text-sm font-medium text-muted-foreground">
                             {{
                                 trans('admin.master_data.user.label.department')
                             }}
@@ -165,9 +157,7 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span
-                            class="text-sm font-medium text-muted-foreground"
-                        >
+                        <span class="text-sm font-medium text-muted-foreground">
                             {{ trans('user.label.created_at') }}
                         </span>
                         <span class="text-sm">
@@ -178,9 +168,7 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span
-                            class="text-sm font-medium text-muted-foreground"
-                        >
+                        <span class="text-sm font-medium text-muted-foreground">
                             {{ trans('user.label.updated_at') }}
                         </span>
                         <span class="text-sm">
