@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.19.0] - 2026-06-12
+
+### Added
+- feat(reports): structure category option list identical to create ticket
+
+### Other Changes
+- Merge pull request #35 from tomylana93/dev
+
 ## [0.18.1] - 2026-06-12
 
 ### Fixed

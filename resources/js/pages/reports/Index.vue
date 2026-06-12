@@ -102,56 +102,24 @@ const breakdownGroups = computed(() =>
     })),
 );
 
-const groupedCategories = computed(() => {
-    const categories = props.options.categories;
+function categoryOptionLabel(
+    groups: Array<{ label: string; options: ReportOption[] }>,
+    value: string | null,
+): string {
+    if (value === null) {
+        return '';
+    }
 
-    // 1. Parent categories are those with no parent_id
-    const parents = categories.filter((cat) => !cat.parent_id);
+    for (const group of groups) {
+        const found = group.options.find((opt) => opt.value === value);
 
-    // 2. Child categories are those with parent_id
-    const children = categories.filter((cat) => cat.parent_id);
-
-    const groups: Array<{
-        isGroup: boolean;
-        label: string;
-        value?: string;
-        items?: Array<{ value: string; label: string }>;
-    }> = [];
-
-    // 3. For each parent, find its children
-    parents.forEach((parent) => {
-        const parentChildren = children.filter(
-            (child) => child.parent_id === parent.value,
-        );
-
-        if (parentChildren.length > 0) {
-            groups.push({
-                isGroup: true,
-                label: parent.label,
-                value: parent.value,
-                items: parentChildren.map((c) => ({
-                    value: c.value,
-                    label: c.label,
-                })),
-            });
+        if (found) {
+            return found.label;
         }
-    });
+    }
 
-    // 4. Handle children whose parent is not active/not found
-    children.forEach((child) => {
-        const hasParent = parents.some((p) => p.value === child.parent_id);
-
-        if (!hasParent) {
-            groups.push({
-                isGroup: false,
-                label: child.label,
-                value: child.value,
-            });
-        }
-    });
-
-    return groups;
-});
+    return '';
+}
 
 function queryFromFilters(filters: ReportFilters): Record<string, string> {
     const query: Record<string, string> = {
@@ -465,7 +433,7 @@ function optionLabel(options: ReportOption[], value: string | null): string {
                                 :placeholder="trans('reports.filters.category')"
                             >
                                 {{
-                                    optionLabel(
+                                    categoryOptionLabel(
                                         options.categories,
                                         filters.category_id,
                                     ) || trans('reports.filters.all')
@@ -476,24 +444,19 @@ function optionLabel(options: ReportOption[], value: string | null): string {
                             <SelectItem value="__all">
                                 {{ trans('reports.filters.all') }}
                             </SelectItem>
-                            <template
-                                v-for="group in groupedCategories"
+                            <SelectGroup
+                                v-for="group in options.categories"
                                 :key="group.label"
                             >
-                                <SelectGroup v-if="group.isGroup">
-                                    <SelectLabel>{{ group.label }}</SelectLabel>
-                                    <SelectItem
-                                        v-for="item in group.items"
-                                        :key="item.value"
-                                        :value="item.value"
-                                    >
-                                        {{ item.label }}
-                                    </SelectItem>
-                                </SelectGroup>
-                                <SelectItem v-else :value="group.value!">
-                                    {{ group.label }}
+                                <SelectLabel>{{ group.label }}</SelectLabel>
+                                <SelectItem
+                                    v-for="option in group.options"
+                                    :key="option.value"
+                                    :value="option.value"
+                                >
+                                    {{ option.label }}
                                 </SelectItem>
-                            </template>
+                            </SelectGroup>
                         </SelectContent>
                     </Select>
 
