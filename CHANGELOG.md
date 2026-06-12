@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.18.1] - 2026-06-12
+
+### Fixed
+- fix(reports): make parent categories not selectable in reports filter
+
+### Other Changes
+- Merge pull request #34 from tomylana93/dev
+
 ## [0.18.0] - 2026-06-12
 
 ### Added
