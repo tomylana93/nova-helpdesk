@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.6] - 2026-06-12
+
+### Other Changes
+- Implement HTML5 browser desktop notifications with cross-tab deduplication
+- Merge branch 'dev' into main
+
 ## [0.13.5] - 2026-06-11
 
 ### Other Changes
