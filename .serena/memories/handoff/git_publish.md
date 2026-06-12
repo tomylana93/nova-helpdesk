@@ -9,4 +9,9 @@
 - After merge, sync local `main` via fast-forward (`git checkout main && git pull origin main`).
 - Run production VPS deployment from the merged `main` checkout with `./deploy.sh`; it builds assets locally, uploads a release to the server, runs remote Composer/migrations/role sync/cache steps, updates the `current` symlink, and prunes old releases. Treat failures as deployment blockers and do not continue branch sync until resolved.
 - After successful deploy, switch back to the original branch, fast-forward it to `origin/main`, then push that branch so it reflects the merged result.
-- End with branch, commit/tag, PR URL/number, merge status, CI result, deploy result, and final local branch/status.
+- GitHub stable release polish after deploy:
+  - Ensure the new release tag and the previous release tag exist on remote (`git push origin vX.Y.Z` as needed) so GitHub generated changelog links work.
+  - Use GitHub release notes format with `## What's Changed` and `**Full Changelog**: .../compare/previous...current`; `gh api repos/{owner}/{repo}/releases/generate-notes` can generate notes when `previous_tag_name` exists remotely, but manually include the feature PR if the release tag commit predates the PR merge commit.
+  - Mark the release latest with `gh release edit <tag> --latest`.
+  - For an Immutable badge like GitHub's release UI, enable repo immutable releases via `gh api repos/{owner}/{repo}/immutable-releases -X PUT`; existing releases remain mutable until republished, so toggle the target release draft/published (`gh release edit <tag> --draft && gh release edit <tag> --draft=false --latest`) and verify `immutable: true` with `gh api repos/{owner}/{repo}/releases/tags/<tag>`.
+- End with branch, commit/tag, PR URL/number, merge status, CI result, deploy result, release URL/latest/immutable status, and final local branch/status.
