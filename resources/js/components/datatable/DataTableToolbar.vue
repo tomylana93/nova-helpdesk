@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 <template>
     <div
-        class="grid gap-4 lg:grid-cols-[minmax(0,42rem)_auto] lg:items-start lg:justify-between xl:grid-cols-[minmax(0,46rem)_auto]"
+        class="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start lg:justify-between"
     >
         <div class="min-w-0 space-y-3">
             <DataTableFilters

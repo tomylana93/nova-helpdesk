@@ -16,6 +16,8 @@ export type ReportOption<T extends string = string> = {
     value: T;
     label: string;
     branch_id?: string;
+    parent_id?: string | null;
+    parent_name?: string | null;
 };
 
 export type ReportSummary = {

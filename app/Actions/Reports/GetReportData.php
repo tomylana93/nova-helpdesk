@@ -230,9 +230,10 @@ class GetReportData
                 ->map->resolve()
                 ->all(),
             'categories' => TicketCategory::query()
+                ->with('parent')
                 ->where('status', GeneralStatus::Active)
                 ->orderBy('name')
-                ->get(['id', 'name'])
+                ->get(['id', 'name', 'parent_id'])
                 ->mapInto(TicketCategoryOptionResource::class)
                 ->map->resolve()
                 ->all(),
