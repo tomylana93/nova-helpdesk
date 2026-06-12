@@ -68,7 +68,7 @@ function setYear(value: AcceptableValue | AcceptableValue[]): void {
 </script>
 
 <template>
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div class="inline-flex rounded-lg border border-border/60 p-0.5">
             <Button
                 v-for="mode in ['monthly', 'yearly'] as const"
@@ -86,7 +86,7 @@ function setYear(value: AcceptableValue | AcceptableValue[]): void {
             :model-value="String(period.month)"
             @update:model-value="setMonth"
         >
-            <SelectTrigger class="w-[140px]">
+            <SelectTrigger class="w-full sm:w-[140px]">
                 <SelectValue :placeholder="trans('dashboard.period.month')" />
             </SelectTrigger>
             <SelectContent>
@@ -104,7 +104,7 @@ function setYear(value: AcceptableValue | AcceptableValue[]): void {
             :model-value="String(period.year)"
             @update:model-value="setYear"
         >
-            <SelectTrigger class="w-[100px]">
+            <SelectTrigger class="w-full sm:w-[100px]">
                 <SelectValue :placeholder="trans('dashboard.period.year')" />
             </SelectTrigger>
             <SelectContent>
