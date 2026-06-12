@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.21.0] - 2026-06-12
+
+### Added
+- feat(reports): dynamically localize dates in Excel exports to the user's timezone
+
+### Other Changes
+- Merge pull request #37 from tomylana93/dev
+
 ## [0.20.0] - 2026-06-12
 
 ### Added
