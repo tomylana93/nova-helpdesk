@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.15.0] - 2026-06-12
+
+### Added
+- feat(admin): add user branch department table filters
+
+### Other Changes
+- Merge pull request #28 from tomylana93/dev
+
 ## [0.14.1] - 2026-06-12
 
 ### Changed & Refactored
