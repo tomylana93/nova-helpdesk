@@ -84,31 +84,49 @@ class Ticket extends Model
         });
     }
 
+    /**
+     * @return BelongsTo<Branch, $this>
+     */
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
+    /**
+     * @return BelongsTo<Department, $this>
+     */
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function requester(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requester_id');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
+    /**
+     * @return BelongsTo<TicketCategory, $this>
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(TicketCategory::class, 'category_id');
     }
 
+    /**
+     * @return HasMany<TicketComment, $this>
+     */
     public function comments(): HasMany
     {
         return $this->hasMany(TicketComment::class);
@@ -122,11 +140,17 @@ class Ticket extends Model
         return $this->morphMany(TicketAttachment::class, 'attachable');
     }
 
+    /**
+     * @return HasMany<TicketActivity, $this>
+     */
     public function activities(): HasMany
     {
         return $this->hasMany(TicketActivity::class)->oldest('occurred_at');
     }
 
+    /**
+     * @return HasOne<TicketApproval, $this>
+     */
     public function approval(): HasOne
     {
         return $this->hasOne(TicketApproval::class)->latest();

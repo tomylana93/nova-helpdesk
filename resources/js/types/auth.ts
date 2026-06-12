@@ -38,6 +38,7 @@ export type AuthAbilities = {
     update_tickets: boolean;
     manage_sla_policies: boolean;
     manage_approvals: boolean;
+    view_reports: boolean;
 };
 
 export type NotificationItem = {

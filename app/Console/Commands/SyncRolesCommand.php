@@ -71,6 +71,7 @@ class SyncRolesCommand extends Command
                 AdminPermission::CreateTickets->value,
                 AdminPermission::UpdateTickets->value,
                 AdminPermission::ManageApprovals->value,
+                AdminPermission::ViewReports->value,
             ]);
 
         Role::findOrCreate(UserRole::Requester->value, 'web')
