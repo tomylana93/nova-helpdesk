@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.17.0] - 2026-06-12
+
+### Added
+- feat(helpdesk): add read-only Auditor role with ticket creation
+
+### Other Changes
+- Merge pull request #31 from tomylana93/dev
+
 ## [0.16.0] - 2026-06-12
 
 ### Added
