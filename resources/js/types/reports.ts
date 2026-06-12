@@ -54,7 +54,7 @@ export type ReportsProps = {
     options: {
         branches: ReportOption[];
         departments: ReportOption[];
-        categories: ReportOption[];
+        categories: { label: string; options: ReportOption[] }[];
         assignees: ReportOption[];
         statuses: ReportOption<TicketStatus>[];
         priorities: ReportOption<TicketPriority>[];
