@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.20.0] - 2026-06-12
+
+### Added
+- feat(sla): exclude weekends, public holidays, and lunch breaks from SLA calculations
+
+### Other Changes
+- Merge pull request #36 from tomylana93/dev
+
 ## [0.19.0] - 2026-06-12
 
 ### Added
