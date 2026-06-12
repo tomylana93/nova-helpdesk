@@ -129,19 +129,10 @@ const groupedCategories = computed(() => {
                 isGroup: true,
                 label: parent.label,
                 value: parent.value,
-                items: [
-                    { value: parent.value, label: parent.label },
-                    ...parentChildren.map((c) => ({
-                        value: c.value,
-                        label: c.label,
-                    })),
-                ],
-            });
-        } else {
-            groups.push({
-                isGroup: false,
-                label: parent.label,
-                value: parent.value,
+                items: parentChildren.map((c) => ({
+                    value: c.value,
+                    label: c.label,
+                })),
             });
         }
     });
