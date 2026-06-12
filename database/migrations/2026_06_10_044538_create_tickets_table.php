@@ -25,6 +25,9 @@ return new class extends Migration
             $table->string('subject');
             $table->text('description');
             $table->timestamp('submitted_at')->useCurrent();
+            $table->timestamp('first_response_due_at')->nullable();
+            $table->timestamp('first_responded_at')->nullable();
+            $table->timestamp('resolution_due_at')->nullable();
             $table->timestamp('resolved_at')->nullable();
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();
