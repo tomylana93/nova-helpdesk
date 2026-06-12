@@ -72,7 +72,7 @@ class AuditActivitiesExport implements FromQuery, ShouldAutoSize, WithHeadings, 
         $activity = $row;
 
         return [
-            $activity->occurred_at->toDateTimeString(),
+            $activity->occurred_at->timezone($this->filters->timezone)->toDateTimeString(),
             str($activity->event)->headline()->toString(),
             $activity->actor?->name,
             $activity->ticket->ticket_number,

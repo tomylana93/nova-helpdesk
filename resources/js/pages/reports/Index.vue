@@ -162,7 +162,10 @@ function reportsUrl(filters: ReportFilters, page?: number): string {
 }
 
 function exportUrl(kind: 'operational' | 'audit'): string {
-    const query = queryFromFilters(props.filters);
+    const query = {
+        ...queryFromFilters(props.filters),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    };
 
     return kind === 'operational'
         ? exportOperational.url({ query })
