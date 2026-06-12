@@ -40,6 +40,7 @@ return [
             'all_priorities' => 'Semua Prioritas',
             'view' => 'Tampilan',
             'actions' => 'Aksi',
+            'attachments' => 'Lampiran',
         ],
         'view' => [
             'all' => 'Semua tiket',
@@ -76,6 +77,7 @@ return [
             'department' => 'Pilih departemen (opsional)',
             'category' => 'Pilih kategori',
             'assignee' => 'Pilih petugas (opsional)',
+            'uploader_idle' => 'Seret & lepas berkas ke sini atau klik untuk mencari',
         ],
         'action' => [
             'create' => 'Kirim Tiket',

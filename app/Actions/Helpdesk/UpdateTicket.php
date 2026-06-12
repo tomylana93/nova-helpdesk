@@ -12,6 +12,7 @@ class UpdateTicket
     public function __construct(
         private readonly RecordTicketActivity $recordActivity,
         private readonly TransitionTicketStatus $transition,
+        private readonly AttachUploadedFiles $attachFiles,
     ) {}
 
     /**
@@ -19,6 +20,9 @@ class UpdateTicket
      */
     public function handle(Ticket $ticket, array $data, User $actor): void
     {
+        $attachmentUploadIds = $data['attachment_upload_ids'] ?? [];
+        unset($data['attachment_upload_ids']);
+
         $oldAssignee = $ticket->assigned_to;
 
         // Status is owned by the state machine, not a blind column write.
@@ -26,6 +30,9 @@ class UpdateTicket
         unset($data['status']);
 
         $ticket->update($data);
+
+        // Promote and attach files
+        $this->attachFiles->handle($ticket, $attachmentUploadIds);
 
         if (array_key_exists('assigned_to', $data) && $data['assigned_to'] !== $oldAssignee) {
             $this->recordActivity->handle($ticket, 'assigned', $actor, [

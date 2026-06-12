@@ -11,16 +11,24 @@ class AddTicketComment
 {
     public function __construct(
         private readonly MarkFirstResponse $markFirstResponse,
+        private readonly AttachUploadedFiles $attachFiles,
     ) {}
 
-    public function handle(Ticket $ticket, User $user, string $body, string $visibility = 'public'): TicketComment
-    {
+    public function handle(
+        Ticket $ticket,
+        User $user,
+        string $body,
+        string $visibility = 'public',
+        array $attachmentUploadIds = []
+    ): TicketComment {
         $comment = TicketComment::query()->create([
             'ticket_id' => $ticket->id,
             'user_id' => $user->id,
             'body' => $body,
             'visibility' => $visibility,
         ]);
+
+        $this->attachFiles->handle($comment, $attachmentUploadIds);
 
         if ($user->id !== $ticket->requester_id) {
             $this->markFirstResponse->handle($ticket);

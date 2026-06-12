@@ -9,9 +9,9 @@
   Agent status buttons come from `TicketStatus::agentActionableTransitions()` (excludes approval moves
   + Reopened). `TicketTable` has an agent-only `view` filter (mine/unassigned/overdue).
 - Ticketing model:
-  - `Ticket` (`app/Models/Ticket.php`): Key fields are `ticket_number` (auto-generated in `creating` hook, e.g. `INC-XXXXX` or `REQ-XXXXX` based on `TicketType`), `type` (`TicketType` enum), `status` (`TicketStatus` enum, defaults to `New`), `priority` (`TicketPriority` enum, defaults to `Low`), `subject`, `description`, dates (`submitted_at`, `first_response_due_at`, `resolution_due_at`, `resolved_at`, `closed_at`).
+  - `Ticket` (`app/Models/Ticket.php`): Key fields are `ticket_number` (auto-generated in `creating` hook, e.g. `INC-XXXXX` or `REQ-XXXXX` based on `TicketType`), `type` (`TicketType` enum), `status` (`TicketStatus` enum, defaults to `Open`), `priority` (`TicketPriority` enum, defaults to `Low`), `subject`, `description`, dates (`submitted_at`, `first_response_due_at`, `resolution_due_at`, `resolved_at`, `closed_at`).
   - `TicketComment` (`app/Models/TicketComment.php`): Stores comments; fields are `ticket_id`, `user_id`, `body`, `visibility` (`public` or `internal`).
-  - `TicketApproval` (`app/Models/TicketApproval.php`): Stores approval details; fields are `ticket_id`, `reviewer_id`, `status` (`pending`, `approved`, `rejected`), `decided_at`, `decision_note`.
+  - `TicketApproval` (`app/Models/TicketApproval.php`): Stores approval details; fields are `ticket_id`, `reviewer_id`, `status` (`pending`, `approved`, `rejected`), `decided_at`, `decision_note`).
   - `TicketAttachment` (`app/Models/TicketAttachment.php`): Associates uploaded files with tickets.
   - `TicketActivity` (`app/Models/TicketActivity.php`): Records ticket lifecycle events (e.g. created, assigned, updated).
 - Actions (`app/Actions/Helpdesk/`):

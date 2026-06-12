@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * @property TicketType $type
@@ -113,9 +114,12 @@ class Ticket extends Model
         return $this->hasMany(TicketComment::class);
     }
 
-    public function attachments(): HasMany
+    /**
+     * @return MorphMany<TicketAttachment, $this>
+     */
+    public function attachments(): MorphMany
     {
-        return $this->hasMany(TicketAttachment::class);
+        return $this->morphMany(TicketAttachment::class, 'attachable');
     }
 
     public function activities(): HasMany

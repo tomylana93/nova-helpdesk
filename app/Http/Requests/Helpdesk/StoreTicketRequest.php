@@ -30,6 +30,12 @@ class StoreTicketRequest extends FormRequest
                 'required',
                 Rule::exists('ticket_categories', 'id')->where('status', GeneralStatus::Active->value),
             ],
+            'attachment_upload_ids' => ['nullable', 'array'],
+            'attachment_upload_ids.*' => [
+                'required',
+                'uuid',
+                Rule::exists('temporary_uploads', 'id')->where('user_id', $this->user()?->id),
+            ],
         ];
     }
 }

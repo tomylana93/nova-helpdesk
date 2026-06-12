@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import { store } from '@/actions/App/Http/Controllers/Helpdesk/TicketController';
+import {
+    store as storeUpload,
+    destroy as destroyUpload,
+} from '@/actions/App/Http/Controllers/TemporaryUploadController';
 import InputError from '@/components/InputError.vue';
 import PageWrapper from '@/components/PageWrapper.vue';
 import { Button } from '@/components/ui/button';
@@ -17,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { Uploader } from '@/components/uploader';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { create, index } from '@/routes/tickets';
@@ -34,6 +40,7 @@ type CreateTicketFormData = {
     description: string;
     priority: string;
     category_id: string;
+    attachment_upload_ids: string[];
 };
 
 const props = defineProps<Props>();
@@ -48,14 +55,27 @@ const form = useForm<CreateTicketFormData>({
     description: '',
     priority: '',
     category_id: '',
+    attachment_upload_ids: [],
 });
 
+const temporaryUploadUrl = storeUpload().url;
+const deleteTemporaryUploadUrl = (id: string) => destroyUpload(id).url;
+const attachmentUploadIds = ref<string[]>([]);
+
 function submit(): void {
-    form.submit(store());
+    form.transform((data) => ({
+        ...data,
+        attachment_upload_ids: attachmentUploadIds.value,
+    })).submit(store(), {
+        onSuccess: () => {
+            attachmentUploadIds.value = [];
+        },
+    });
 }
 
 function reset(): void {
     form.resetAndClearErrors();
+    attachmentUploadIds.value = [];
 }
 
 setLayoutProps({
@@ -204,6 +224,33 @@ setLayoutProps({
                     </Select>
                     <InputError :message="form.errors.category_id" />
                 </div>
+            </div>
+
+            <div class="grid gap-2">
+                <Label>{{ trans('helpdesk.ticket.label.attachments') }}</Label>
+                <Uploader
+                    v-model="attachmentUploadIds"
+                    :upload-url="temporaryUploadUrl"
+                    :delete-url-resolver="deleteTemporaryUploadUrl"
+                    :accepted-file-types="[
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/vnd.ms-excel',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'text/csv',
+                        'image/png',
+                        'image/jpeg',
+                        'application/zip',
+                        'application/x-rar-compressed',
+                    ]"
+                    :max-file-size="10 * 1024 * 1024"
+                    :multiple="true"
+                    :label-idle="
+                        trans('helpdesk.ticket.placeholder.uploader_idle')
+                    "
+                />
+                <InputError :message="form.errors.attachment_upload_ids" />
             </div>
 
             <div

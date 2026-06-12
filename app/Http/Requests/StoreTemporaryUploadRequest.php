@@ -31,7 +31,7 @@ class StoreTemporaryUploadRequest extends FormRequest
                 'required',
                 'file',
                 'max:10240',
-                'mimetypes:image/jpeg,image/png,image/webp,image/x-icon,image/vnd.microsoft.icon',
+                'mimetypes:image/jpeg,image/png,image/webp,image/x-icon,image/vnd.microsoft.icon,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,application/zip,application/x-zip-compressed,application/x-rar-compressed,application/rar',
             ],
         ];
     }

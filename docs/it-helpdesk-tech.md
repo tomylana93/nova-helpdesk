@@ -2,6 +2,16 @@
 
 > Status: Draft
 > Last updated: 2026-06-08
+>
+> **Refactor note (2026-06-11) — current delivered scope.** The 1-agent-model refactor
+> (`docs/it-helpdesk-refactor-design.md`, `docs/it-helpdesk-refactor-steps.md`) supersedes parts of this
+> technical design for what is shipped today: **Queue removed** (§4); SLA matches on **type + priority** only (§5);
+> the **assigned IT agent** (not super admin) approves service requests (§6); **super_admin is read-only
+> oversight** — never an assignment/approval/notification target, full access only via `Gate::before`
+> (Personas, §6, §9); statuses are the 7-state machine (`Open, PendingApproval, InProgress,
+> WaitingForRequester, Resolved, Closed, Reopened`). This document stays the draft technical design for
+> the long-term vision; actual implementations have deprecated Queues and simplified routing and models.
+
 
 ## Overview
 The target implementation evolves the current Laravel/Inertia admin platform into a modular internal IT helpdesk. The existing technical foundation should remain in place where it already solves platform concerns well: authentication, settings, shared layout, uploads, localization, permissions, and data-table behavior.

@@ -25,6 +25,14 @@ export type TicketSlaTarget = {
     state: TicketSlaState;
 };
 
+export type TicketAttachment = {
+    id: string;
+    original_name: string;
+    size: number;
+    mime_type: string;
+    url: string;
+};
+
 export type Ticket = {
     id: string;
     ticket_number: string;
@@ -54,6 +62,7 @@ export type Ticket = {
     closed_at: string | null;
     created_at: string;
     updated_at: string;
+    attachments?: TicketAttachment[];
 };
 
 export type TicketTableRow = {

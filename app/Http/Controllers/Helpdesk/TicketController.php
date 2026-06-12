@@ -14,6 +14,7 @@ use App\Http\Requests\Helpdesk\StoreTicketRequest;
 use App\Http\Requests\Helpdesk\UpdateTicketRequest;
 use App\Http\Resources\TicketResource;
 use App\Models\Ticket;
+use App\Models\TicketAttachment;
 use App\Models\TicketComment;
 use App\Tables\Helpdesk\TicketTable;
 use Illuminate\Http\RedirectResponse;
@@ -58,7 +59,7 @@ class TicketController extends Controller
     {
         $this->authorize('view', $ticket);
 
-        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category']);
+        $ticket->load(['requester', 'assignee', 'branch', 'department', 'category', 'attachments']);
 
         $user = $request->user();
         $isAgent = $user?->hasRole(UserRole::ItAgent) ?? false;
@@ -70,7 +71,7 @@ class TicketController extends Controller
         $viewerRole = $isAgent ? 'it_agent' : ($isSuperAdmin ? 'super_admin' : 'requester');
 
         $commentsQuery = TicketComment::query()
-            ->with('user:id,name')
+            ->with(['user:id,name', 'attachments'])
             ->where('ticket_id', $ticket->id)
             ->latest();
 
@@ -106,6 +107,13 @@ class TicketController extends Controller
                 'visibility' => $c->visibility,
                 'authorName' => $c->user->name,
                 'createdAt' => $c->created_at?->toJSON(),
+                'attachments' => $c->attachments->map(fn (TicketAttachment $attachment): array => [
+                    'id' => $attachment->id,
+                    'original_name' => $attachment->original_name,
+                    'size' => $attachment->size,
+                    'mime_type' => $attachment->mime_type,
+                    'url' => $attachment->url,
+                ])->all(),
             ])->all(),
         ]);
     }
