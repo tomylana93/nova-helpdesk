@@ -68,6 +68,8 @@ class User extends Authenticatable implements HasMedia
 
     /**
      * Get the branch associated with the user.
+     *
+     * @return BelongsTo<Branch, $this>
      */
     public function branch(): BelongsTo
     {
@@ -76,6 +78,8 @@ class User extends Authenticatable implements HasMedia
 
     /**
      * Get the department associated with the user.
+     *
+     * @return BelongsTo<Department, $this>
      */
     public function department(): BelongsTo
     {

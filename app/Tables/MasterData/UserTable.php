@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tables\MasterData;
 
+use App\Enums\GeneralStatus;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use App\Http\Resources\BranchOptionResource;
+use App\Http\Resources\DepartmentOptionResource;
+use App\Models\Branch;
+use App\Models\Department;
 use App\Models\User;
 use App\Tables\AbstractTable;
 use App\Tables\Filters\GlobalSearchFilter;
@@ -26,13 +31,15 @@ class UserTable extends AbstractTable
     protected function query(): Builder
     {
         return User::query()
-            ->with('roles:id,name')
+            ->with(['roles:id,name', 'branch:id,name', 'department:id,name'])
             ->select([
-                'id',
-                'name',
-                'email',
-                'status',
-                'created_at',
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.status',
+                'users.created_at',
+                'users.branch_id',
+                'users.department_id',
             ]);
     }
 
@@ -46,10 +53,26 @@ class UserTable extends AbstractTable
      */
     protected function filterConfigurations(): array
     {
+        $branchOptions = Branch::query()
+            ->where('status', GeneralStatus::Active)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->mapInto(BranchOptionResource::class)
+            ->map->resolve()
+            ->all();
+
+        $departmentOptions = Department::query()
+            ->where('status', GeneralStatus::Active)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->mapInto(DepartmentOptionResource::class)
+            ->map->resolve()
+            ->all();
+
         return [
             $this->searchFilter(
                 'search',
-                AllowedFilter::custom('search', new GlobalSearchFilter(['name', 'email'])),
+                AllowedFilter::custom('search', new GlobalSearchFilter(['users.name', 'users.email'])),
                 __('datatable.placeholder.search'),
             ),
             $this->selectFilter(
@@ -65,8 +88,24 @@ class UserTable extends AbstractTable
                 __('admin.master_data.user.label.role'),
             ),
             $this->selectFilter(
+                'branch_id',
+                AllowedFilter::exact('branch_id', 'users.branch_id'),
+                __('admin.master_data.user.label.branch'),
+                $branchOptions,
+                __('datatable.label.all_branches'),
+                __('admin.master_data.user.label.branch'),
+            ),
+            $this->selectFilter(
+                'department_id',
+                AllowedFilter::exact('department_id', 'users.department_id'),
+                __('admin.master_data.user.label.department'),
+                $departmentOptions,
+                __('datatable.label.all_departments'),
+                __('admin.master_data.user.label.department'),
+            ),
+            $this->selectFilter(
                 'status',
-                AllowedFilter::exact('status'),
+                AllowedFilter::exact('status', 'users.status'),
                 __('admin.master_data.user.label.status'),
                 UserStatus::options(),
                 __('datatable.label.all_statuses'),
@@ -81,10 +120,26 @@ class UserTable extends AbstractTable
     protected function allowedSorts(): array
     {
         return [
-            'name',
-            'email',
-            'status',
-            'created_at',
+            AllowedSort::field('name', 'users.name'),
+            AllowedSort::field('email', 'users.email'),
+            AllowedSort::field('status', 'users.status'),
+            AllowedSort::field('created_at', 'users.created_at'),
+            AllowedSort::callback('branch', function (Builder $query, bool $descending): void {
+                $query->orderBy(
+                    Branch::query()
+                        ->select('name')
+                        ->whereColumn('branches.id', 'users.branch_id'),
+                    $descending ? 'desc' : 'asc',
+                );
+            }),
+            AllowedSort::callback('department', function (Builder $query, bool $descending): void {
+                $query->orderBy(
+                    Department::query()
+                        ->select('name')
+                        ->whereColumn('departments.id', 'users.department_id'),
+                    $descending ? 'desc' : 'asc',
+                );
+            }),
         ];
     }
 
@@ -121,6 +176,8 @@ class UserTable extends AbstractTable
             'email' => $user->email,
             'role' => $roleName,
             'roleLabel' => $roleLabel,
+            'branchName' => $user->branch?->name,
+            'departmentName' => $user->department?->name,
             'status' => $status->value,
             'statusLabel' => $status->label(),
             'createdAt' => $user->created_at?->toJSON(),

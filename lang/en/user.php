@@ -10,6 +10,8 @@ return [
         'name' => 'Name',
         'email' => 'Email',
         'role' => 'Role',
+        'branch' => 'Branch',
+        'department' => 'Department',
         'status' => 'Status',
         'actions' => 'Actions',
         'created_at' => 'Created At',

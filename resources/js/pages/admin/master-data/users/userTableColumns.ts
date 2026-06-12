@@ -108,6 +108,38 @@ export function userTableColumns(): ColumnDef<UserTableRow>[] {
                       ),
         },
         {
+            accessorKey: 'branch',
+            meta: { label: trans('user.label.branch') },
+            header: ({ column }) =>
+                h(DataTableColumnHeader, {
+                    column,
+                    title: trans('user.label.branch'),
+                }),
+            cell: ({ row }) =>
+                row.original.branchName === null ||
+                row.original.branchName === undefined
+                    ? h('span', { class: 'text-sm text-muted-foreground' }, '-')
+                    : h('span', { class: 'text-sm' }, row.original.branchName),
+        },
+        {
+            accessorKey: 'department',
+            meta: { label: trans('user.label.department') },
+            header: ({ column }) =>
+                h(DataTableColumnHeader, {
+                    column,
+                    title: trans('user.label.department'),
+                }),
+            cell: ({ row }) =>
+                row.original.departmentName === null ||
+                row.original.departmentName === undefined
+                    ? h('span', { class: 'text-sm text-muted-foreground' }, '-')
+                    : h(
+                          'span',
+                          { class: 'text-sm' },
+                          row.original.departmentName,
+                      ),
+        },
+        {
             accessorKey: 'status',
             meta: { label: trans('user.label.status') },
             header: ({ column }) =>

@@ -202,15 +202,22 @@ test('admin users index exposes a single deferred table payload contract', funct
             ->where('table.rows.0.roleLabel', UserRole::Requester->label())
             ->where('table.state.filters.search', null)
             ->where('table.state.filters.status', null)
+            ->where('table.state.filters.role', null)
+            ->where('table.state.filters.branch_id', null)
+            ->where('table.state.filters.department_id', null)
             ->where('table.state.sort', '-created_at')
             ->where('table.schema.filters.0.key', 'search')
             ->where('table.schema.filters.0.type', 'search')
             ->where('table.schema.filters.1.key', 'role')
             ->where('table.schema.filters.1.type', 'select')
             ->where('table.schema.filters.1.options.0.value', UserRole::SuperAdmin->value)
-            ->where('table.schema.filters.2.key', 'status')
+            ->where('table.schema.filters.2.key', 'branch_id')
             ->where('table.schema.filters.2.type', 'select')
-            ->where('table.schema.filters.2.options.0.value', 'active')
+            ->where('table.schema.filters.3.key', 'department_id')
+            ->where('table.schema.filters.3.type', 'select')
+            ->where('table.schema.filters.4.key', 'status')
+            ->where('table.schema.filters.4.type', 'select')
+            ->where('table.schema.filters.4.options.0.value', 'active')
         ));
 });
 
@@ -326,4 +333,125 @@ test('a staff user does not require branch or department', function (): void {
         ->assertRedirect(route('admin.master-data.users.index'));
 
     expect(User::query()->where('email', 'agent-user@example.test')->exists())->toBeTrue();
+});
+
+test('admin users index filters and sorts by branch and department', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::Requester->value, 'web');
+
+    $branchA = Branch::factory()->create(['name' => 'Alpha Branch']);
+    $branchB = Branch::factory()->create(['name' => 'Beta Branch']);
+
+    $deptA = Department::factory()->create(['name' => 'Alpha Dept', 'branch_id' => $branchA->id]);
+    $deptB = Department::factory()->create(['name' => 'Beta Dept', 'branch_id' => $branchB->id]);
+
+    $userA = User::factory()->create([
+        'name' => 'User Alpha',
+        'branch_id' => $branchA->id,
+        'department_id' => $deptA->id,
+    ]);
+    $userA->assignRole(UserRole::Requester->value);
+
+    $userB = User::factory()->create([
+        'name' => 'User Beta',
+        'branch_id' => $branchB->id,
+        'department_id' => $deptB->id,
+    ]);
+    $userB->assignRole(UserRole::Requester->value);
+
+    // 1. Filter by branch_id
+    $response = $this
+        ->actingAs($actor)
+        ->get(route('admin.master-data.users.index', [
+            'filter' => ['branch_id' => $branchA->id],
+        ]));
+
+    $response->assertInertia(fn (Assert $page): Assert => $page
+        ->component('admin/master-data/users/Index')
+        ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+            ->has('table.rows', 1)
+            ->where('table.rows.0.name', 'User Alpha')
+            ->where('table.rows.0.branchName', 'Alpha Branch')
+            ->where('table.rows.0.departmentName', 'Alpha Dept')
+        ));
+
+    // 2. Filter by department_id
+    $response = $this
+        ->actingAs($actor)
+        ->get(route('admin.master-data.users.index', [
+            'filter' => ['department_id' => $deptB->id],
+        ]));
+
+    $response->assertInertia(fn (Assert $page): Assert => $page
+        ->component('admin/master-data/users/Index')
+        ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+            ->has('table.rows', 1)
+            ->where('table.rows.0.name', 'User Beta')
+            ->where('table.rows.0.branchName', 'Beta Branch')
+            ->where('table.rows.0.departmentName', 'Beta Dept')
+        ));
+
+    // 3. Sort by branch ascending
+    $response = $this
+        ->actingAs($actor)
+        ->get(route('admin.master-data.users.index', [
+            'filter' => ['role' => UserRole::Requester->value],
+            'sort' => 'branch',
+        ]));
+
+    $response->assertInertia(fn (Assert $page): Assert => $page
+        ->component('admin/master-data/users/Index')
+        ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+            ->has('table.rows', 2)
+            ->where('table.rows.0.name', 'User Alpha')
+            ->where('table.rows.1.name', 'User Beta')
+        ));
+
+    // 4. Sort by branch descending
+    $response = $this
+        ->actingAs($actor)
+        ->get(route('admin.master-data.users.index', [
+            'filter' => ['role' => UserRole::Requester->value],
+            'sort' => '-branch',
+        ]));
+
+    $response->assertInertia(fn (Assert $page): Assert => $page
+        ->component('admin/master-data/users/Index')
+        ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+            ->has('table.rows', 2)
+            ->where('table.rows.0.name', 'User Beta')
+            ->where('table.rows.1.name', 'User Alpha')
+        ));
+
+    // 5. Sort by department ascending
+    $response = $this
+        ->actingAs($actor)
+        ->get(route('admin.master-data.users.index', [
+            'filter' => ['role' => UserRole::Requester->value],
+            'sort' => 'department',
+        ]));
+
+    $response->assertInertia(fn (Assert $page): Assert => $page
+        ->component('admin/master-data/users/Index')
+        ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+            ->has('table.rows', 2)
+            ->where('table.rows.0.name', 'User Alpha')
+            ->where('table.rows.1.name', 'User Beta')
+        ));
+
+    // 6. Sort by department descending
+    $response = $this
+        ->actingAs($actor)
+        ->get(route('admin.master-data.users.index', [
+            'filter' => ['role' => UserRole::Requester->value],
+            'sort' => '-department',
+        ]));
+
+    $response->assertInertia(fn (Assert $page): Assert => $page
+        ->component('admin/master-data/users/Index')
+        ->loadDeferredProps(fn (Assert $reload): Assert => $reload
+            ->has('table.rows', 2)
+            ->where('table.rows.0.name', 'User Beta')
+            ->where('table.rows.1.name', 'User Alpha')
+        ));
 });
