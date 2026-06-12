@@ -2,7 +2,7 @@
 import { Link, router, useHttp, usePage } from '@inertiajs/vue3';
 import { useEchoNotification } from '@laravel/echo-vue';
 import { Bell, CheckCheck, Inbox } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -76,6 +76,46 @@ const handleMarkAsRead = (id: string) => {
 
 const user = page.props.auth.user;
 
+// Helper to check if any other tab is active
+const isAnyTabActive = (): boolean => {
+    const lastActive = localStorage.getItem('helpdesk_active_tab_timestamp');
+
+    if (!lastActive) {
+        return false;
+    }
+
+    return Date.now() - parseInt(lastActive, 10) < 5000;
+};
+
+// Update active status for this tab
+const updateActiveStatus = () => {
+    if (document.visibilityState === 'visible') {
+        localStorage.setItem(
+            'helpdesk_active_tab_timestamp',
+            Date.now().toString(),
+        );
+    }
+};
+
+onMounted(() => {
+    // Automatically request permission on mount if default
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+
+    updateActiveStatus();
+    const interval = setInterval(updateActiveStatus, 3000);
+
+    window.addEventListener('visibilitychange', updateActiveStatus);
+    window.addEventListener('focus', updateActiveStatus);
+
+    onUnmounted(() => {
+        clearInterval(interval);
+        window.removeEventListener('visibilitychange', updateActiveStatus);
+        window.removeEventListener('focus', updateActiveStatus);
+    });
+});
+
 // Echo composables register their own mount/unmount lifecycle hooks and must be
 // called synchronously during setup. The auth state is stable for the lifetime
 // of this component, so the conditional calls below are safe.
@@ -101,20 +141,62 @@ if (user) {
                 ...notificationsList.value.slice(0, 4),
             ];
 
-            toast.info(notification.message || 'New notification', {
-                description: notification.subject || undefined,
-                action: notification.ticket_id
-                    ? {
-                          label: 'View Ticket',
-                          onClick: () => {
-                              handleMarkAsRead(notification.id);
-                              router.visit(
-                                  showTicketRoute(notification.ticket_id!),
-                              );
-                          },
-                      }
-                    : undefined,
-            });
+            const storageKey = `notified_${notification.id}`;
+            const alreadyNotified = localStorage.getItem(storageKey);
+
+            if (!alreadyNotified) {
+                localStorage.setItem(storageKey, Date.now().toString());
+                setTimeout(() => {
+                    localStorage.removeItem(storageKey);
+                }, 5000);
+
+                // Show browser/desktop notification only if tab is hidden and no other tab is active
+                if (
+                    'Notification' in window &&
+                    Notification.permission === 'granted' &&
+                    document.visibilityState === 'hidden' &&
+                    !isAnyTabActive()
+                ) {
+                    const desktopNotification = new Notification(
+                        notification.ticket_number || 'New Notification',
+                        {
+                            body: notification.message || '',
+                            icon: '/favicon.ico',
+                        },
+                    );
+
+                    desktopNotification.onclick = () => {
+                        window.focus();
+                        handleMarkAsRead(notification.id);
+
+                        if (notification.ticket_id) {
+                            router.visit(
+                                showTicketRoute(notification.ticket_id),
+                            );
+                        }
+
+                        desktopNotification.close();
+                    };
+                } else {
+                    // Otherwise show standard Sonner toast in the active tab
+                    toast.info(notification.message || 'New notification', {
+                        description: notification.subject || undefined,
+                        action: notification.ticket_id
+                            ? {
+                                  label: 'View Ticket',
+                                  onClick: () => {
+                                      handleMarkAsRead(notification.id);
+                                      router.visit(
+                                          showTicketRoute(
+                                              notification.ticket_id!,
+                                          ),
+                                      );
+                                  },
+                              }
+                            : undefined,
+                    });
+                }
+            }
         },
     );
 }
