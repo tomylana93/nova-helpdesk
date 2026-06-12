@@ -19,6 +19,8 @@ class TicketCategoryOptionResource extends JsonResource
         return [
             'value' => $category->id,
             'label' => $category->name,
+            'parent_id' => $category->parent_id,
+            'parent_name' => $category->parent?->name,
         ];
     }
 }

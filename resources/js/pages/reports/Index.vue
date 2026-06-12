@@ -15,7 +15,9 @@ import {
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -99,6 +101,66 @@ const breakdownGroups = computed(() =>
         segments,
     })),
 );
+
+const groupedCategories = computed(() => {
+    const categories = props.options.categories;
+
+    // 1. Parent categories are those with no parent_id
+    const parents = categories.filter((cat) => !cat.parent_id);
+
+    // 2. Child categories are those with parent_id
+    const children = categories.filter((cat) => cat.parent_id);
+
+    const groups: Array<{
+        isGroup: boolean;
+        label: string;
+        value?: string;
+        items?: Array<{ value: string; label: string }>;
+    }> = [];
+
+    // 3. For each parent, find its children
+    parents.forEach((parent) => {
+        const parentChildren = children.filter(
+            (child) => child.parent_id === parent.value,
+        );
+
+        if (parentChildren.length > 0) {
+            groups.push({
+                isGroup: true,
+                label: parent.label,
+                value: parent.value,
+                items: [
+                    { value: parent.value, label: parent.label },
+                    ...parentChildren.map((c) => ({
+                        value: c.value,
+                        label: c.label,
+                    })),
+                ],
+            });
+        } else {
+            groups.push({
+                isGroup: false,
+                label: parent.label,
+                value: parent.value,
+            });
+        }
+    });
+
+    // 4. Handle children whose parent is not active/not found
+    children.forEach((child) => {
+        const hasParent = parents.some((p) => p.value === child.parent_id);
+
+        if (!hasParent) {
+            groups.push({
+                isGroup: false,
+                label: child.label,
+                value: child.value,
+            });
+        }
+    });
+
+    return groups;
+});
 
 function queryFromFilters(filters: ReportFilters): Record<string, string> {
     const query: Record<string, string> = {
@@ -423,13 +485,24 @@ function optionLabel(options: ReportOption[], value: string | null): string {
                             <SelectItem value="__all">
                                 {{ trans('reports.filters.all') }}
                             </SelectItem>
-                            <SelectItem
-                                v-for="option in options.categories"
-                                :key="option.value"
-                                :value="option.value"
+                            <template
+                                v-for="group in groupedCategories"
+                                :key="group.label"
                             >
-                                {{ option.label }}
-                            </SelectItem>
+                                <SelectGroup v-if="group.isGroup">
+                                    <SelectLabel>{{ group.label }}</SelectLabel>
+                                    <SelectItem
+                                        v-for="item in group.items"
+                                        :key="item.value"
+                                        :value="item.value"
+                                    >
+                                        {{ item.label }}
+                                    </SelectItem>
+                                </SelectGroup>
+                                <SelectItem v-else :value="group.value!">
+                                    {{ group.label }}
+                                </SelectItem>
+                            </template>
                         </SelectContent>
                     </Select>
 
