@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.16.0] - 2026-06-12
+
+### Added
+- feat(reports): add operational reporting exports
+
+### Other Changes
+- Merge pull request #30 from tomylana93/dev
+- docs: update deploy handoff flow
+- Merge pull request #29 from tomylana93/dev
+
 ## [0.15.0] - 2026-06-12
 
 ### Added

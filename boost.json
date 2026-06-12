@@ -23,6 +23,8 @@
         "pest-testing",
         "inertia-vue-development",
         "tailwindcss-development",
+        "echo-vue-development",
+        "echo-development",
         "medialibrary-development",
         "laravel-permission-development",
         "laravel-query-builder",

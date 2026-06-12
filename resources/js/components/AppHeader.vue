@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    BarChart3,
     Database,
     LayoutGrid,
     Menu,
@@ -40,6 +41,7 @@ import { getInitials } from '@/composables/useInitials';
 import { dashboard } from '@/routes';
 import { index as adminMasterDataIndex } from '@/routes/admin/master-data';
 import { index as adminSettingsIndex } from '@/routes/admin/settings';
+import { index as reportsIndex } from '@/routes/reports';
 import { index as ticketsIndex } from '@/routes/tickets';
 import type {
     AuthenticatedSharedPageProps,
@@ -69,6 +71,9 @@ const mainNavItems = computed<NavItem[]>(() => {
         },
         ...(abilities.view_tickets
             ? [{ title: 'Tickets', href: ticketsIndex(), icon: Ticket }]
+            : []),
+        ...(abilities.view_reports
+            ? [{ title: 'Reports', href: reportsIndex(), icon: BarChart3 }]
             : []),
         ...(abilities.manage_settings
             ? [

@@ -84,6 +84,7 @@ function createAgentUser(): User
         AdminPermission::CreateTickets->value,
         AdminPermission::UpdateTickets->value,
         AdminPermission::ManageApprovals->value,
+        AdminPermission::ViewReports->value,
     ];
     foreach ($permissions as $perm) {
         Permission::findOrCreate($perm, 'web');
