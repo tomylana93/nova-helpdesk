@@ -36,9 +36,8 @@
             }
         </style>
 
-        <link rel="icon" href="{{ $siteFaviconAnyUrl ?? '/favicon.ico' }}" sizes="any">
-        <link rel="icon" href="{{ $siteFaviconSvgUrl ?? '/favicon.svg' }}" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="{{ $siteAppleTouchIconUrl ?? '/apple-touch-icon.png' }}">
+        <link rel="icon" href="{{ $siteFaviconAnyUrl ?? '/assets/images/favicon.ico' }}" sizes="any">
+        <link rel="apple-touch-icon" href="{{ $siteAppleTouchIconUrl ?? '/assets/images/apple-touch-icon.png' }}">
 
         @fonts
         <link rel="preconnect" href="https://fonts.bunny.net">

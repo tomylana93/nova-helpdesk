@@ -81,7 +81,7 @@ test('style settings can be updated and applied to runtime', function (): void {
             ->where('branding.icon_alt', '/assets/images/icon_alt.png')
             ->where('branding.logo', '/assets/images/logo.png')
             ->where('branding.logo_alt', '/assets/images/logo_alt.png')
-            ->where('branding.favicon_any', '/favicon.ico'),
+            ->where('branding.favicon_any', '/assets/images/favicon.ico'),
         );
 
     auth()->logout();

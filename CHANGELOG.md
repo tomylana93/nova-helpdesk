@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.1] - 2026-06-12
+
+### Changed & Refactored
+- refactor(style): update favicon fallbacks to custom assets
+
+### Other Changes
+- Merge pull request #27 from tomylana93/dev
+
 ## [0.14.0] - 2026-06-12
 
 ### Added

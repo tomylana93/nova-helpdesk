@@ -161,7 +161,9 @@ if (user) {
                         notification.ticket_number || 'New Notification',
                         {
                             body: notification.message || '',
-                            icon: '/favicon.ico',
+                            icon:
+                                page.props.branding?.favicon ||
+                                '/assets/images/favicon.ico',
                         },
                     );
 
