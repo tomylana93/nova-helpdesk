@@ -85,9 +85,9 @@ class OperationalTicketsExport implements FromQuery, ShouldAutoSize, WithHeading
             $ticket->branch?->name,
             $ticket->department?->name,
             $ticket->category?->name,
-            $ticket->submitted_at->toDateTimeString(),
-            $ticket->resolved_at?->toDateTimeString(),
-            $ticket->resolution_due_at?->toDateTimeString(),
+            $ticket->submitted_at->timezone($this->filters->timezone)->toDateTimeString(),
+            $ticket->resolved_at?->timezone($this->filters->timezone)->toDateTimeString(),
+            $ticket->resolution_due_at?->timezone($this->filters->timezone)->toDateTimeString(),
             $this->slaState($ticket),
         ];
     }

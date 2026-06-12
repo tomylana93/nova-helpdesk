@@ -20,10 +20,16 @@ class ReportFilters
         public readonly ?string $priority,
         public readonly ?string $type,
         public readonly ?string $event,
+        public readonly string $timezone = 'Asia/Jakarta',
     ) {}
 
     public static function fromRequest(Request $request): self
     {
+        $timezone = self::stringOrNull($request->query('timezone')) ?? 'Asia/Jakarta';
+        if (! in_array($timezone, timezone_identifiers_list(), true)) {
+            $timezone = 'Asia/Jakarta';
+        }
+
         return new self(
             DashboardPeriod::fromRequest(
                 is_string($request->query('mode')) ? $request->query('mode') : null,
@@ -38,6 +44,7 @@ class ReportFilters
             self::enumValueOrNull(TicketPriority::class, $request->query('priority')),
             self::enumValueOrNull(TicketType::class, $request->query('type')),
             self::stringOrNull($request->query('event')),
+            $timezone,
         );
     }
 
@@ -56,6 +63,7 @@ class ReportFilters
             'priority' => $this->priority,
             'type' => $this->type,
             'event' => $this->event,
+            'timezone' => $this->timezone,
         ];
     }
 
