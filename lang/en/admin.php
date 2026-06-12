@@ -388,5 +388,85 @@ return [
                 ],
             ],
         ],
+        'asset' => [
+            'index' => [
+                'title' => 'Assets',
+                'heading' => 'Asset Management',
+                'description' => 'Manage company hardware and software assets.',
+            ],
+            'create' => [
+                'title' => 'Create Asset',
+                'heading' => 'Create New Asset',
+                'description' => 'Add a new asset to the inventory.',
+            ],
+            'show' => [
+                'title' => 'Asset Detail',
+                'heading' => 'Asset Detail',
+                'description' => 'View asset information.',
+            ],
+            'edit' => [
+                'title' => 'Edit Asset',
+                'heading' => 'Edit Asset',
+                'description' => 'Update asset information.',
+            ],
+            'label' => [
+                'asset_tag' => 'Asset Tag',
+                'name' => 'Asset Name',
+                'category' => 'Category',
+                'status' => 'Status',
+                'branch' => 'Branch Location',
+                'user' => 'Assignee',
+            ],
+            'placeholder' => [
+                'asset_tag' => 'Enter asset tag (e.g. AST-10001)',
+                'name' => 'Enter asset name (e.g. Laptop Lenovo)',
+                'category' => 'Select category',
+                'status' => 'Select status',
+                'branch' => 'Select branch',
+                'branch_unassigned' => 'None / Storage',
+                'user' => 'Select assignee',
+                'user_unassigned' => 'Unassigned',
+            ],
+            'action' => [
+                'create' => 'Create Asset',
+                'update' => 'Update Asset',
+                'back' => 'Back to Assets',
+                'delete' => 'Delete',
+                'confirm_delete' => 'Are you sure you want to delete this asset?',
+            ],
+            'history' => [
+                'title' => 'Support History',
+                'empty' => 'No tickets associated with this asset.',
+            ],
+            'message' => [
+                'created' => [
+                    'success' => 'Asset created successfully.',
+                ],
+                'updated' => [
+                    'success' => 'Asset updated successfully.',
+                ],
+                'deleted' => [
+                    'success' => 'Asset deleted successfully.',
+                ],
+            ],
+            'validation' => [
+                'user_branch' => 'The selected assignee must belong to the selected branch.',
+            ],
+        ],
+    ],
+    'asset' => [
+        'category' => [
+            'laptop' => 'Laptop',
+            'monitor' => 'Monitor',
+            'device' => 'Mobile Device',
+            'license' => 'Software License',
+            'other' => 'Other',
+        ],
+        'status' => [
+            'in_use' => 'In Use',
+            'in_storage' => 'In Storage',
+            'under_repair' => 'Under Repair',
+            'retired' => 'Retired',
+        ],
     ],
 ];

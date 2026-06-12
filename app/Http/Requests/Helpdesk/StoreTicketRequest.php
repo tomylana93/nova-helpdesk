@@ -36,6 +36,12 @@ class StoreTicketRequest extends FormRequest
                 'uuid',
                 Rule::exists('temporary_uploads', 'id')->where('user_id', $this->user()?->id),
             ],
+            'asset_ids' => ['nullable', 'array'],
+            'asset_ids.*' => [
+                'required',
+                'uuid',
+                Rule::exists('assets', 'id')->where('user_id', $this->user()?->id),
+            ],
         ];
     }
 }

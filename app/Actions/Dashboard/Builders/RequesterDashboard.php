@@ -7,6 +7,8 @@ use App\Actions\Dashboard\Support\Delta;
 use App\Actions\Dashboard\Support\TicketMetricQueries;
 use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
+use App\Http\Resources\AssetResource;
+use App\Models\Asset;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +33,13 @@ class RequesterDashboard
         $resolved = $this->queries->countResolved($scope(), $period->start(), $period->end());
         $resolvedPrev = $this->queries->countResolved($scope(), $period->previousStart(), $period->previousEnd());
 
+        $myAssets = AssetResource::collection(
+            Asset::query()
+                ->with(['branch'])
+                ->where('user_id', $user->id)
+                ->get()
+        )->resolve();
+
         return [
             'live' => [
                 ['key' => 'active', 'value' => $activeCount],
@@ -45,6 +54,7 @@ class RequesterDashboard
                 'points' => $this->queries->trend($scope(), $scope(), $period),
             ],
             'breakdown' => $this->priorityBreakdown($scope()),
+            'myAssets' => $myAssets,
         ];
     }
 

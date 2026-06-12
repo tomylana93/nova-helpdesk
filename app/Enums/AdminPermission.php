@@ -17,4 +17,5 @@ enum AdminPermission: string
     case ManageSlaPolicies = 'manage sla policies';
     case ManageApprovals = 'manage approvals';
     case ViewReports = 'view reports';
+    case ManageAssets = 'manage assets';
 }

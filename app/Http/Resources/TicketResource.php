@@ -67,6 +67,7 @@ class TicketResource extends JsonResource
                 'mime_type' => $attachment->mime_type,
                 'url' => $attachment->url,
             ])->all(),
+            'assets' => AssetResource::collection($this->whenLoaded('assets')),
         ];
     }
 }

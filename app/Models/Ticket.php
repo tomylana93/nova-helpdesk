@@ -9,10 +9,12 @@ use App\Enums\TicketType;
 use Carbon\Carbon;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -41,6 +43,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property User|null $assignee
  * @property TicketCategory|null $category
  * @property TicketApproval|null $approval
+ * @property Collection<int, Asset> $assets
  */
 #[Fillable([
     'type',
@@ -154,6 +157,14 @@ class Ticket extends Model
     public function approval(): HasOne
     {
         return $this->hasOne(TicketApproval::class)->latest();
+    }
+
+    /**
+     * @return BelongsToMany<Asset, $this>
+     */
+    public function assets(): BelongsToMany
+    {
+        return $this->belongsToMany(Asset::class, 'ticket_asset');
     }
 
     /**

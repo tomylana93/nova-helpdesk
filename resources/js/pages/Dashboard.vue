@@ -10,12 +10,13 @@ import {
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
 import { computed } from 'vue';
-
 import BreakdownDonut from '@/components/dashboard/BreakdownDonut.vue';
 import MetricCard from '@/components/dashboard/MetricCard.vue';
 import PeriodControl from '@/components/dashboard/PeriodControl.vue';
 import SlaGauge from '@/components/dashboard/SlaGauge.vue';
 import TrendChart from '@/components/dashboard/TrendChart.vue';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useDashboard } from '@/composables/useDashboard';
 import { dashboard } from '@/routes';
 import type { AuthenticatedSharedPageProps, DashboardProps } from '@/types';
@@ -83,6 +84,67 @@ const metricIcons: Record<string, Component> = {
                     :value="metric.value"
                     :icon="liveIcons[metric.key] ?? Ticket"
                 />
+            </div>
+        </section>
+
+        <!-- Zone: My Assets (For Requesters) -->
+        <section
+            v-if="
+                props.role === 'requester' &&
+                props.myAssets &&
+                props.myAssets.length > 0
+            "
+            class="space-y-3"
+        >
+            <h2
+                class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+            >
+                My Assets
+            </h2>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Card
+                    v-for="asset in props.myAssets"
+                    :key="asset.id"
+                    class="flex flex-col"
+                >
+                    <CardHeader class="pb-2">
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                            >
+                                {{ asset.asset_tag }}
+                            </span>
+                            <Badge
+                                :variant="asset.statusVariant as 'default'"
+                                class="text-[10px] font-medium capitalize"
+                            >
+                                {{ asset.statusLabel }}
+                            </Badge>
+                        </div>
+                        <CardTitle class="mt-1 text-sm font-semibold">
+                            {{ asset.name }}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="text-xs text-muted-foreground">
+                        <div
+                            class="flex justify-between border-b border-border/50 py-1"
+                        >
+                            <span>Category</span>
+                            <span class="font-medium text-foreground">{{
+                                asset.categoryLabel
+                            }}</span>
+                        </div>
+                        <div
+                            v-if="asset.branch"
+                            class="flex justify-between py-1"
+                        >
+                            <span>Location</span>
+                            <span class="font-medium text-foreground">{{
+                                asset.branch.name
+                            }}</span>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </section>
 

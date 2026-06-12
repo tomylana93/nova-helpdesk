@@ -25,6 +25,9 @@ class CreateTicket
         $attachmentUploadIds = $data['attachment_upload_ids'] ?? [];
         unset($data['attachment_upload_ids']);
 
+        $assetIds = $data['asset_ids'] ?? [];
+        unset($data['asset_ids']);
+
         $type = TicketType::from($data['type']);
         $initialStatus = $type === TicketType::ServiceRequest
             ? TicketStatus::PendingApproval
@@ -39,6 +42,10 @@ class CreateTicket
             'requester_id' => $requester->id,
             'status' => $initialStatus,
         ]);
+
+        if (! empty($assetIds)) {
+            $ticket->assets()->sync($assetIds);
+        }
 
         $this->assignSla->handle($ticket);
         $this->recordActivity->handle($ticket, 'created', $requester);

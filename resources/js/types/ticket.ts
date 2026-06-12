@@ -1,4 +1,5 @@
 import type { DataTablePayload } from '@/types';
+import type { Asset } from './asset';
 
 export type TicketStatus =
     | 'open'
@@ -63,6 +64,7 @@ export type Ticket = {
     created_at: string;
     updated_at: string;
     attachments?: TicketAttachment[];
+    assets?: Asset[];
 };
 
 export type TicketTableRow = {

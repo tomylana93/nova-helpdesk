@@ -12,6 +12,7 @@
   - **Queues:** REMOVED in helpdesk refactor Phase 5 (model/controller/actions/table/policy/permission/nav/translations all deleted; `queue_id` dropped from `tickets`+`sla_policies`). See `mem:helpdesk/refactor-plan`.
   - **Ticket Categories:** `TicketCategoryController`, actions `CreateTicketCategory`/`UpdateTicketCategory`, table `TicketCategoryTable`.
   - **SLA Policies:** `SlaPolicyController`, actions `CreateSlaPolicy`/`UpdateSlaPolicy`, table `SlaPolicyTable`.
+  - **Assets:** `AssetController`, actions `CreateAsset`/`UpdateAsset`/`GetAssetFormOptions`, table `AssetTable`, model `Asset`, enums `AssetCategory`/`AssetStatus`, permission `manage assets`. Asset assignee must be active and belong to the selected active branch when a branch is set.
 - User org-context validation (`StoreUserRequest`/`UpdateUserRequest`): `branch_id`+`department_id` REQUIRED when role is `requester` OR `auditor` (method `requiresOrganisation()`); agents/super_admin need neither. Guarantees tickets opened by requesters/auditors inherit org context in `CreateTicket`.
 - Authorization & Permissions (`app/Enums/AdminPermission.php`):
   - Permissions: `manage settings`, `view users`, `create users`, `update users`, `manage branches`, `manage departments`, `manage categories`, `view tickets`, `create tickets`, `update tickets`, `manage sla policies`, `manage approvals`, `view reports`. (`manage queues` removed in Phase 5.)

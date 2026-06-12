@@ -2,6 +2,7 @@
 import { Head, Link, setLayoutProps, usePage } from '@inertiajs/vue3';
 import {
     Building2,
+    Cpu,
     FolderTree,
     Network,
     ShieldCheck,
@@ -15,6 +16,7 @@ import CardFooter from '@/components/ui/card/CardFooter.vue';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { index } from '@/routes/admin/master-data';
+import { index as indexAssets } from '@/routes/admin/master-data/assets';
 import { index as indexBranches } from '@/routes/admin/master-data/branches';
 import { index as indexDepartments } from '@/routes/admin/master-data/departments';
 import { index as indexSlaPolicies } from '@/routes/admin/master-data/sla-policies';
@@ -91,6 +93,15 @@ const masterDataCard = computed<CardItem[]>(() => {
             ),
             href: indexSlaPolicies(),
             icon: ShieldCheck,
+        });
+    }
+
+    if (page.props.auth.abilities.manage_assets) {
+        cards.push({
+            title: trans('admin.master_data.asset.index.title'),
+            description: trans('admin.master_data.asset.index.description'),
+            href: indexAssets(),
+            icon: Cpu,
         });
     }
 

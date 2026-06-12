@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Asset;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\SlaPolicy;
@@ -27,6 +28,7 @@ class ImportMasterDataCommand extends Command
             $this->importDepartments();
             $this->importCategories();
             $this->importSlaPolicies();
+            $this->importAssets();
         });
 
         $this->info('Master data import completed successfully!');
@@ -165,5 +167,36 @@ class ImportMasterDataCommand extends Command
 
         $this->output->progressFinish();
         $this->line('Imported SLA policies: '.count($rows));
+    }
+
+    private function importAssets(): void
+    {
+        $path = database_path('data/assets.csv');
+        if (! file_exists($path)) {
+            return;
+        }
+
+        $rows = $this->parseCsv($path);
+
+        $this->output->progressStart(count($rows));
+
+        foreach ($rows as $row) {
+            $asset = Asset::query()->find($row['id']) ?: new Asset;
+            $asset->forceFill([
+                'id' => $row['id'],
+                'asset_tag' => $row['asset_tag'],
+                'name' => $row['name'],
+                'category' => $row['category'],
+                'status' => $row['status'],
+                'branch_id' => $row['branch_id'] ?: null,
+                'user_id' => $row['user_id'] ?: null,
+                'created_at' => $row['created_at'] ?: null,
+                'updated_at' => $row['updated_at'] ?: null,
+            ])->save();
+            $this->output->progressAdvance();
+        }
+
+        $this->output->progressFinish();
+        $this->line('Imported assets: '.count($rows));
     }
 }
