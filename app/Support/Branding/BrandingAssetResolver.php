@@ -32,10 +32,10 @@ class BrandingAssetResolver
             'icon_alt' => $this->assetUrl($this->styleSettings->site_icon_alt_path, '/assets/images/icon_alt.png'),
             'logo' => $this->assetUrl($this->styleSettings->site_logo_path, '/assets/images/logo.png'),
             'logo_alt' => $this->assetUrl($this->styleSettings->site_logo_alt_path, '/assets/images/logo_alt.png'),
-            'favicon' => $faviconUrl ?? '/favicon.ico',
-            'favicon_any' => $faviconUrl ?? '/favicon.ico',
-            'favicon_svg' => $faviconUrl ?? '/favicon.svg',
-            'apple_touch_icon' => $faviconUrl ?? '/apple-touch-icon.png',
+            'favicon' => $faviconUrl ?? '/assets/images/favicon.ico',
+            'favicon_any' => $faviconUrl ?? '/assets/images/favicon.ico',
+            'favicon_svg' => $faviconUrl ?? '/assets/images/favicon.ico',
+            'apple_touch_icon' => $faviconUrl ?? '/assets/images/apple-touch-icon.png',
         ];
     }
 
