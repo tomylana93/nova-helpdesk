@@ -212,7 +212,9 @@ setLayoutProps({
         </div>
 
         <div class="rounded-lg border bg-card p-6 shadow-sm">
-            <div class="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3">
+            <div
+                class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
                 <div>
                     <p
                         class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
@@ -557,7 +559,7 @@ setLayoutProps({
                         id="comment-visibility"
                         v-model="commentForm.visibility"
                     >
-                        <SelectTrigger class="w-48">
+                        <SelectTrigger class="w-full sm:w-48">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

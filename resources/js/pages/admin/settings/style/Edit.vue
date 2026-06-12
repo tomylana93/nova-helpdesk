@@ -221,7 +221,7 @@ setLayoutProps({
                             type="single"
                             name="site_logo_style"
                             variant="outline"
-                            class="grid w-full grid-cols-2 gap-3"
+                            class="grid w-full grid-cols-1 gap-3 sm:grid-cols-2"
                         >
                             <ToggleGroupItem
                                 v-for="option in logoStyleOptions"

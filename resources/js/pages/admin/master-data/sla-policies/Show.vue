@@ -35,9 +35,11 @@ setLayoutProps({
     <Head :title="trans('admin.master_data.sla_policy.show.title')" />
 
     <div class="mx-auto max-w-2xl space-y-6 p-4 sm:p-6">
-        <div class="flex items-center justify-between">
+        <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
             <h1 class="text-xl font-semibold">{{ slaPolicy.name }}</h1>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 <Button :as="Link" :href="edit(slaPolicy.id)" size="sm">
                     {{ trans('admin.master_data.sla_policy.action.update') }}
                 </Button>
@@ -48,7 +50,7 @@ setLayoutProps({
         </div>
 
         <div class="rounded-lg border bg-card p-6 shadow-sm">
-            <dl class="grid grid-cols-2 gap-x-8 gap-y-4">
+            <dl class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
                 <div>
                     <dt
                         class="text-xs font-medium tracking-wider text-muted-foreground uppercase"

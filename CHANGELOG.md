@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.17.1] - 2026-06-12
+
+### Changed & Refactored
+- refactor(ui): address responsive review findings
+- refactor(ui): responsive settings layouts and pickers
+- refactor(ui): stack detail definition lists on mobile
+- refactor(ui): responsive dashboard period control and gutters
+
+### Other Changes
+- style(ui): prettier reflow after detail list responsive edits
+- docs: add responsive refactor implementation plan
+- docs: add responsive refactor design spec
+- Merge pull request #32 from tomylana93/dev
+
 ## [0.17.0] - 2026-06-12
 
 ### Added

@@ -50,7 +50,7 @@ const metricIcons: Record<string, Component> = {
 </script>
 
 <template>
-    <div class="flex flex-1 flex-col gap-6 p-6">
+    <div class="flex flex-1 flex-col gap-6 p-4 md:p-6">
         <Head title="Dashboard" />
 
         <!-- Header: greeting + period control (design-system aligned, no gradient) -->

@@ -104,7 +104,7 @@ function formatDate(dateString: string): string {
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
                         <span
-                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
                         >
                             {{ trans('admin.master_data.user.label.status') }}
                         </span>
@@ -118,7 +118,7 @@ function formatDate(dateString: string): string {
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
                         <span
-                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
                         >
                             {{ trans('admin.master_data.user.label.role') }}
                         </span>
@@ -138,7 +138,7 @@ function formatDate(dateString: string): string {
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
                         <span
-                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
                         >
                             {{ trans('admin.master_data.user.label.branch') }}
                         </span>
@@ -151,7 +151,7 @@ function formatDate(dateString: string): string {
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
                         <span
-                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
                         >
                             {{
                                 trans('admin.master_data.user.label.department')
@@ -166,7 +166,7 @@ function formatDate(dateString: string): string {
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
                         <span
-                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
                         >
                             {{ trans('user.label.created_at') }}
                         </span>
@@ -179,7 +179,7 @@ function formatDate(dateString: string): string {
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
                         <span
-                            class="min-w-[140px] text-sm font-medium text-muted-foreground"
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
                         >
                             {{ trans('user.label.updated_at') }}
                         </span>

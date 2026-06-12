@@ -224,7 +224,7 @@ function optionLabel(options: ReportOption[], value: string | null): string {
 <template>
     <Head :title="trans('reports.title')" />
 
-    <div class="flex flex-1 flex-col gap-6 p-6">
+    <div class="flex flex-1 flex-col gap-6 p-4 md:p-6">
         <div
             class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"
         >
