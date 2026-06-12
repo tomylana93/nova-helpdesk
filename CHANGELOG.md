@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.18.0] - 2026-06-12
+
+### Added
+- feat(reports): group category filter by parent and fix filter layout
+
+### Other Changes
+- Merge pull request #33 from tomylana93/dev
+
 ## [0.17.1] - 2026-06-12
 
 ### Changed & Refactored
