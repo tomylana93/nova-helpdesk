@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.13.7] - 2026-06-12
+
+### Changed & Refactored
+- refactor(database): Consolidation of SLA and first_responded_at columns into create_tickets_table migration
+
+### Other Changes
+- Merge branch 'dev' into main
+
 ## [0.13.6] - 2026-06-12
 
 ### Other Changes
