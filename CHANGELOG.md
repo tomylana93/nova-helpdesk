@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.0] - 2026-06-12
+
+### Added
+- feat(helpdesk): implement ticket and comment attachments support
+
+### Other Changes
+- docs(repo): clean up stale memory and documentation references
+- Merge pull request #26 from tomylana93/dev
+
 ## [0.13.7] - 2026-06-12
 
 ### Changed & Refactored
