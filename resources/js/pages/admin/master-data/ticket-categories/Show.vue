@@ -99,7 +99,9 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
                             {{
                                 trans(
                                     'admin.master_data.ticket_category.label.name',
@@ -114,7 +116,9 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
                             {{
                                 trans(
                                     'admin.master_data.ticket_category.label.parent',
@@ -129,7 +133,9 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
                             {{
                                 trans(
                                     'admin.master_data.ticket_category.label.description',
@@ -144,7 +150,9 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
                             {{
                                 trans(
                                     'admin.master_data.ticket_category.label.status',
@@ -166,7 +174,9 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
                             {{ trans('user.label.created_at') }}
                         </span>
                         <span class="text-sm">
@@ -177,7 +187,9 @@ function formatDate(dateString: string): string {
                     <div
                         class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
                     >
-                        <span class="text-sm font-medium text-muted-foreground">
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
                             {{ trans('user.label.updated_at') }}
                         </span>
                         <span class="text-sm">

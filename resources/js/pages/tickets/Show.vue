@@ -559,7 +559,7 @@ setLayoutProps({
                         id="comment-visibility"
                         v-model="commentForm.visibility"
                     >
-                        <SelectTrigger class="w-48">
+                        <SelectTrigger class="w-full sm:w-48">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
