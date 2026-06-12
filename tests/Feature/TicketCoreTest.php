@@ -109,7 +109,8 @@ test('it can associate attachments with a ticket', function (): void {
     $ticket = Ticket::factory()->create();
 
     $attachment = TicketAttachment::factory()->create([
-        'ticket_id' => $ticket->id,
+        'attachable_id' => $ticket->id,
+        'attachable_type' => (new Ticket)->getMorphClass(),
         'file_path' => 'attachments/test.pdf',
         'original_name' => 'test.pdf',
         'mime_type' => 'application/pdf',

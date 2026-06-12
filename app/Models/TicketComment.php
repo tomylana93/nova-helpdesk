@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * @property string $ticket_id
@@ -35,6 +36,14 @@ class TicketComment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return MorphMany<TicketAttachment, $this>
+     */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(TicketAttachment::class, 'attachable');
     }
 
     /**

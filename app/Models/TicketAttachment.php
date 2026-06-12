@@ -7,18 +7,20 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * @property string $ticket_id
+ * @property string $attachable_id
+ * @property string $attachable_type
  * @property string $file_path
  * @property string $original_name
  * @property string $mime_type
  * @property int $size
  */
 #[Fillable([
-    'ticket_id',
+    'attachable_id',
+    'attachable_type',
     'file_path',
     'original_name',
     'mime_type',
@@ -29,9 +31,9 @@ class TicketAttachment extends Model
     /** @use HasFactory<TicketAttachmentFactory> */
     use HasFactory, HasUuids;
 
-    public function ticket(): BelongsTo
+    public function attachable(): MorphTo
     {
-        return $this->belongsTo(Ticket::class);
+        return $this->morphTo();
     }
 
     /**

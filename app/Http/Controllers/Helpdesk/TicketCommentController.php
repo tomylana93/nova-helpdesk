@@ -20,6 +20,7 @@ class TicketCommentController extends Controller
             $request->user(),
             $request->validated('body'),
             $request->validated('visibility'),
+            $request->validated('attachment_upload_ids', []),
         );
 
         Inertia::flash('success', trans('helpdesk.comment.message.created.success'));

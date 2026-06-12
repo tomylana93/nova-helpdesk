@@ -14,6 +14,7 @@ class CreateTicket
         private readonly AssignSlaPolicy $assignSla,
         private readonly AssignTicketToAgent $assignAgent,
         private readonly RecordTicketActivity $recordActivity,
+        private readonly AttachUploadedFiles $attachFiles,
     ) {}
 
     /**
@@ -21,6 +22,9 @@ class CreateTicket
      */
     public function handle(array $data, User $requester): Ticket
     {
+        $attachmentUploadIds = $data['attachment_upload_ids'] ?? [];
+        unset($data['attachment_upload_ids']);
+
         $type = TicketType::from($data['type']);
         $initialStatus = $type === TicketType::ServiceRequest
             ? TicketStatus::PendingApproval
@@ -38,6 +42,9 @@ class CreateTicket
 
         $this->assignSla->handle($ticket);
         $this->recordActivity->handle($ticket, 'created', $requester);
+
+        // Promote and attach files
+        $this->attachFiles->handle($ticket, $attachmentUploadIds);
 
         // Notify the requester of their submission.
         $requester->notify(new TicketNotification($ticket, 'created', "Your ticket {$ticket->ticket_number} has been created."));

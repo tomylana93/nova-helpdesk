@@ -40,6 +40,7 @@ return [
             'all_priorities' => 'All Priorities',
             'view' => 'View',
             'actions' => 'Actions',
+            'attachments' => 'Attachments',
         ],
         'view' => [
             'all' => 'All tickets',
@@ -76,6 +77,7 @@ return [
             'department' => 'Select department (optional)',
             'category' => 'Select category',
             'assignee' => 'Select assignee (optional)',
+            'uploader_idle' => 'Drag & drop files here or click to browse',
         ],
         'action' => [
             'create' => 'Submit Ticket',

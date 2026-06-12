@@ -19,7 +19,8 @@ class TicketAttachmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'ticket_id' => Ticket::factory(),
+            'attachable_id' => Ticket::factory(),
+            'attachable_type' => (new Ticket)->getMorphClass(),
             'file_path' => 'attachments/'.fake()->uuid().'.pdf',
             'original_name' => fake()->word().'.pdf',
             'mime_type' => 'application/pdf',

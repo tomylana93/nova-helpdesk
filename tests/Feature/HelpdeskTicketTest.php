@@ -6,10 +6,13 @@ use App\Enums\TicketType;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\SlaPolicy;
+use App\Models\TemporaryUpload;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\User;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
 // --- INDEX ---
@@ -513,4 +516,81 @@ test('sla due dates are computed correctly using submitted_at when creating a ti
         ->and($ticket?->submitted_at)->not->toBeNull()
         ->and($ticket?->first_response_due_at)->not->toBeNull()
         ->and($ticket?->resolution_due_at)->not->toBeNull();
+});
+
+test('requester can submit a ticket with attachments', function (): void {
+    Storage::fake('public');
+
+    $requester = createRequesterUser();
+    $category = TicketCategory::factory()->create();
+
+    $tempUpload = TemporaryUpload::query()->create([
+        'id' => (string) Str::uuid(),
+        'user_id' => $requester->id,
+        'path' => 'temporary-uploads/test.png',
+        'disk' => 'public',
+        'original_name' => 'test.png',
+        'mime_type' => 'image/png',
+        'size' => 1024,
+    ]);
+
+    Storage::disk('public')->put($tempUpload->path, 'dummy content');
+
+    $response = $this
+        ->actingAs($requester)
+        ->post(route('tickets.store'), [
+            'type' => TicketType::Incident->value,
+            'subject' => 'My printer is broken',
+            'description' => 'Cannot print from any device.',
+            'priority' => TicketPriority::Medium->value,
+            'category_id' => $category->id,
+            'attachment_upload_ids' => [$tempUpload->id],
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    $ticket = Ticket::query()->where('subject', 'My printer is broken')->first();
+    expect($ticket)->not->toBeNull()
+        ->and($ticket->attachments)->toHaveCount(1)
+        ->and($ticket->attachments->first()->original_name)->toBe('test.png');
+
+    expect(TemporaryUpload::query()->find($tempUpload->id))->toBeNull();
+    Storage::disk('public')->assertExists($ticket->attachments->first()->file_path);
+});
+
+test('requester can add a comment with attachments', function (): void {
+    Storage::fake('public');
+
+    $requester = createRequesterUser();
+    $ticket = Ticket::factory()->create(['requester_id' => $requester->id]);
+
+    $tempUpload = TemporaryUpload::query()->create([
+        'id' => (string) Str::uuid(),
+        'user_id' => $requester->id,
+        'path' => 'temporary-uploads/comment.png',
+        'disk' => 'public',
+        'original_name' => 'comment.png',
+        'mime_type' => 'image/png',
+        'size' => 1024,
+    ]);
+
+    Storage::disk('public')->put($tempUpload->path, 'dummy content');
+
+    $response = $this
+        ->actingAs($requester)
+        ->post(route('tickets.comments.store', $ticket), [
+            'body' => 'I still have the issue.',
+            'visibility' => 'public',
+            'attachment_upload_ids' => [$tempUpload->id],
+        ]);
+
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    $comment = $ticket->comments()->where('body', 'I still have the issue.')->first();
+    expect($comment)->not->toBeNull()
+        ->and($comment->attachments)->toHaveCount(1)
+        ->and($comment->attachments->first()->original_name)->toBe('comment.png');
+
+    expect(TemporaryUpload::query()->find($tempUpload->id))->toBeNull();
+    Storage::disk('public')->assertExists($comment->attachments->first()->file_path);
 });

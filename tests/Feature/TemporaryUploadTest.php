@@ -62,9 +62,9 @@ test('temporary uploads reject unsupported mime types', function (): void {
         ->actingAs($user)
         ->post(route('temporary-uploads.store'), [
             'file' => UploadedFile::fake()->create(
-                'report.pdf',
+                'run.exe',
                 100,
-                'application/pdf',
+                'application/x-msdownload',
             ),
         ]);
 

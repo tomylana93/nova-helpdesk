@@ -6,6 +6,7 @@ use App\Enums\TicketPriority;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
 use App\Models\Ticket;
+use App\Models\TicketAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -59,6 +60,13 @@ class TicketResource extends JsonResource
             'closed_at' => $ticket->closed_at?->toJSON(),
             'created_at' => $ticket->created_at?->toJSON(),
             'updated_at' => $ticket->updated_at?->toJSON(),
+            'attachments' => $ticket->attachments->map(fn (TicketAttachment $attachment): array => [
+                'id' => $attachment->id,
+                'original_name' => $attachment->original_name,
+                'size' => $attachment->size,
+                'mime_type' => $attachment->mime_type,
+                'url' => $attachment->url,
+            ])->all(),
         ];
     }
 }

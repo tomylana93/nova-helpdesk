@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps, useForm } from '@inertiajs/vue3';
+import { Paperclip } from 'lucide-vue-next';
+import { ref } from 'vue';
 import {
     approve,
     reject,
@@ -10,6 +12,10 @@ import {
     reopen,
     transition,
 } from '@/actions/App/Http/Controllers/Helpdesk/TicketLifecycleController';
+import {
+    store as storeUpload,
+    destroy as destroyUpload,
+} from '@/actions/App/Http/Controllers/TemporaryUploadController';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,10 +29,11 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { Uploader } from '@/components/uploader';
 import { useTrans } from '@/composables/useTrans';
 import { dashboard } from '@/routes';
 import { edit, index, show } from '@/routes/tickets';
-import type { Ticket } from '@/types';
+import type { Ticket, TicketAttachment } from '@/types/ticket';
 
 type Comment = {
     id: string;
@@ -34,6 +41,7 @@ type Comment = {
     visibility: 'public' | 'internal';
     authorName: string;
     createdAt: string | null;
+    attachments: TicketAttachment[];
 };
 
 type TransitionOption = {
@@ -62,10 +70,21 @@ type Props = {
 
 const props = defineProps<Props>();
 
-const commentForm = useForm({
+type CommentFormData = {
+    body: string;
+    visibility: string;
+    attachment_upload_ids: string[];
+};
+
+const commentForm = useForm<CommentFormData>({
     body: '',
     visibility: 'public',
+    attachment_upload_ids: [],
 });
+
+const temporaryUploadUrl = storeUpload().url;
+const deleteTemporaryUploadUrl = (id: string) => destroyUpload(id).url;
+const commentAttachmentUploadIds = ref<string[]>([]);
 
 const approvalForm = useForm({
     decision_note: '',
@@ -79,9 +98,17 @@ const transitionForm = useForm({
 const lifecycleForm = useForm({});
 
 function submitComment(): void {
-    commentForm.submit(storeComment(props.ticket.id), {
-        onSuccess: () => commentForm.reset(),
-    });
+    commentForm
+        .transform((data) => ({
+            ...data,
+            attachment_upload_ids: commentAttachmentUploadIds.value,
+        }))
+        .submit(storeComment(props.ticket.id), {
+            onSuccess: () => {
+                commentForm.reset();
+                commentAttachmentUploadIds.value = [];
+            },
+        });
 }
 
 function submitApprove(): void {
@@ -110,6 +137,19 @@ function submitConfirm(): void {
 }
 
 const { trans } = useTrans();
+
+function formatBytes(bytes: number, decimals = 2) {
+    if (!bytes) {
+        return '0 Bytes';
+    }
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
 
 setLayoutProps({
     breadcrumbs: [
@@ -298,6 +338,38 @@ setLayoutProps({
             <p class="text-sm whitespace-pre-wrap text-muted-foreground">
                 {{ ticket.description }}
             </p>
+
+            <div
+                v-if="ticket.attachments && ticket.attachments.length > 0"
+                class="mt-6 border-t pt-4"
+            >
+                <h3
+                    class="mb-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+                >
+                    {{ trans('helpdesk.ticket.label.attachments') }}
+                </h3>
+                <ul class="divide-y divide-border">
+                    <li
+                        v-for="attachment in ticket.attachments"
+                        :key="attachment.id"
+                        class="flex items-center justify-between py-2 text-sm"
+                    >
+                        <a
+                            :href="attachment.url"
+                            target="_blank"
+                            class="flex items-center gap-2 font-medium text-primary hover:underline"
+                        >
+                            <Paperclip class="h-4 w-4 text-muted-foreground" />
+                            <span class="max-w-[250px] truncate sm:max-w-md">{{
+                                attachment.original_name
+                            }}</span>
+                            <span class="text-xs text-muted-foreground"
+                                >({{ formatBytes(attachment.size) }})</span
+                            >
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- Agent Lifecycle Actions -->
@@ -405,6 +477,40 @@ setLayoutProps({
                         </div>
                     </div>
                     <p class="whitespace-pre-wrap">{{ comment.body }}</p>
+
+                    <div
+                        v-if="
+                            comment.attachments &&
+                            comment.attachments.length > 0
+                        "
+                        class="mt-3 border-t pt-2"
+                    >
+                        <ul class="flex flex-wrap gap-2">
+                            <li
+                                v-for="attachment in comment.attachments"
+                                :key="attachment.id"
+                            >
+                                <a
+                                    :href="attachment.url"
+                                    target="_blank"
+                                    class="flex items-center gap-1.5 rounded border bg-background px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-muted hover:underline"
+                                >
+                                    <Paperclip
+                                        class="h-3 w-3 text-muted-foreground"
+                                    />
+                                    <span class="max-w-[150px] truncate">{{
+                                        attachment.original_name
+                                    }}</span>
+                                    <span
+                                        class="text-[10px] text-muted-foreground"
+                                        >({{
+                                            formatBytes(attachment.size)
+                                        }})</span
+                                    >
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -462,6 +568,34 @@ setLayoutProps({
                             }}</SelectItem>
                         </SelectContent>
                     </Select>
+                </div>
+
+                <div class="grid gap-2">
+                    <Uploader
+                        v-model="commentAttachmentUploadIds"
+                        :upload-url="temporaryUploadUrl"
+                        :delete-url-resolver="deleteTemporaryUploadUrl"
+                        :accepted-file-types="[
+                            'application/pdf',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            'text/csv',
+                            'image/png',
+                            'image/jpeg',
+                            'application/zip',
+                            'application/x-rar-compressed',
+                        ]"
+                        :max-file-size="10 * 1024 * 1024"
+                        :multiple="true"
+                        :label-idle="
+                            trans('helpdesk.ticket.placeholder.uploader_idle')
+                        "
+                    />
+                    <InputError
+                        :message="commentForm.errors.attachment_upload_ids"
+                    />
                 </div>
 
                 <Button
