@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.22.1] - 2026-06-15
+
+### Fixed
+- fix(helpdesk): resolve ticket assets serialization nested data wrapper bug
+
+### Other Changes
+- Merge pull request #40 from tomylana93/dev
+- docs: document immutable release flow
+- Merge pull request #39 from tomylana93/dev
+
 ## [0.22.0] - 2026-06-12
 
 ### Added
