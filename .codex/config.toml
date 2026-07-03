@@ -1,15 +1,14 @@
-[mcp_servers.serena]
-command = "serena"
-args = ["start-mcp-server", "--context=codex", "--project-from-cwd"]
 
-[mcp_servers.shadcn_vue]
+[mcp_servers.serena]
+type = "streamableHttp"
+url = "http://localhost:9121/mcp"
+[mcp_servers.context7]
+command = "pnpm"
+args = ["dlx", "@upstash/context7-mcp"]
+
+[mcp_servers.shadcn]
 command = "pnpm"
 args = ["dlx", "shadcn-vue@latest", "mcp"]
-
-[mcp_servers.playwright]
-command = "npx"
-args = ["@playwright/mcp@latest"]
-env_vars = ["DISPLAY"]
 
 [mcp_servers.laravel-boost]
 command = "php"

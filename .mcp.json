@@ -7,7 +7,18 @@
                 "boost:mcp"
             ]
         },
-        "shadcnVue": {
+        "serena": {
+            "type": "http",
+            "url": "http://localhost:9121/mcp"
+        },
+        "context7": {
+            "command": "pnpm",
+            "args": [
+                "dlx",
+                "@upstash/context7-mcp"
+            ]
+        },
+        "shadcn": {
             "command": "pnpm",
             "args": [
                 "dlx",

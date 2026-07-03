@@ -1,107 +1,249 @@
 <laravel-boost-guidelines>
-=== .ai/agent-context rules ===
+=== .ai/01-serena rules ===
 
-# Agent Context Orchestration
+# Serena MCP
 
-These rules optimize how AI agents should use this project's MCP tools, Serena memories, and domain skills. They augment the default Laravel Boost guidelines.
+The Serena MCP server provides semantic code tools (symbol search, references, precise editing) and a per-project instruction manual.
 
-## Startup Sequence
+## Session Start — Mandatory First Actions
 
-- Activate the Serena project for this repository before code exploration when Serena tools are available.
-- Read Serena's initial instructions once per session before coding tasks.
-- Use `mem:core` as the Serena memory entry point; follow its references only for domains touched by the task.
-- Call Boost `application-info` early in a new session when package/runtime versions matter.
-- Use Boost `search-docs` before code changes that involve Laravel ecosystem packages. Scope by package when the relevant package is known.
+**Before any Bash, Read, grep, or file operation**, call these two in order:
 
-## Tool Routing
+1. `activate_project` — activate the project in Serena.
+2. `initial_instructions` — read the project instruction manual.
 
-- Use Boost `search-docs` for Laravel, Fortify, Inertia, Pest, Tailwind, Wayfinder, Vite, and related ecosystem syntax or behavior.
-- Use Boost `database-schema` before creating or changing migrations, models, relationships, validation tied to persisted fields, or queries.
-- Use Boost `database-query` for read-only database inspection; do not use Tinker for simple SELECT-style checks.
-- Use Boost `browser-logs`, `last-error`, and `read-log-entries` before guessing at frontend/backend runtime failures.
-- Use Boost `get-absolute-url` before sharing a local application URL.
-- Use Serena memories for stable project conventions and architecture; avoid rediscovering facts already stored there.
-- Use Serena symbolic tools for code navigation when editing PHP, Vue, TypeScript, or SCSS; avoid reading entire source files unless necessary.
-- Use shell commands for Artisan, package scripts, git status/diff, and fast text/file search with `rg`.
+Any tool call that is not `activate_project` before these two completes is a rule violation, even if the task looks trivial. There are no exceptions.
 
-## Mandatory Skill Usage
+## Code Navigation — Serena First, grep Never
 
-- Before substantial code, test, frontend, auth, UI, docs, or workflow work, inspect the available project skills and activate every skill whose `description` matches the task.
-- Treat skill `description` frontmatter as the source of truth for activation triggers and exclusions.
-- Do not rely on `AGENTS.md` as a complete skill inventory; project skills may be added, removed, or changed independently.
-- If multiple skills apply, use the minimal set that covers the task and state which ones are being used.
-- If an obvious relevant skill exists but cannot be used, state the reason briefly and continue with the closest fallback.
-- Common project-critical domains that usually have skills include Laravel backend, Fortify/auth, Inertia Vue, Wayfinder route integration, Pest tests, Tailwind UI/layout, shadcn-vue components, and Playwright/browser workflows. This list is a reminder, not the authoritative inventory.
+Use Serena's semantic tools for all code exploration and refactoring. Do **not** use `grep`, `Bash cat`, or `Read` on large files when a symbolic tool covers the same need.
 
-## Skill Inventory Maintenance
+| Need | Use |
+|------|-----|
+| Understand a class/file structure | `get_symbols_overview` or `find_symbol` with `depth` |
+| Find all callers of a function | `find_referencing_symbols` |
+| Find a specific symbol | `find_symbol` |
+| Search by pattern | `search_for_pattern` |
+| Edit a method body | `replace_symbol_body` |
+| Insert code near a symbol | `insert_before_symbol` / `insert_after_symbol` |
 
-- Do not paste full skill contents into `AGENTS.md`; skills remain source-of-truth in their own `SKILL.md` files.
-- When a new project skill is added under `.agents/skills/**/SKILL.md`, make sure its frontmatter `description` has explicit activation triggers and exclusions.
-- Do not maintain a complete skill list in `AGENTS.md`; only add workflow-level reminders for broad domains if they materially improve activation.
-- If a new skill changes the default workflow for implementation, refactor, verification, docs, or memory management, update `.ai/guidelines/agent-context.md` and regenerate `AGENTS.md` with `php artisan boost:install --guidelines --no-interaction`.
-- If a new skill captures a stable project convention that future agents should discover through Serena, update the relevant Serena memory and link it from `mem:core` or another parent memory.
-- After adding or changing project skills, check `git status --short` and verify the expected `SKILL.md`, guideline, and memory changes are included.
+**Concrete examples:**
 
-## Working Pattern
+```
+❌ grep -rn "AppearanceTabs" resources/js
+✅ mcp__serena__find_referencing_symbols("AppearanceTabs")
 
-- Load the minimal relevant skill files and documentation for the task; do not bulk-read every skill.
-- Check sibling files and existing components before introducing new structures.
-- Prefer generated Wayfinder imports from `@/actions` and `@/routes`; do not hand-edit generated Wayfinder files.
-- Prefer feature tests for behavior changes and run the smallest relevant verification command first.
-- After PHP edits, run `vendor/bin/pint --dirty --format agent`.
-- After frontend edits, run the relevant subset of lint, format, type, and build checks.
-- After broad implementations, refactors, or cross-domain changes, prefer `composer run ci:check` before handoff when time permits; otherwise report the focused checks that were run and the skipped broader CI check.
-- If an MCP tool or skill is unavailable in the current client, state the missing capability briefly and use the closest local fallback.
+❌ cat -n FrontendLocaleExporter.php
+✅ mcp__serena__find_symbol("FrontendLocaleExporter", depth=2)
 
-## Implementation And Refactor Flow
+❌ grep -rEln "lang:export|LangExport" app
+✅ mcp__serena__search_for_pattern("lang:export", path="app")
 
-- Intake: restate the requested outcome internally, inspect `git status --short`, and identify whether the task is backend, frontend, auth, route-integration, UI, test, or cross-domain.
-- Context: load `mem:core`, then only the relevant domain memories and skills; use Boost docs before Laravel ecosystem changes.
-- Discovery: inspect existing sibling files, routes, components, tests, and generated Wayfinder boundaries before choosing an approach.
-- Safety: before changing public methods, routes, controller actions, request payloads, component props, or generated types, search references and update all call sites or preserve backward compatibility.
-- Planning: for non-trivial work, decide the smallest coherent change set and the minimum verification commands before editing.
-- Implementation: prefer Laravel generators for new backend artifacts, preserve existing directory conventions, avoid new dependencies without approval, and keep generated files generated.
-- Refactor: preserve behavior unless the user explicitly requests a behavior change; make incremental edits instead of unrelated rewrites.
-- Verification: run focused tests/checks first, run formatters after edits, regenerate/check Wayfinder after route/controller changes, and use `composer run ci:check` for broad or risky changes when time permits.
-- Handoff: report changed files, verification run, and any skipped broader checks or residual risks.
+❌ Read full file to find one method
+✅ mcp__serena__find_symbol("methodName") → read only the body
+```
 
-## Thin Controllers And Actions
+**Exceptions where full `Read` is acceptable:**
+- File is ≤ 100 lines.
+- File is non-code (config, docs, `.env.example`).
+- You genuinely need the entire file (e.g. reading a test to understand full flow).
+- Never re-read a file already read in full in the same session.
 
-- Keep controllers thin: route model binding, authorization, validated input handoff, action invocation, and HTTP/Inertia response composition only.
-- Move business logic out of controller methods when it includes multi-step writes, transactions, branching workflows, external service calls, event dispatching, file/storage operations, complex Eloquent mutations, or logic reused by more than one entry point.
-- For `store`, `update`, and `destroy`, prefer action classes named by intent: `Create{Model}`, `Update{Model}`, and `Delete{Model}` or domain-specific verbs when clearer.
-- Put general application actions under `app/Actions/{Domain}` with namespace `App\Actions\{Domain}`. Keep Fortify-specific actions under `app/Actions/Fortify`.
-- Create action classes with `php artisan make:class Actions/{Domain}/{ActionName} --no-interaction`.
-- Prefer a public `handle(...)` method for application action classes. Use `__invoke()` only when the surrounding codebase already uses invokable actions for that domain or a framework contract requires a specific method.
-- Inject dependencies through the action constructor. Pass request-derived data, route models, and authenticated users as explicit `handle()` arguments.
-- Use Form Requests for validation and authorization where appropriate; pass `$request->validated()` or a documented subset into the action instead of the whole request unless the action explicitly needs request services.
-- Keep transactions inside the action when the action owns the write consistency boundary.
-- Return domain results from actions, such as models, DTO-like arrays, or value objects. Let controllers decide redirects, Inertia responses, status codes, and flash messages.
-- Avoid moving simple one-line persistence into an action unless it improves reuse, testability, or keeps a controller method consistently thin with nearby methods.
-- Test behavior through feature tests first. Add focused unit tests for actions only when the action has complex branching or is reused independently from HTTP.
+## Fallback (Serena MCP not connected)
 
-## Serena Memory Management
+Say so explicitly in the evidence block, then fall back to ripgrep/Read — but still read only the symbols you need. Do not slurp whole files or rewrite files wholesale.
 
-- Use `mem:core` as the entry point and only follow memory references relevant to the current task.
-- Read `mem:memory_maintenance` before adding, renaming, or restructuring Serena memories.
-- Add or update memories only for stable, non-obvious project facts that would prevent future rediscovery.
-- Do not store task-local notes, temporary debugging observations, volatile line-level details, generic framework knowledge, secrets, credentials, or user-private data.
-- Keep memories dense and operational: terse bullets, durable invariants, paths or commands only when they are stable.
-- Prefer updating an existing domain memory over creating a new one unless the topic needs its own reusable entry point.
-- When adding a new memory, link it from an appropriate parent memory using the `mem:` prefix so future agents can discover it.
-- If implementation changes invalidate an existing memory, update the memory in the same task before handoff.
+> **Model note:** Claude Code (Opus 4.8) and Codex CLI (GPT-5.5) have a `serena-hooks` SessionStart/PreToolUse reminder, but a reminder is **not a guarantee** — prior sessions ran Bash before `activate_project` even with hooks active. Follow these rules from the text, not from the hook. **Antigravity (Gemini 3.5 Flash) has no compatible session-start hook**, so it must comply purely from this text; its sessions warrant the closest developer review.
 
-## Project Docs And Task Tracking
+=== .ai/02-ai-workflow rules ===
 
-- Do not create documentation files unless the user explicitly requests them, but if `docs/PRD.md`, `docs/TASKS.md`, or similar project docs already exist, read the relevant sections during intake for feature, refactor, or planning work.
-- Treat user instructions in the current conversation as higher priority than stale docs. When docs conflict with the user's request, follow the user and update the affected doc if the user asked for doc maintenance or if the doc is part of the active task workflow.
-- Treat `docs/PRD.md` as product intent and acceptance criteria, not as implementation truth. If implementation or user direction makes PRD content stale, mark or update the smallest affected section rather than rewriting unrelated content.
-- Treat `docs/TASKS.md` as an execution checklist. Only check off a task after the implementation is complete, relevant verification has passed, and the result is stable enough to hand off.
-- Do not check off tasks for partial work, unverified behavior, skipped blockers, or changes that still require user confirmation.
-- When a checklist item is blocked or superseded, annotate it briefly instead of marking it complete.
-- Keep task doc edits minimal and traceable: update only the relevant checklist lines, status notes, or acceptance criteria touched by the work.
-- If docs mention behavior that no longer matches code, verify against code/tests before changing either side; do not assume the docs are current.
-- Do not duplicate PRD/TASKS details into Serena memories unless they have become stable, non-obvious project conventions that future agents need outside the task context.
+# AI Agent Workflow (Developer-Directed, Two-Path)
+
+This project balances rapid progress with the developer's understanding of the architecture. The developer acts as the director, reviewing designs, raising constraints, and interviewing the AI (via `/grill-me`) on the plan. The AI agent performs all implementation and testing, ensuring they follow the approved design and explaining decisions concisely. Three agents run this project, all first-class and sharing these rules via `AGENTS.md`/`CLAUDE.md`: Claude Code (Opus 4.8), Codex CLI (GPT-5.5), and Antigravity (Gemini 3.5 Flash). Match the task to the model: reserve the Deep (architectural) path for the stronger reasoning models (Opus 4.8, GPT-5.5). Keep the fast model (Gemini 3.5 Flash) on Routine, tightly-scoped tasks (single-file CRUD, copy/format tweaks); when a fast-model task turns out to be Deep, it must stop and escalate to the developer rather than improvise an architectural change.
+
+## Step 0 — Triage every task
+
+At the start of each task, output exactly one of these lines and then **stop**:
+
+> `Step 0 — Deep: [one-line reason]. Awaiting your confirmation before proceeding.`
+> `Step 0 — Routine: [one-line reason]. Awaiting your confirmation before proceeding.`
+
+Do **not** run any tool, read any file, or write any code until the developer replies. The only exception is a single-word correction or typo fix where the scope is unambiguous — in that case state the triage inline and continue.
+
+When in doubt, default to Deep.
+
+- **Deep (architectural)** if any: introduces a new TMS domain concept (Shipment, Vehicle, Route, Order…) or a relation between them; is expensive to reverse (new migration/schema, module boundary, Inertia↔Vue pattern, auth/authorization); or the developer hasn't done it before in this stack.
+- **Routine** if all: follows an existing repo pattern (similar CRUD, add column, shadcn component); reversible and local.
+
+## Mandatory Tool Evidence
+
+The compliance contract is **visible and in order**. After developer confirmation and Serena activation, post this block before touching any file:
+
+```
+---
+Pre-flight:
+- Classification: [Deep/Routine] — [reason]
+- Serena: activated ✓ | initial_instructions read ✓  (or: unavailable — fallback: …)
+- Memories: [mem:name] read  (or: not needed — [reason])
+- Docs: search-docs used ✓  (or: not needed — [reason])
+- Context7: used ✓  (or: not needed — [reason])
+- Skills: [skill-name] read ✓  (or: not applicable — [reason])
+- UI: @/components/ui checked ✓  (or: no UI involved)
+---
+```
+
+No Bash, Read, Edit, or Write call may appear before this block (Serena `activate_project` and `initial_instructions` are the only allowed prior calls). Missing block = non-compliant session.
+
+If a required MCP/tool is unavailable, stop and report the unavailable tool plus the documented fallback before proceeding.
+
+## Agent Model Boundaries
+
+- **Claude Code CLI (Opus 4.8):** allowed for Deep and Routine work.
+- **Codex CLI (GPT-5.5):** allowed for Deep and Routine work.
+- **Antigravity CLI (Gemini 3.5 Flash):** Routine only. If the task touches schema, auth/authorization, new dependencies, new TMS domain concepts, module boundaries, or new frontend/backend patterns, stop and ask the developer to reroute to Claude Code or Codex.
+
+## Deep path (AI writes; developer directs)
+
+1. `brainstorming` skill → explore intent and alternatives.
+2. `writing-plans` skill → written plan. Developer reviews and uses `/grill-me` to stress-test the design.
+3. Once the plan is approved, the AI executes: TDD test-first (AI writes the tests, then the implementation in one turn, verifying they pass/GREEN).
+4. AI automatically captures each architectural decision as one short Serena memory ("why X, not Y").
+
+## Routine path (AI writes; stays tested)
+
+- Brief discussion, then AI writes test-first + full implementation, explaining the "why" concisely. Domain skills (laravel-best-practices, inertia-vue, wayfinder, fortify, pest, tailwind) apply automatically.
+
+## Always
+
+- TDD test-first is the default loop on both paths. Test-after is only acceptable when the developer explicitly labels the task as a "spike" or "throwaway" — the AI must never self-classify to skip tests.
+- Code navigation via Serena symbolic tools; library docs via Context7 MCP; Vue UI via shadcn MCP.
+
+## Finishing a task — gate before committing to `dev`
+
+Run every step in order. Do not skip. Post the checklist in your reply before committing.
+
+```
+Finishing gate:
+[ ] vendor/bin/pint --dirty --format agent          (always)
+[ ] pnpm run lint   (eslint --fix)                  (always)
+[ ] pnpm run format (prettier --write)              (always)
+[ ] php artisan wayfinder:generate                  (if any route file, controller, or action changed)
+[ ] composer ci:check → GREEN                       (always; inner loop uses --filter, this is the outer gate)
+[ ] Memory written: [mem:name]  or  not needed: [reason]
+[ ] Code review run  or  skipped: [reason]
+[ ] Commit requested by developer: yes / no
+```
+
+**Wayfinder trigger — run `wayfinder:generate` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
+
+**On ci:check failure:** re-run auto-fix for format/lint issues; for logic failures (test/phpstan/types) use `systematic-debugging` skill and re-run, but **stop and report** after ~2–3 unsuccessful rounds or if the fix touches a Deep-path decision — never loop blindly. See `mem:task_completion` for the exact command list.
+
+**Memory upkeep threshold:** write or update a Serena memory only if the task produced something durable — a new TMS domain concept/decision, a changed convention, or changed tooling. Most routine tasks produce no memory. If memories were deleted/renamed, consider `serena memories check`. Follow `mem:memory_maintenance`.
+
+**Commit rule:** commit directly to `dev` only when the developer explicitly asks. Never auto-push to `main`. CI runs on push. `dev` → `main` for releases only.
+
+## Releases & versioning
+
+- **SemVer `0.x`** (pre-1.0). release-please drives changelog + version bumps from conventional commits. Source of truth = git tags / GitHub Releases; `config/version.php` mirrors it (auto-bumped — never edit by hand).
+- **Conventional commits matter** (they feed release-please): `feat:` → minor, `fix:`/`perf:` → patch, `feat!:`/`BREAKING CHANGE:` → minor while `0.x`. `chore:`/`ci:`/`test:`/`style:` are hidden from the changelog.
+- **Pre-release on `dev`**: pushing to `dev` makes release-please maintain a release-candidate PR; merging it tags `X.Y.Z-rc.N` (GitHub pre-release).
+- **Stable on `main`**: promote via a `dev` → `main` PR (required checks `ci` + `quality` must pass — `main` is protected). After merge, release-please opens a metadata-only release PR on `main`; merging it tags stable `X.Y.Z` + GitHub Release.
+- `main` is protected (ruleset): PR required, no direct/force push. The release-please PR only bumps version/changelog, so merging it via admin bypass is acceptable; real code review happens on the `dev` → `main` PR.
+
+=== .ai/03-mcp-routing rules ===
+
+# AI Agent Workflow (Developer-Directed, Two-Path)
+
+This project balances rapid progress with the developer's understanding of the architecture. The developer acts as the director, reviewing designs, raising constraints, and interviewing the AI (via `/grill-me`) on the plan. The AI agent performs all implementation and testing, ensuring they follow the approved design and explaining decisions concisely. Three agents run this project, all first-class and sharing these rules via `AGENTS.md`/`CLAUDE.md`: Claude Code (Opus 4.8), Codex CLI (GPT-5.5), and Antigravity (Gemini 3.5 Flash). Match the task to the model: reserve the Deep (architectural) path for the stronger reasoning models (Opus 4.8, GPT-5.5). Keep the fast model (Gemini 3.5 Flash) on Routine, tightly-scoped tasks (single-file CRUD, copy/format tweaks); when a fast-model task turns out to be Deep, it must stop and escalate to the developer rather than improvise an architectural change.
+
+## Step 0 — Triage every task
+
+At the start of each task, output exactly one of these lines and then **stop**:
+
+> `Step 0 — Deep: [one-line reason]. Awaiting your confirmation before proceeding.`
+> `Step 0 — Routine: [one-line reason]. Awaiting your confirmation before proceeding.`
+
+Do **not** run any tool, read any file, or write any code until the developer replies. The only exception is a single-word correction or typo fix where the scope is unambiguous — in that case state the triage inline and continue.
+
+When in doubt, default to Deep.
+
+- **Deep (architectural)** if any: introduces a new TMS domain concept (Shipment, Vehicle, Route, Order…) or a relation between them; is expensive to reverse (new migration/schema, module boundary, Inertia↔Vue pattern, auth/authorization); or the developer hasn't done it before in this stack.
+- **Routine** if all: follows an existing repo pattern (similar CRUD, add column, shadcn component); reversible and local.
+
+## Mandatory Tool Evidence
+
+The compliance contract is **visible and in order**. After developer confirmation and Serena activation, post this block before touching any file:
+
+```
+---
+Pre-flight:
+- Classification: [Deep/Routine] — [reason]
+- Serena: activated ✓ | initial_instructions read ✓  (or: unavailable — fallback: …)
+- Memories: [mem:name] read  (or: not needed — [reason])
+- Docs: search-docs used ✓  (or: not needed — [reason])
+- Context7: used ✓  (or: not needed — [reason])
+- Skills: [skill-name] read ✓  (or: not applicable — [reason])
+- UI: @/components/ui checked ✓  (or: no UI involved)
+---
+```
+
+No Bash, Read, Edit, or Write call may appear before this block (Serena `activate_project` and `initial_instructions` are the only allowed prior calls). Missing block = non-compliant session.
+
+If a required MCP/tool is unavailable, stop and report the unavailable tool plus the documented fallback before proceeding.
+
+## Agent Model Boundaries
+
+- **Claude Code CLI (Opus 4.8):** allowed for Deep and Routine work.
+- **Codex CLI (GPT-5.5):** allowed for Deep and Routine work.
+- **Antigravity CLI (Gemini 3.5 Flash):** Routine only. If the task touches schema, auth/authorization, new dependencies, new TMS domain concepts, module boundaries, or new frontend/backend patterns, stop and ask the developer to reroute to Claude Code or Codex.
+
+## Deep path (AI writes; developer directs)
+
+1. `brainstorming` skill → explore intent and alternatives.
+2. `writing-plans` skill → written plan. Developer reviews and uses `/grill-me` to stress-test the design.
+3. Once the plan is approved, the AI executes: TDD test-first (AI writes the tests, then the implementation in one turn, verifying they pass/GREEN).
+4. AI automatically captures each architectural decision as one short Serena memory ("why X, not Y").
+
+## Routine path (AI writes; stays tested)
+
+- Brief discussion, then AI writes test-first + full implementation, explaining the "why" concisely. Domain skills (laravel-best-practices, inertia-vue, wayfinder, fortify, pest, tailwind) apply automatically.
+
+## Always
+
+- TDD test-first is the default loop on both paths. Test-after is only acceptable when the developer explicitly labels the task as a "spike" or "throwaway" — the AI must never self-classify to skip tests.
+- Code navigation via Serena symbolic tools; library docs via Context7 MCP; Vue UI via shadcn MCP.
+
+## Finishing a task — gate before committing to `dev`
+
+Run every step in order. Do not skip. Post the checklist in your reply before committing.
+
+```
+Finishing gate:
+[ ] vendor/bin/pint --dirty --format agent          (always)
+[ ] pnpm run lint   (eslint --fix)                  (always)
+[ ] pnpm run format (prettier --write)              (always)
+[ ] php artisan wayfinder:generate                  (if any route file, controller, or action changed)
+[ ] composer ci:check → GREEN                       (always; inner loop uses --filter, this is the outer gate)
+[ ] Memory written: [mem:name]  or  not needed: [reason]
+[ ] Code review run  or  skipped: [reason]
+[ ] Commit requested by developer: yes / no
+```
+
+**Wayfinder trigger — run `wayfinder:generate` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
+
+**On ci:check failure:** re-run auto-fix for format/lint issues; for logic failures (test/phpstan/types) use `systematic-debugging` skill and re-run, but **stop and report** after ~2–3 unsuccessful rounds or if the fix touches a Deep-path decision — never loop blindly. See `mem:task_completion` for the exact command list.
+
+**Memory upkeep threshold:** write or update a Serena memory only if the task produced something durable — a new TMS domain concept/decision, a changed convention, or changed tooling. Most routine tasks produce no memory. If memories were deleted/renamed, consider `serena memories check`. Follow `mem:memory_maintenance`.
+
+**Commit rule:** commit directly to `dev` only when the developer explicitly asks. Never auto-push to `main`. CI runs on push. `dev` → `main` for releases only.
+
+## Releases & versioning
+
+- **SemVer `0.x`** (pre-1.0). release-please drives changelog + version bumps from conventional commits. Source of truth = git tags / GitHub Releases; `config/version.php` mirrors it (auto-bumped — never edit by hand).
+- **Conventional commits matter** (they feed release-please): `feat:` → minor, `fix:`/`perf:` → patch, `feat!:`/`BREAKING CHANGE:` → minor while `0.x`. `chore:`/`ci:`/`test:`/`style:` are hidden from the changelog.
+- **Pre-release on `dev`**: pushing to `dev` makes release-please maintain a release-candidate PR; merging it tags `X.Y.Z-rc.N` (GitHub pre-release).
+- **Stable on `main`**: promote via a `dev` → `main` PR (required checks `ci` + `quality` must pass — `main` is protected). After merge, release-please opens a metadata-only release PR on `main`; merging it tags stable `X.Y.Z` + GitHub Release.
+- `main` is protected (ruleset): PR required, no direct/force push. The release-please PR only bumps version/changelog, so merging it via admin bypass is acceptable; real code review happens on the `dev` → `main` PR.
 
 === foundation rules ===
 

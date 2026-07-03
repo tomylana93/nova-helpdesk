@@ -1,32 +1,30 @@
 {
-  "mcpServers": {
-    "laravel-boost": {
-      "command": "php",
-      "args": [
-        "/home/tomylana93/projects/nova-helpdesk/artisan",
-        "boost:mcp"
-      ]
-    },
-    "serena": {
-      "command": "serena",
-      "args": [
-        "start-mcp-server",
-        "--context=antigravity"
-      ]
-    },
-    "shadcn-vue": {
-      "command": "pnpm",
-      "args": [
-        "dlx",
-        "shadcn-vue@latest",
-        "mcp"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ]
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": [
+                "artisan",
+                "boost:mcp"
+            ]
+        },
+        "serena": {
+            "type": "streamableHttp",
+            "url": "http://localhost:9121/mcp"
+        },
+        "context7": {
+            "command": "pnpm",
+            "args": [
+                "dlx",
+                "@upstash/context7-mcp"
+            ]
+        },
+        "shadcn": {
+            "command": "pnpm",
+            "args": [
+                "dlx",
+                "shadcn-vue@latest",
+                "mcp"
+            ]
+        }
     }
-  }
 }
