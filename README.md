@@ -86,6 +86,26 @@ composer run dev
 
 Version bumps are handled by Release Please from Conventional Commits. Pushes to `dev` maintain release-candidate PRs, and pushes to `main` maintain stable release PRs. The application reads the current version from `config/version.php`.
 
+### Deployment
+
+Production is deployed **locally**, from an exact stable release tag — never from GitHub Actions and never from RC/`dev` state. GitHub Actions is responsible only for CI and Release Please metadata/tags.
+
+Infra targets (SSH host, paths, Reverb host) are not baked into the tracked script. Copy `.env.deploy.example` to `.env.deploy` (git-ignored) once and fill in your values:
+
+```bash
+cp .env.deploy.example .env.deploy   # first time only; edit DEPLOY_HOST, DEPLOY_ROOT, REVERB_HOST
+```
+
+```bash
+git fetch origin --prune --tags
+git checkout main && git pull --ff-only origin main
+git checkout vX.Y.Z          # exact stable tag (no -rc)
+composer ci:check            # optional local gate
+./deploy.sh vX.Y.Z
+```
+
+`deploy.sh` refuses to run unless the working tree is clean, the tag is a stable `vX.Y.Z` (RC tags rejected), `HEAD` is exactly that tag's commit, and `config/version.php` matches. It builds assets locally, uploads a `vX.Y.Z-<hash>` release via rsync, then runs remote Composer/migrations/role-sync/cache/symlink/prune and restarts the Reverb + queue workers. Production secrets live only in the server-provisioned `/srv/nova-helpdesk/shared/.env`; the deploy script never creates that file and never writes DB credentials or other secrets into it (it fails clearly if the file is missing). The only value it may write is a generated `APP_KEY`, and only when one is absent on first deploy.
+
 ---
 
 ## 👥 Personas & Roles
