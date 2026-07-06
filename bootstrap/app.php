@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureActiveUser;
+use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetApplicationLocale;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetApplicationLocale::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            EnsurePasswordChanged::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

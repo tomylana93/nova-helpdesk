@@ -40,7 +40,7 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request, CreateUser $createUser): RedirectResponse
     {
-        $createUser->handle($request->validated());
+        $createUser->handle($request->userData());
 
         Inertia::flash('success', trans('admin.master_data.user.message.created.success'));
 
@@ -72,7 +72,7 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        $updateUser->handle($user, $request->validated());
+        $updateUser->handle($user, $request->userData());
 
         Inertia::flash('success', trans('admin.master_data.user.message.updated.success'));
 

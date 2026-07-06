@@ -59,4 +59,18 @@ return [
         ],
     ],
 
+    'force_password' => [
+        'title' => 'Change password',
+        'label' => [
+            'password' => 'New password',
+            'password_confirmation' => 'Confirm new password',
+        ],
+        'action' => [
+            'submit' => 'Change password',
+        ],
+        'message' => [
+            'success' => 'Your password has been changed.',
+        ],
+    ],
+
 ];

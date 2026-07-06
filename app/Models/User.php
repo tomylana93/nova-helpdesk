@@ -23,6 +23,7 @@ use Spatie\Permission\Traits\HasRoles;
 #[Appends(['avatar'])]
 /**
  * @property UserStatus $status
+ * @property bool $must_change_password
  * @property Branch|null $branch
  * @property Department|null $department
  */
@@ -43,6 +44,8 @@ class User extends Authenticatable implements HasMedia
 
     /**
      * Get the user's avatar URL.
+     *
+     * @return Attribute<string|null, never>
      */
     protected function avatar(): Attribute
     {
@@ -94,6 +97,7 @@ class User extends Authenticatable implements HasMedia
     protected function casts(): array
     {
         return [
+            'must_change_password' => 'boolean',
             'password' => 'hashed',
             'status' => UserStatus::class,
         ];

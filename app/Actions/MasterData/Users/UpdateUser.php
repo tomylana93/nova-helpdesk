@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 
 class UpdateUser
 {
+    /**
+     * @param  array{name?: string, email?: string, status?: string, role: string, branch_id?: string|null, department_id?: string|null}  $data
+     */
     public function handle(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data): User {

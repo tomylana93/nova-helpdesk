@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ForcedPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Reports\ReportController;
@@ -25,6 +26,12 @@ Route::middleware(['auth', 'active'])->group(function () {
         ->middleware('throttle:temporary-uploads')
         ->name('temporary-uploads.store');
     Route::delete('temporary-uploads/{temporaryUpload}', [TemporaryUploadController::class, 'destroy'])->name('temporary-uploads.destroy');
+
+    Route::get('force-password', [ForcedPasswordController::class, 'edit'])
+        ->name('password.force.edit');
+    Route::put('force-password', [ForcedPasswordController::class, 'update'])
+        ->middleware('throttle:6,1')
+        ->name('password.force.update');
 
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');

@@ -35,6 +35,7 @@ test('admin users can be created with active status by default', function (): vo
 
     expect($createdUser)->not->toBeNull();
     expect($createdUser?->status)->toBe(UserStatus::Active);
+    expect($createdUser?->must_change_password)->toBeTrue();
     expect(Hash::check(app(PasswordSettings::class)->default_user_password, (string) $createdUser?->password))->toBeTrue();
     expect($createdUser?->getRoleNames()->all())->toBe([UserRole::ItAgent->value]);
     expect($createdUser?->branch_id)->toBe($branch->id);
@@ -116,6 +117,42 @@ test('role is required when creating admin users', function (): void {
     $response
         ->assertSessionHasErrors('role')
         ->assertRedirect(route('admin.master-data.users.create'));
+});
+
+test('admin users cannot create another super admin once one exists', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+
+    $response = $this
+        ->actingAs($actor)
+        ->from(route('admin.master-data.users.create'))
+        ->post(route('admin.master-data.users.store'), [
+            'name' => 'Second Super Admin',
+            'email' => 'second-super-admin@example.test',
+            'role' => UserRole::SuperAdmin->value,
+        ]);
+
+    $response
+        ->assertSessionHasErrors('role')
+        ->assertRedirect(route('admin.master-data.users.create'));
+});
+
+test('existing super admin must remain active and assigned to super admin role', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+
+    $response = $this
+        ->actingAs($actor)
+        ->from(route('admin.master-data.users.edit', $actor))
+        ->put(route('admin.master-data.users.update', $actor), [
+            'name' => $actor->name,
+            'email' => $actor->email,
+            'status' => UserStatus::Suspend->value,
+            'role' => UserRole::ItAgent->value,
+        ]);
+
+    $response
+        ->assertSessionHasErrors(['role', 'status'])
+        ->assertRedirect(route('admin.master-data.users.edit', $actor));
 });
 
 test('role is required when updating admin users', function (): void {
