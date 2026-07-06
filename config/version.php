@@ -12,5 +12,5 @@ return [
     | Do not edit by hand. Read it anywhere via config('version.app').
     |
     */
-    'app' => '0.23.1', // x-release-please-version
+    'app' => '0.23.2-rc', // x-release-please-version
 ];
