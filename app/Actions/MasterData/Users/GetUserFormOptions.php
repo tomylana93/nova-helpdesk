@@ -15,21 +15,21 @@ class GetUserFormOptions
      */
     public function handle(): array
     {
-        $branchOptions = Branch::query()
+        $branchOptions = array_values(Branch::query()
             ->where('status', GeneralStatus::Active)
             ->orderBy('name')
             ->get(['id', 'name'])
             ->mapInto(BranchOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
 
-        $departmentOptions = Department::query()
+        $departmentOptions = array_values(Department::query()
             ->where('status', GeneralStatus::Active)
             ->orderBy('name')
             ->get(['id', 'name', 'branch_id'])
             ->mapInto(DepartmentOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
 
         return ['branchOptions' => $branchOptions, 'departmentOptions' => $departmentOptions];
     }

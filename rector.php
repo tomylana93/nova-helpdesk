@@ -11,6 +11,10 @@ use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Php85\Rector\Property\AddOverrideAttributeToOverriddenPropertiesRector;
 use Rector\Renaming\Rector\ClassConstFetch\RenameClassConstFetchRector;
+use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
+use Rector\TypeDeclaration\Rector\Closure\AddClosureVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
+use Rector\TypeDeclaration\Rector\Function_\AddFunctionVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use RectorLaravel\Rector\FuncCall\AppToResolveRector;
 use RectorLaravel\Set\LaravelSetList;
@@ -50,6 +54,10 @@ return RectorConfig::configure()
         SeparateMultiUseImportsRector::class,
         NullToStrictStringFuncCallArgRector::class,
         AppToResolveRector::class,
+        AddClosureVoidReturnTypeWhereNoReturnRector::class,
+        ClosureReturnTypeRector::class,
+        AddArrowFunctionReturnTypeRector::class,
+        AddFunctionVoidReturnTypeWhereNoReturnRector::class,
     ])
     ->withPreparedSets(
         deadCode: true,

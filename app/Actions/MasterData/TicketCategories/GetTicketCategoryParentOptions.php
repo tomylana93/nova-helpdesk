@@ -13,7 +13,7 @@ class GetTicketCategoryParentOptions
      */
     public function handle(?string $excludeId = null): array
     {
-        return TicketCategory::query()
+        return array_values(TicketCategory::query()
             ->whereNull('parent_id')
             ->where('status', GeneralStatus::Active)
             ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
@@ -21,6 +21,6 @@ class GetTicketCategoryParentOptions
             ->get(['id', 'name'])
             ->mapInto(TicketCategoryOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
     }
 }

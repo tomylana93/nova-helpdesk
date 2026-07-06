@@ -18,7 +18,10 @@ class SlaPolicyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true).' SLA',
+            'name' => str($this->faker->word().' '.$this->faker->word().' '.$this->faker->word())
+                ->title()
+                ->append(' SLA')
+                ->toString(),
             'ticket_type' => $this->faker->optional()->randomElement(['incident', 'service_request']),
             'priority' => $this->faker->randomElement(['low', 'medium', 'high', 'critical']),
             'first_response_target_minutes' => $this->faker->randomElement([30, 60, 120, 240]),

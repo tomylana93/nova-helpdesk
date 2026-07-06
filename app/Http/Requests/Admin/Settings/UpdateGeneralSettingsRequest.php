@@ -28,4 +28,18 @@ class UpdateGeneralSettingsRequest extends FormRequest
             'site_locale' => ['required', Rule::enum(SiteLocale::class)],
         ];
     }
+
+    /**
+     * @return array{site_name: string, site_description?: string|null, site_locale: string}
+     */
+    public function settingsData(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'site_name' => (string) $validated['site_name'],
+            'site_description' => isset($validated['site_description']) ? (string) $validated['site_description'] : null,
+            'site_locale' => (string) $validated['site_locale'],
+        ];
+    }
 }

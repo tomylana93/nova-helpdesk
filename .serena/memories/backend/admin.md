@@ -6,7 +6,7 @@
   - Actions: `app/Actions/Settings/UpdateGeneralSettings`, `UpdateStyleSettings`, `UpdatePasswordSettings`.
   - Settings classes (`app/Settings/*`): `GeneralSettings` (site_name, site_description, site_locale), `StyleSettings` (theme, font, layout, auth_layout, logo_style, asset paths), `PasswordSettings` (default_user_password, encrypted).
 - Master data under `admin/master-data` (`admin/master-data/Index` page):
-  - **Users:** `UserController`, actions `CreateUser`/`UpdateUser`, table `UserTable` (`app/Tables/MasterData/UserTable`).
+  - **Users:** `UserController`, actions `CreateUser`/`UpdateUser`, table `UserTable` (`app/Tables/MasterData/UserTable`). Admin-created users are active, receive `PasswordSettings.default_user_password`, and must change password on first access (`must_change_password=true`). `StoreUserRequest`/`UpdateUserRequest` use `UserRoleRules` to prevent a second `super_admin`; an existing super_admin must remain active and assigned to `super_admin`.
   - **Branches:** `BranchController`, actions `CreateBranch`/`UpdateBranch`, table `BranchTable`.
   - **Departments:** `DepartmentController`, actions `CreateDepartment`/`UpdateDepartment`, table `DepartmentTable`.
   - **Queues:** REMOVED in helpdesk refactor Phase 5 (model/controller/actions/table/policy/permission/nav/translations all deleted; `queue_id` dropped from `tickets`+`sla_policies`). See `mem:helpdesk/refactor-plan`.

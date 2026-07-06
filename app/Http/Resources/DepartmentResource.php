@@ -4,8 +4,10 @@ namespace App\Http\Resources;
 
 use App\Enums\GeneralStatus;
 use App\Models\Department;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
 
 class DepartmentResource extends JsonResource
 {
@@ -22,8 +24,21 @@ class DepartmentResource extends JsonResource
         /** @var GeneralStatus $status */
         $status = $department->status;
 
+        $attributes = parent::toArray($request);
+        if ($attributes instanceof Arrayable) {
+            $attributes = $attributes->toArray();
+        }
+
+        if ($attributes instanceof JsonSerializable) {
+            $attributes = $attributes->jsonSerialize();
+        }
+
+        if (! is_array($attributes)) {
+            $attributes = [];
+        }
+
         return [
-            ...parent::toArray($request),
+            ...$attributes,
             'statusLabel' => $status->label(),
         ];
     }

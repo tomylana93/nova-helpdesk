@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 class TicketMetricQueries
 {
@@ -89,10 +90,8 @@ class TicketMetricQueries
      */
     private function bucketCounts(Builder $query, string $column, string $granularity): array
     {
-        $expr = $this->dateGroupExpression($column, $granularity);
-
         return $query
-            ->selectRaw("{$expr} as bucket, count(*) as aggregate")
+            ->selectRaw($this->dateGroupSelectExpression($column, $granularity))
             ->groupBy('bucket')
             ->pluck('aggregate', 'bucket')
             ->mapWithKeys(fn ($count, $bucket): array => [(string) $bucket => (int) $count])
@@ -102,17 +101,36 @@ class TicketMetricQueries
     /**
      * Driver-portable expression that extracts a zero-padded day-of-month
      * (granularity=day) or month-of-year (granularity=month) from a column.
+     *
+     * @return literal-string
      */
-    private function dateGroupExpression(string $column, string $granularity): string
+    private function dateGroupSelectExpression(string $column, string $granularity): string
     {
         $driver = DB::connection()->getDriverName();
         $isMonth = $granularity === 'month';
 
         return match ($driver) {
-            'sqlite' => "strftime('%".($isMonth ? 'm' : 'd')."', {$column})",
-            'mysql', 'mariadb' => "DATE_FORMAT({$column}, '%".($isMonth ? 'm' : 'd')."')",
-            'pgsql' => "to_char({$column}, '".($isMonth ? 'MM' : 'DD')."')",
-            default => "strftime('%".($isMonth ? 'm' : 'd')."', {$column})",
+            'mysql', 'mariadb' => match ([$column, $isMonth]) {
+                ['created_at', true] => "DATE_FORMAT(created_at, '%m') as bucket, count(*) as aggregate",
+                ['created_at', false] => "DATE_FORMAT(created_at, '%d') as bucket, count(*) as aggregate",
+                ['resolved_at', true] => "DATE_FORMAT(resolved_at, '%m') as bucket, count(*) as aggregate",
+                ['resolved_at', false] => "DATE_FORMAT(resolved_at, '%d') as bucket, count(*) as aggregate",
+                default => throw new InvalidArgumentException("Unsupported ticket metric date column [{$column}]."),
+            },
+            'pgsql' => match ([$column, $isMonth]) {
+                ['created_at', true] => "to_char(created_at, 'MM') as bucket, count(*) as aggregate",
+                ['created_at', false] => "to_char(created_at, 'DD') as bucket, count(*) as aggregate",
+                ['resolved_at', true] => "to_char(resolved_at, 'MM') as bucket, count(*) as aggregate",
+                ['resolved_at', false] => "to_char(resolved_at, 'DD') as bucket, count(*) as aggregate",
+                default => throw new InvalidArgumentException("Unsupported ticket metric date column [{$column}]."),
+            },
+            default => match ([$column, $isMonth]) {
+                ['created_at', true] => "strftime('%m', created_at) as bucket, count(*) as aggregate",
+                ['created_at', false] => "strftime('%d', created_at) as bucket, count(*) as aggregate",
+                ['resolved_at', true] => "strftime('%m', resolved_at) as bucket, count(*) as aggregate",
+                ['resolved_at', false] => "strftime('%d', resolved_at) as bucket, count(*) as aggregate",
+                default => throw new InvalidArgumentException("Unsupported ticket metric date column [{$column}]."),
+            },
         };
     }
 

@@ -6,8 +6,10 @@ use App\Enums\AssetCategory;
 use App\Enums\AssetStatus;
 use App\Models\Asset;
 use App\Models\Ticket;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
 
 class AssetResource extends JsonResource
 {
@@ -27,8 +29,21 @@ class AssetResource extends JsonResource
         /** @var AssetStatus $status */
         $status = $asset->status;
 
+        $attributes = parent::toArray($request);
+        if ($attributes instanceof Arrayable) {
+            $attributes = $attributes->toArray();
+        }
+
+        if ($attributes instanceof JsonSerializable) {
+            $attributes = $attributes->jsonSerialize();
+        }
+
+        if (! is_array($attributes)) {
+            $attributes = [];
+        }
+
         return [
-            ...parent::toArray($request),
+            ...$attributes,
             'categoryLabel' => $category->label(),
             'statusLabel' => $status->label(),
             'statusVariant' => $status->variant(),

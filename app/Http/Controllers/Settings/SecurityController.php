@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\Auth\ChangeUserPassword;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\PasswordUpdateRequest;
 use Illuminate\Http\RedirectResponse;
@@ -26,13 +27,11 @@ class SecurityController extends Controller
     /**
      * Update the user's password.
      */
-    public function update(PasswordUpdateRequest $request): RedirectResponse
+    public function update(PasswordUpdateRequest $request, ChangeUserPassword $changeUserPassword): RedirectResponse
     {
-        $request->user()->update([
-            'password' => $request->password,
-        ]);
+        $changeUserPassword->handle($request->user(), $request->string('password')->toString());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('settings.security.message.updated')]);
 
         return back();
     }

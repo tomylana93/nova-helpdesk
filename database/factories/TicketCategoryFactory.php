@@ -21,7 +21,7 @@ class TicketCategoryFactory extends Factory
     {
         return [
             'parent_id' => null,
-            'name' => Str::title(fake()->unique()->words(2, true)),
+            'name' => Str::title(fake()->word().' '.fake()->word()),
             'description' => fake()->sentence(),
             'status' => GeneralStatus::Active,
         ];

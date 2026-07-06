@@ -238,7 +238,7 @@ abstract class AbstractTable
     }
 
     /**
-     * @param  list<array{label: string, value: string, icon?: string}>  $options
+     * @param  list<array<string, mixed>>  $options
      * @return array{key: string, filter: AllowedFilter|string, definition: array<string, mixed>}
      */
     protected function selectFilter(

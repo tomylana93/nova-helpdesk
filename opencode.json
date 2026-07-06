@@ -11,15 +11,20 @@
             ]
         },
         "serena": {
+            "type": "remote",
+            "enabled": true,
+            "url": "http://localhost:9121/mcp"
+        },
+        "context7": {
             "type": "local",
             "enabled": true,
-            "command": [
-                "serena",
-                "start-mcp-server",
-                "--context=ide"
+            "args": [
+                "pnpm",
+                "dlx",
+                "@upstash/context7-mcp"
             ]
         },
-        "shadcn-vue": {
+        "shadcn": {
             "type": "local",
             "enabled": true,
             "command": [
@@ -27,14 +32,6 @@
                 "dlx",
                 "shadcn-vue@latest",
                 "mcp"
-            ]
-        },
-        "playwright": {
-            "type": "local",
-            "enabled": true,
-            "command": [
-                "npx",
-                "@playwright/mcp@latest"
             ]
         }
     }

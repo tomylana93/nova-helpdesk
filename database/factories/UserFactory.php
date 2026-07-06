@@ -43,4 +43,14 @@ class UserFactory extends Factory
             'status' => $status,
         ]);
     }
+
+    /**
+     * Require the user to change their password on next access.
+     */
+    public function mustChangePassword(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'must_change_password' => true,
+        ]);
+    }
 }

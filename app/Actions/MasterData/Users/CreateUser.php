@@ -14,6 +14,9 @@ class CreateUser
         private readonly PasswordSettings $passwordSettings,
     ) {}
 
+    /**
+     * @param  array{name: string, email: string, role: string, branch_id?: string|null, department_id?: string|null}  $data
+     */
     public function handle(array $data): User
     {
         return DB::transaction(function () use ($data): User {
@@ -25,6 +28,8 @@ class CreateUser
                 'branch_id' => $data['branch_id'] ?? null,
                 'department_id' => $data['department_id'] ?? null,
             ]);
+
+            $user->forceFill(['must_change_password' => true])->save();
 
             $user->syncRoles([$data['role']]);
 

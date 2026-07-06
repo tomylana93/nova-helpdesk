@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\TicketCommentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,11 +29,17 @@ class TicketComment extends Model
     /** @use HasFactory<TicketCommentFactory> */
     use HasFactory, HasUuids;
 
+    /**
+     * @return BelongsTo<Ticket, $this>
+     */
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -49,7 +56,11 @@ class TicketComment extends Model
     /**
      * Scope query to only public comments.
      */
-    protected function scopePublic($query)
+    /**
+     * @param  Builder<TicketComment>  $query
+     * @return Builder<TicketComment>
+     */
+    protected function scopePublic(Builder $query): Builder
     {
         return $query->where('visibility', 'public');
     }

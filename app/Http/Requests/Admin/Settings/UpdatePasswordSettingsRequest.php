@@ -27,4 +27,16 @@ class UpdatePasswordSettingsRequest extends FormRequest
             'default_user_password' => $this->passwordRules(),
         ];
     }
+
+    /**
+     * @return array{default_user_password: string}
+     */
+    public function settingsData(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'default_user_password' => (string) $validated['default_user_password'],
+        ];
+    }
 }

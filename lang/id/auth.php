@@ -46,4 +46,18 @@ return [
             'login' => 'Kembali ke masuk',
         ],
     ],
+
+    'force_password' => [
+        'title' => 'Ganti kata sandi',
+        'label' => [
+            'password' => 'Kata sandi baru',
+            'password_confirmation' => 'Konfirmasi kata sandi baru',
+        ],
+        'action' => [
+            'submit' => 'Ganti kata sandi',
+        ],
+        'message' => [
+            'success' => 'Kata sandi Anda telah diganti.',
+        ],
+    ],
 ];

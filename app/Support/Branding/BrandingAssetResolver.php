@@ -59,7 +59,7 @@ class BrandingAssetResolver
             'source' => $disk->url($path),
             'name' => basename($path),
             'size' => (int) $disk->size($path),
-            'type' => $disk->mimeType($path),
+            'type' => $disk->mimeType($path) ?: null,
             'poster' => $disk->url($path),
         ];
     }

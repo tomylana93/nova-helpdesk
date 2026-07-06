@@ -63,7 +63,7 @@ class StyleSettingsController extends Controller
     ): RedirectResponse {
         $this->authorize('update', StyleSettings::class);
 
-        $updateStyleSettings->handle($styleSettings, $request->validated());
+        $updateStyleSettings->handle($styleSettings, $request->settingsData());
 
         Inertia::flash('toast', [
             'type' => 'success',

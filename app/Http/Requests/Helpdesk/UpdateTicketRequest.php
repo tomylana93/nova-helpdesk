@@ -49,7 +49,7 @@ class UpdateTicketRequest extends FormRequest
                 'nullable',
                 'exists:users,id',
                 function (string $attribute, mixed $value, Closure $fail): void {
-                    if ($value) {
+                    if (is_string($value) && $value !== '') {
                         $user = User::query()->find($value);
                         if (! $user || ! $user->hasRole(UserRole::ItAgent->value)) {
                             $fail('The assigned user must be an IT Agent.');

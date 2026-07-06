@@ -16,21 +16,21 @@ class GetAssetFormOptions
      */
     public function handle(): array
     {
-        $branchOptions = Branch::query()
+        $branchOptions = array_values(Branch::query()
             ->where('status', GeneralStatus::Active)
             ->orderBy('name')
             ->get(['id', 'name'])
             ->mapInto(BranchOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
 
-        $userOptions = User::query()
+        $userOptions = array_values(User::query()
             ->where('status', UserStatus::Active)
             ->orderBy('name')
             ->get(['id', 'name'])
             ->mapInto(UserOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
 
         return [
             'branchOptions' => $branchOptions,

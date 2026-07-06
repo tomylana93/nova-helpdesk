@@ -24,11 +24,17 @@ class TicketApproval extends Model
     /** @use HasFactory<TicketApprovalFactory> */
     use HasFactory, HasUuids;
 
+    /**
+     * @return BelongsTo<Ticket, $this>
+     */
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewer_id');

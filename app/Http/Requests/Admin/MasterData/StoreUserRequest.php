@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\MasterData;
 
 use App\Concerns\ProfileValidationRules;
+use App\Concerns\UserRoleRules;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -12,6 +13,7 @@ use Illuminate\Validation\Rule;
 class StoreUserRequest extends FormRequest
 {
     use ProfileValidationRules;
+    use UserRoleRules;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -31,14 +33,27 @@ class StoreUserRequest extends FormRequest
         return [
             ...$this->profileRules(),
             'role' => [
-                'required',
-                'string',
-                Rule::enum(UserRole::class),
-                Rule::exists(config('permission.table_names.roles'), 'name')
-                    ->where('guard_name', 'web'),
+                ...$this->baseRoleRules(),
+                ...$this->preventSuperAdminRoleRule(),
             ],
             'branch_id' => [Rule::requiredIf($this->requiresOrganisation()), 'nullable', 'exists:branches,id'],
             'department_id' => [Rule::requiredIf($this->requiresOrganisation()), 'nullable', 'exists:departments,id'],
+        ];
+    }
+
+    /**
+     * @return array{name: string, email: string, role: string, branch_id?: string|null, department_id?: string|null}
+     */
+    public function userData(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'name' => (string) $validated['name'],
+            'email' => (string) $validated['email'],
+            'role' => (string) $validated['role'],
+            'branch_id' => isset($validated['branch_id']) ? (string) $validated['branch_id'] : null,
+            'department_id' => isset($validated['department_id']) ? (string) $validated['department_id'] : null,
         ];
     }
 

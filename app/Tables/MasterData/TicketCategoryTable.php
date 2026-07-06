@@ -46,14 +46,14 @@ class TicketCategoryTable extends AbstractTable
      */
     protected function filterConfigurations(): array
     {
-        $parentCategoryOptions = TicketCategory::query()
+        $parentCategoryOptions = array_values(TicketCategory::query()
             ->whereNull('parent_id')
             ->where('status', GeneralStatus::Active)
             ->orderBy('name')
             ->get(['id', 'name'])
             ->mapInto(TicketCategoryOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
 
         return [
             $this->searchFilter(

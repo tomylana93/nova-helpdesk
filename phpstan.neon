@@ -4,11 +4,10 @@ includes:
 
 parameters:
     paths:
-        - app
-        - database/factories
-        - database/seeders
+        - app/
+        - bootstrap/app.php
+        - config/
+        - database/
+        - routes/
 
-    level: 5
-
-    excludePaths:
-        - database/migrations/*
+    level: 7
