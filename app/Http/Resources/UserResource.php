@@ -7,8 +7,10 @@ use App\Enums\UserStatus;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\User;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
 
 class UserResource extends JsonResource
 {
@@ -27,8 +29,21 @@ class UserResource extends JsonResource
         /** @var UserStatus $status */
         $status = $user->status;
 
+        $attributes = parent::toArray($request);
+        if ($attributes instanceof Arrayable) {
+            $attributes = $attributes->toArray();
+        }
+
+        if ($attributes instanceof JsonSerializable) {
+            $attributes = $attributes->jsonSerialize();
+        }
+
+        if (! is_array($attributes)) {
+            $attributes = [];
+        }
+
         return [
-            ...parent::toArray($request),
+            ...$attributes,
             'role' => $roleName,
             'roleLabel' => $roleName !== null ? UserRole::tryFrom($roleName)?->label() : null,
             'statusLabel' => $status->label(),

@@ -23,23 +23,23 @@ class GetTicketFormOptions
     public function handle(bool $includeAgents = false, ?string $requesterId = null): array
     {
         $options = [
-            'branchOptions' => Branch::query()
+            'branchOptions' => array_values(Branch::query()
                 ->where('status', GeneralStatus::Active)
                 ->orderBy('name')
                 ->get(['id', 'name'])
                 ->mapInto(BranchOptionResource::class)
                 ->map->resolve()
-                ->all(),
+                ->all()),
 
-            'departmentOptions' => Department::query()
+            'departmentOptions' => array_values(Department::query()
                 ->where('status', GeneralStatus::Active)
                 ->orderBy('name')
                 ->get(['id', 'name', 'branch_id'])
                 ->mapInto(DepartmentOptionResource::class)
                 ->map->resolve()
-                ->all(),
+                ->all()),
 
-            'categoryOptions' => TicketCategory::query()
+            'categoryOptions' => array_values(TicketCategory::query()
                 ->where('status', GeneralStatus::Active)
                 ->whereNull('parent_id')
                 ->with(['subcategories' => function ($q): void {
@@ -49,36 +49,35 @@ class GetTicketFormOptions
                 ->get()
                 ->map(fn (TicketCategory $parent): array => [
                     'label' => $parent->name,
-                    'options' => $parent->subcategories->map(fn (TicketCategory $sub): array => [
+                    'options' => array_values($parent->subcategories->map(fn (TicketCategory $sub): array => [
                         'value' => $sub->id,
                         'label' => $sub->name,
-                    ])->all(),
+                    ])->all()),
                 ])
                 ->filter(fn (array $group): bool => ! empty($group['options']))
-                ->values()
-                ->all(),
+                ->all()),
         ];
 
         if ($includeAgents) {
-            $options['agentOptions'] = User::query()
+            $options['agentOptions'] = array_values(User::query()
                 ->role(UserRole::ItAgent->value)
                 ->orderBy('name')
                 ->get(['id', 'name'])
                 ->mapInto(UserOptionResource::class)
                 ->map->resolve()
-                ->all();
+                ->all());
         }
 
         $targetRequesterId = $requesterId ?? auth()->id();
         $options['assetOptions'] = $targetRequesterId
-            ? Asset::query()
+            ? array_values(Asset::query()
                 ->where('user_id', $targetRequesterId)
                 ->get(['id', 'name', 'asset_tag'])
                 ->map(fn ($asset): array => [
                     'value' => $asset->id,
                     'label' => "[{$asset->asset_tag}] {$asset->name}",
                 ])
-                ->all()
+                ->all())
             : [];
 
         return $options;

@@ -14,6 +14,9 @@ class AddTicketComment
         private readonly AttachUploadedFiles $attachFiles,
     ) {}
 
+    /**
+     * @param  list<string>  $attachmentUploadIds
+     */
     public function handle(
         Ticket $ticket,
         User $user,

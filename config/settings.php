@@ -3,7 +3,6 @@
 use App\Settings\GeneralSettings;
 use App\Settings\PasswordSettings;
 use App\Settings\StyleSettings;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
@@ -93,7 +92,7 @@ return [
         DateTimeInterface::class => DateTimeInterfaceCast::class,
         DateTimeZone::class => DateTimeZoneCast::class,
         //        Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
-        Data::class => DataCast::class,
+        'Spatie\\LaravelData\\Data' => DataCast::class,
     ],
 
     /*

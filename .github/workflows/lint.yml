@@ -1,62 +1,59 @@
-name: linter
+name: lint
 
 on:
   push:
     branches:
-      - main
       - dev
+      - main
   pull_request:
     branches:
-      - main
       - dev
+      - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          tools: composer:v2
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Enable pnpm
         run: corepack enable pnpm
 
-      - name: Install PHP dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Install Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+          pnpm install --frozen-lockfile --config.strict-dep-builds=false
 
-      - name: Install Node dependencies
-        run: pnpm install --frozen-lockfile --config.strict-dep-builds=false
+      - name: Copy Environment File
+        run: cp .env.example .env
 
-      - name: Generate Wayfinder types
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Generate Wayfinder Routes
         run: php artisan wayfinder:generate --with-form --no-interaction
 
-      - name: Check PHP formatting
+      - name: Run Pint Check
         run: composer lint:check
 
-      - name: Check frontend formatting
+      - name: Format Frontend Check
         run: pnpm run format:check
 
-      - name: Lint frontend
+      - name: Lint Frontend Check
         run: pnpm run lint:check
-
-      - name: Type check frontend
-        run: pnpm run types:check
-
-      - name: Run Larastan
-        run: composer analyse
-
-      - name: Run Rector check
-        run: composer refactor:check

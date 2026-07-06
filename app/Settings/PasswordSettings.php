@@ -13,6 +13,9 @@ class PasswordSettings extends Settings
         return 'password';
     }
 
+    /**
+     * @return list<string>
+     */
     public static function encrypted(): array
     {
         return [

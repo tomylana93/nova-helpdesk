@@ -18,6 +18,8 @@ class Branch extends Model
 
     /**
      * Get the departments associated with the branch.
+     *
+     * @return HasMany<Department, $this>
      */
     public function departments(): HasMany
     {
@@ -26,6 +28,8 @@ class Branch extends Model
 
     /**
      * Get the users associated with the branch.
+     *
+     * @return HasMany<User, $this>
      */
     public function users(): HasMany
     {

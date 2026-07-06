@@ -118,17 +118,8 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 
-    /**
-     * Get the application version from version.json.
-     */
     private function appVersion(): string
     {
-        if (file_exists(base_path('version.json'))) {
-            $data = json_decode(file_get_contents(base_path('version.json')), true);
-
-            return $data['version'] ?? '0.8.0';
-        }
-
-        return '0.8.0';
+        return (string) config('version.app');
     }
 }

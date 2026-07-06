@@ -23,6 +23,8 @@ class Department extends Model
 
     /**
      * Get the branch that owns the department.
+     *
+     * @return BelongsTo<Branch, $this>
      */
     public function branch(): BelongsTo
     {
@@ -31,6 +33,8 @@ class Department extends Model
 
     /**
      * Get the users associated with the department.
+     *
+     * @return HasMany<User, $this>
      */
     public function users(): HasMany
     {

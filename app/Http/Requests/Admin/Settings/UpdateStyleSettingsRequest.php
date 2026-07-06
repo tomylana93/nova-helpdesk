@@ -7,9 +7,8 @@ use App\Enums\SiteFont;
 use App\Enums\SiteLayout;
 use App\Enums\SiteLogoStyle;
 use App\Enums\SiteTheme;
-use App\Models\TemporaryUpload;
+use App\Rules\TemporaryUploadBelongsToUser;
 use App\Settings\StyleSettings;
-use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -48,31 +47,56 @@ class UpdateStyleSettingsRequest extends FormRequest
     }
 
     /**
-     * @return array<int, Closure|string|ValidationRule>
+     * @return array{
+     *     site_logo_style: string,
+     *     site_auth_layout: string,
+     *     site_layout: string,
+     *     site_theme: string,
+     *     site_font: string,
+     *     site_icon_upload_id?: string|null,
+     *     site_icon_alt_upload_id?: string|null,
+     *     site_logo_upload_id?: string|null,
+     *     site_logo_alt_upload_id?: string|null,
+     *     site_favicon_upload_id?: string|null,
+     *     site_icon_remove?: bool,
+     *     site_icon_alt_remove?: bool,
+     *     site_logo_remove?: bool,
+     *     site_logo_alt_remove?: bool,
+     *     site_favicon_remove?: bool
+     * }
+     */
+    public function settingsData(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'site_logo_style' => (string) $validated['site_logo_style'],
+            'site_auth_layout' => (string) $validated['site_auth_layout'],
+            'site_layout' => (string) $validated['site_layout'],
+            'site_theme' => (string) $validated['site_theme'],
+            'site_font' => (string) $validated['site_font'],
+            'site_icon_upload_id' => isset($validated['site_icon_upload_id']) ? (string) $validated['site_icon_upload_id'] : null,
+            'site_icon_alt_upload_id' => isset($validated['site_icon_alt_upload_id']) ? (string) $validated['site_icon_alt_upload_id'] : null,
+            'site_logo_upload_id' => isset($validated['site_logo_upload_id']) ? (string) $validated['site_logo_upload_id'] : null,
+            'site_logo_alt_upload_id' => isset($validated['site_logo_alt_upload_id']) ? (string) $validated['site_logo_alt_upload_id'] : null,
+            'site_favicon_upload_id' => isset($validated['site_favicon_upload_id']) ? (string) $validated['site_favicon_upload_id'] : null,
+            'site_icon_remove' => (bool) ($validated['site_icon_remove'] ?? false),
+            'site_icon_alt_remove' => (bool) ($validated['site_icon_alt_remove'] ?? false),
+            'site_logo_remove' => (bool) ($validated['site_logo_remove'] ?? false),
+            'site_logo_alt_remove' => (bool) ($validated['site_logo_alt_remove'] ?? false),
+            'site_favicon_remove' => (bool) ($validated['site_favicon_remove'] ?? false),
+        ];
+    }
+
+    /**
+     * @return array<int, string|ValidationRule>
      */
     private function temporaryImageRules(): array
     {
         return [
             'nullable',
             'string',
-            Rule::exists('temporary_uploads', 'id')->where(
-                fn ($query) => $query->where('user_id', $this->user()?->id),
-            ),
-            function (string $attribute, mixed $value, Closure $fail): void {
-                if (! is_string($value) || $value === '') {
-                    return;
-                }
-
-                $temporaryUpload = TemporaryUpload::query()->find($value);
-
-                if ($temporaryUpload === null) {
-                    return;
-                }
-
-                if (! is_string($temporaryUpload->mime_type) || ! str_starts_with($temporaryUpload->mime_type, 'image/')) {
-                    $fail(__('validation.image', ['attribute' => $attribute]));
-                }
-            },
+            new TemporaryUploadBelongsToUser($this->user()->id),
         ];
     }
 }

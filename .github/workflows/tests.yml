@@ -3,12 +3,15 @@ name: tests
 on:
   push:
     branches:
-      - main
       - dev
+      - main
   pull_request:
     branches:
-      - main
       - dev
+      - main
+
+permissions:
+  contents: read
 
 jobs:
   ci:
@@ -16,27 +19,29 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          tools: composer:v2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
           coverage: none
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Enable pnpm
         run: corepack enable pnpm
 
-      - name: Install PHP dependencies
+      - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Install Node dependencies
+      - name: Install Node Dependencies
         run: pnpm install --frozen-lockfile --config.strict-dep-builds=false
 
       - name: Copy Environment File
@@ -48,5 +53,10 @@ jobs:
       - name: Build Assets
         run: pnpm run build
 
+      - name: Run Type Analysis
+        run: |
+          composer types:check
+          pnpm run types:check
+
       - name: Tests
-        run: php artisan test --compact
+        run: php artisan test

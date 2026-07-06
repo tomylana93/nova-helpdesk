@@ -23,7 +23,7 @@ class DepartmentFactory extends Factory
         return [
             'branch_id' => Branch::factory(),
             'code' => Str::upper(fake()->unique()->lexify('DEPT-????')),
-            'name' => fake()->words(2, true).' Department',
+            'name' => Str::title(fake()->word().' '.fake()->word()).' Department',
             'status' => GeneralStatus::Active,
         ];
     }

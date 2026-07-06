@@ -29,7 +29,7 @@ class PasswordSettingsController extends Controller
     ): RedirectResponse {
         $this->authorize('update', PasswordSettings::class);
 
-        $updatePasswordSettings->handle($passwordSettings, $request->validated());
+        $updatePasswordSettings->handle($passwordSettings, $request->settingsData());
 
         Inertia::flash('toast', [
             'type' => 'success',

@@ -31,6 +31,9 @@ class TicketAttachment extends Model
     /** @use HasFactory<TicketAttachmentFactory> */
     use HasFactory, HasUuids;
 
+    /**
+     * @return MorphTo<Model, $this>
+     */
     public function attachable(): MorphTo
     {
         return $this->morphTo();

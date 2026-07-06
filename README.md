@@ -30,7 +30,7 @@ Nova Helpdesk is a modern, single-company internal IT Helpdesk system designed t
 - **Personalized Notifications**: Direct updates delivered to the user's personal channel via Reverb websockets and database notifications (auto-assigned alerts, SLA warnings/breaches, replies).
 - **Master Data Management**: Super Admin panel to manage users, branches, departments, ticket categories, and SLA policies.
 - **Branded Theme**: Fully dynamic layout variables, dark mode preference cookies, custom site name database settings (falling back to "Nova Helpdesk"), and typography.
-- **Semantic Versioning (SemVer)**: Automatic release version tracking inside `version.json` with an automated commit/tag versioning command.
+- **Semantic Versioning (SemVer)**: Release Please manages stable and release-candidate versions from Conventional Commits, with the runtime version exposed through `config/version.php`.
 
 ---
 
@@ -82,19 +82,9 @@ Start the Laravel local server, queue listener, Vite dev server, and Reverb webs
 composer run dev
 ```
 
-### Bumping Application Version
+### Application Versioning
 
-To bump the version using SemVer, run the Artisan command (by default it will automatically determine the bump type based on git commit history):
-
-```bash
-# Auto mode (calculates bump type from Conventional Commit history)
-composer run version:bump
-
-# Or manually specify the bump type
-composer run version:bump -- patch
-composer run version:bump -- minor
-composer run version:bump -- major
-```
+Version bumps are handled by Release Please from Conventional Commits. Pushes to `dev` maintain release-candidate PRs, and pushes to `main` maintain stable release PRs. The application reads the current version from `config/version.php`.
 
 ---
 
@@ -171,7 +161,6 @@ Nova Helpdesk includes custom Artisan commands to manage application data, setup
 | `app:import-master-data`   | Import initial system master data (users, departments, branches, SLA policies, and categories) from CSV templates. | `php artisan app:import-master-data`                    |
 | `app:check-sla-escalation` | Check for SLA warning/breach conditions and dispatch notifications/alerts. Run this on a cron scheduler.           | `php artisan app:check-sla-escalation`                  |
 | `sync:roles`               | Synchronize the Spatie roles and permissions catalog defined in the backend codebase.                              | `php artisan sync:roles`                                |
-| `app:bump-version {type}`  | Bump SemVer version, update `version.json`, update `CHANGELOG.md`, and create Git tags.                            | `php artisan app:bump-version auto`                     |
 | `make:action`              | Create a new thin action class for business/domain logic under `app/Actions`.                                      | `php artisan make:action Actions/Helpdesk/CreateTicket` |
 | `make:table`               | Create boilerplate schema properties for DataTable client-side integration.                                        | `php artisan make:table TicketTable`                    |
 | `prune:temporary-uploads`  | Prune expired or orphaned temporary media upload attachments from storage.                                         | `php artisan prune:temporary-uploads`                   |

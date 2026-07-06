@@ -92,7 +92,8 @@ class GetReportData
     private function enumBreakdown(Builder $base, string $column, array $cases): array
     {
         $counts = $base->clone()
-            ->selectRaw("{$column}, count(*) as aggregate")
+            ->select($column)
+            ->selectRaw('count(*) as aggregate')
             ->groupBy($column)
             ->pluck('aggregate', $column)
             ->all();
@@ -116,7 +117,8 @@ class GetReportData
     {
         $counts = $base->clone()
             ->whereNotNull($column)
-            ->selectRaw("{$column}, count(*) as aggregate")
+            ->select($column)
+            ->selectRaw('count(*) as aggregate')
             ->groupBy($column)
             ->pluck('aggregate', $column)
             ->all();
@@ -125,7 +127,7 @@ class GetReportData
             return [];
         }
 
-        return $model::query()
+        return array_values($model::query()
             ->whereIn('id', array_keys($counts))
             ->orderBy('name')
             ->get(['id', 'name'])
@@ -134,8 +136,7 @@ class GetReportData
                 'label' => $item->name,
                 'value' => (int) $counts[$item->id],
             ])
-            ->values()
-            ->all();
+            ->all());
     }
 
     /**
@@ -178,7 +179,7 @@ class GetReportData
      */
     private function auditRows(LengthAwarePaginator $activities): array
     {
-        return collect($activities->items())
+        return array_values(collect($activities->items())
             ->map(fn (TicketActivity $activity): array => [
                 'id' => $activity->id,
                 'occurredAt' => $activity->occurred_at->toJSON(),
@@ -191,7 +192,7 @@ class GetReportData
                 'departmentName' => $activity->ticket->department?->name,
                 'metadata' => $activity->metadata,
             ])
-            ->all();
+            ->all());
     }
 
     /**
@@ -199,13 +200,13 @@ class GetReportData
      */
     private function events(User $user, ReportFilters $filters): array
     {
-        return TicketActivity::query()
+        return array_values(TicketActivity::query()
             ->whereHas('ticket', fn (Builder $query): Builder => $this->ticketQuery->applyFilters($query, $user, $filters))
             ->distinct()
             ->orderBy('event')
             ->pluck('event')
             ->map(fn (string $event): array => ['value' => $event, 'label' => str($event)->headline()->toString()])
-            ->all();
+            ->all());
     }
 
     /**
@@ -220,6 +221,7 @@ class GetReportData
                 ->get(['id', 'name'])
                 ->mapInto(BranchOptionResource::class)
                 ->map->resolve()
+                ->values()
                 ->all(),
             'departments' => Department::query()
                 ->where('status', GeneralStatus::Active)
@@ -227,6 +229,7 @@ class GetReportData
                 ->get(['id', 'name', 'branch_id'])
                 ->mapInto(DepartmentOptionResource::class)
                 ->map->resolve()
+                ->values()
                 ->all(),
             'categories' => TicketCategory::query()
                 ->where('status', GeneralStatus::Active)
@@ -241,7 +244,7 @@ class GetReportData
                     'options' => $parent->subcategories->map(fn (TicketCategory $sub): array => [
                         'value' => $sub->id,
                         'label' => $sub->name,
-                    ])->all(),
+                    ])->values()->all(),
                 ])
                 ->filter(fn (array $group): bool => ! empty($group['options']))
                 ->values()
@@ -254,6 +257,7 @@ class GetReportData
                     ->get(['id', 'name'])
                     ->mapInto(UserOptionResource::class)
                     ->map->resolve()
+                    ->values()
                     ->all(),
             'statuses' => TicketStatus::options(),
             'priorities' => TicketPriority::options(),

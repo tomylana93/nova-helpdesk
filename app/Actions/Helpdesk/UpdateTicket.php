@@ -16,7 +16,18 @@ class UpdateTicket
     ) {}
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array{
+     *     subject?: string,
+     *     description?: string,
+     *     status?: string,
+     *     priority?: string,
+     *     assigned_to?: string|null,
+     *     branch_id?: string|null,
+     *     department_id?: string|null,
+     *     category_id?: string,
+     *     attachment_upload_ids?: list<string>,
+     *     asset_ids?: list<string>
+     * }  $data
      */
     public function handle(Ticket $ticket, array $data, User $actor): void
     {
@@ -46,7 +57,7 @@ class UpdateTicket
                 'assigned_to' => $data['assigned_to'],
             ]);
 
-            if (! empty($data['assigned_to'])) {
+            if (isset($data['assigned_to']) && $data['assigned_to'] !== '') {
                 $newAssignee = User::query()->find($data['assigned_to']);
                 $newAssignee?->notify(new TicketNotification(
                     $ticket,

@@ -94,6 +94,8 @@ class ReportFilters
             return null;
         }
 
-        return $enum::tryFrom($value)?->value;
+        $enumValue = $enum::tryFrom($value)?->value;
+
+        return is_string($enumValue) ? $enumValue : null;
     }
 }

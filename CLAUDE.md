@@ -127,14 +127,14 @@ Finishing gate:
 [ ] vendor/bin/pint --dirty --format agent          (always)
 [ ] pnpm run lint   (eslint --fix)                  (always)
 [ ] pnpm run format (prettier --write)              (always)
-[ ] php artisan wayfinder:generate                  (if any route file, controller, or action changed)
+[ ] php artisan wayfinder:generate --with-form --no-interaction (if any route file, controller, or action changed)
 [ ] composer ci:check → GREEN                       (always; inner loop uses --filter, this is the outer gate)
 [ ] Memory written: [mem:name]  or  not needed: [reason]
 [ ] Code review run  or  skipped: [reason]
 [ ] Commit requested by developer: yes / no
 ```
 
-**Wayfinder trigger — run `wayfinder:generate` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
+**Wayfinder trigger — run `wayfinder:generate --with-form --no-interaction` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
 
 **On ci:check failure:** re-run auto-fix for format/lint issues; for logic failures (test/phpstan/types) use `systematic-debugging` skill and re-run, but **stop and report** after ~2–3 unsuccessful rounds or if the fix touches a Deep-path decision — never loop blindly. See `mem:task_completion` for the exact command list.
 
@@ -222,14 +222,14 @@ Finishing gate:
 [ ] vendor/bin/pint --dirty --format agent          (always)
 [ ] pnpm run lint   (eslint --fix)                  (always)
 [ ] pnpm run format (prettier --write)              (always)
-[ ] php artisan wayfinder:generate                  (if any route file, controller, or action changed)
+[ ] php artisan wayfinder:generate --with-form --no-interaction (if any route file, controller, or action changed)
 [ ] composer ci:check → GREEN                       (always; inner loop uses --filter, this is the outer gate)
 [ ] Memory written: [mem:name]  or  not needed: [reason]
 [ ] Code review run  or  skipped: [reason]
 [ ] Commit requested by developer: yes / no
 ```
 
-**Wayfinder trigger — run `wayfinder:generate` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
+**Wayfinder trigger — run `wayfinder:generate --with-form --no-interaction` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
 
 **On ci:check failure:** re-run auto-fix for format/lint issues; for logic failures (test/phpstan/types) use `systematic-debugging` skill and re-run, but **stop and report** after ~2–3 unsuccessful rounds or if the fix touches a Deep-path decision — never loop blindly. See `mem:task_completion` for the exact command list.
 
@@ -276,7 +276,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - vue (VUE) - v3
 - @laravel/echo-vue (ECHO_VUE) - v2
 - @laravel/vite-plugin-wayfinder (WAYFINDER_VITE) - v0
-- eslint (ESLINT) - v9
+- eslint (ESLINT) - v10
 - laravel-echo (ECHO) - v2
 - prettier (PRETTIER) - v3
 

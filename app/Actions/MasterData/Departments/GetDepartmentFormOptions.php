@@ -13,13 +13,13 @@ class GetDepartmentFormOptions
      */
     public function handle(): array
     {
-        $branchOptions = Branch::query()
+        $branchOptions = array_values(Branch::query()
             ->where('status', GeneralStatus::Active)
             ->orderBy('name')
             ->get(['id', 'name'])
             ->mapInto(BranchOptionResource::class)
             ->map->resolve()
-            ->all();
+            ->all());
 
         return ['branchOptions' => $branchOptions];
     }

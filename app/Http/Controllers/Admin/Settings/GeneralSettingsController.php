@@ -36,7 +36,7 @@ class GeneralSettingsController extends Controller
     ): RedirectResponse {
         $this->authorize('update', GeneralSettings::class);
 
-        $updateGeneralSettings->handle($generalSettings, $request->validated());
+        $updateGeneralSettings->handle($generalSettings, $request->settingsData());
 
         Inertia::flash('toast', [
             'type' => 'success',
