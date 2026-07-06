@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.23.1](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.0...v0.23.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* **helpdesk:** drop manage-assets permission from it_agent role ([e951673](https://github.com/tomylana93/nova-helpdesk/commit/e95167375b7cfa892bff6486b8819504d442fa07))
+* **helpdesk:** drop manage-assets permission from it_agent role ([08b2cb7](https://github.com/tomylana93/nova-helpdesk/commit/08b2cb7a15a21b0f3fbe186bd259339567951796))
+
+
+### Documentation
+
+* **release:** document local deploy workflow ([fb46a82](https://github.com/tomylana93/nova-helpdesk/commit/fb46a823d7e04df5f6e21cc463df347b566c7248))
+
 ## [0.23.0-rc.2](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.0-rc.1...v0.23.0-rc.2) (2026-07-06)
 
 
