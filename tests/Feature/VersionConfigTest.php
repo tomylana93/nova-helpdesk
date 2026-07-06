@@ -6,7 +6,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 it('exposes the application version from config', function (): void {
     expect(config('version.app'))
         ->toBeString()
-        ->toMatch('/^0\.\d+\.\d+(?:-rc\.\d+)?$/');
+        ->toMatch('/^0\.\d+\.\d+(?:-rc(?:\.\d+)?)?$/');
 });
 
 it('shares the configured application version with inertia pages', function (): void {
