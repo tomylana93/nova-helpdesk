@@ -1,7 +1,7 @@
 # Versioning and Releases
 
 - Source of truth is Git tags / GitHub Releases managed by Release Please, mirrored at runtime in `config/version.php` via `config('version.app')`.
-- `version.json`, `composer version:bump`, and `php artisan app:bump-version` are legacy/retired and must not be used for new release work.
+- `version.json` (removed from the repo), `composer version:bump`, and `php artisan app:bump-version` are retired and must not be used. Release Please is the only supported version bump path.
 - Release Please configs:
   - Stable releases from `main`: `release-please-config.json` + `.release-please-manifest.json`.
   - Release candidates from `dev`: `release-please-config.dev.json` + `.release-please-manifest.dev.json` with `rc` prereleases.

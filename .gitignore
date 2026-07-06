@@ -30,5 +30,7 @@ yarn-error.log
 /lang/*.json
 /database/data/*.csv
 
-/deploy.sh
+# Local ops templates (nginx/supervisor) stay untracked; deploy.sh is tracked.
 /.deploy
+# Local deploy config (infra targets); commit .env.deploy.example instead.
+/.env.deploy

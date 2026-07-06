@@ -35,6 +35,27 @@ Nova Helpdesk uses Semantic Versioning (SemVer) driven by your commit messages. 
 - `fix(tickets): resolve SLA breach notification duplication`
 - `docs: add contributing guidelines`
 
+> **Release Please owns versioning.** Do not bump versions by hand and do not edit `config/version.php` (it carries the `x-release-please-version` marker). Pushing to `dev` maintains a release-candidate (`X.Y.Z-rc.N`) PR/tag; merging `dev` → `main` maintains the stable (`X.Y.Z`) PR/tag. The retired `version.json` / `composer version:bump` / `app:bump-version` paths must not be used.
+
+---
+
+## 🚀 Release & Deployment
+
+Production is deployed **locally** from an exact stable tag — deployment is intentionally **not** performed by GitHub Actions (CI and Release Please metadata only).
+
+Infra targets are not tracked. Copy `.env.deploy.example` to `.env.deploy` (git-ignored) once and fill in `DEPLOY_HOST`, `DEPLOY_ROOT`, and `REVERB_HOST`:
+
+```bash
+cp .env.deploy.example .env.deploy   # first time only
+git fetch origin --prune --tags
+git checkout main && git pull --ff-only origin main
+git checkout vX.Y.Z          # exact stable tag; RC tags are rejected
+composer ci:check            # optional local gate
+./deploy.sh vX.Y.Z
+```
+
+`deploy.sh` validates a clean worktree, stable tag format, `HEAD == tag commit`, and a matching `config/version.php` before it builds and uploads. Production secrets are **not** in the repo: the server must already have `/srv/nova-helpdesk/shared/.env` provisioned (with `APP_KEY`, DB credentials, etc.). The deploy script never creates that file and never writes DB credentials or other secrets into it — it aborts with a named-variable list if anything required is missing. The only value it may write is a generated `APP_KEY`, and only when one is absent on first deploy.
+
 ---
 
 ## 🏗️ Architectural Guidelines
