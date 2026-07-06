@@ -141,9 +141,13 @@ rsync -avz --delete \
   --exclude='storage' \
   --exclude='public/hot' \
   --exclude='.env' \
+  --exclude='.env.deploy' \
   --exclude='.serena' \
   --exclude='.agents' \
   --exclude='.ai' \
+  --exclude='.claude' \
+  --exclude='.codex' \
+  --exclude='.superpowers' \
   --exclude='.deploy' \
   --exclude='deploy.sh' \
   ./ "${DEPLOY_HOST}:${RELEASE_DIR}/"
