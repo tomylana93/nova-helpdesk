@@ -35,6 +35,19 @@ test('it syncs all application roles from the enum', function (): void {
         ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageDepartments->value))->toBeFalse()
         ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageCategories->value))->toBeFalse()
         ->and(Role::findByName(UserRole::Auditor->value, 'web')->hasPermissionTo(AdminPermission::ManageSlaPolicies->value))->toBeFalse();
+
+    expect(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ViewTickets->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::CreateTickets->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::UpdateTickets->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageApprovals->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ViewReports->value))->toBeTrue()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageAssets->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageSettings->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ViewUsers->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageBranches->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageDepartments->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageCategories->value))->toBeFalse()
+        ->and(Role::findByName(UserRole::ItAgent->value, 'web')->hasPermissionTo(AdminPermission::ManageSlaPolicies->value))->toBeFalse();
 });
 
 test('it is safe to rerun the sync roles command', function (): void {
