@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.23.2](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.1...v0.23.2) (2026-07-06)
+
+
+### Bug Fixes
+
+* **deploy:** exclude local config from releases ([f73bed6](https://github.com/tomylana93/nova-helpdesk/commit/f73bed62bb466cc9ce0a64d23c3a6a73aae931cf))
+* **deploy:** promote local release artifact cleanup ([e8c8a04](https://github.com/tomylana93/nova-helpdesk/commit/e8c8a04d648ab8293e36c4e4bc8e414092656585))
+
 ## [0.23.2-rc](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.1...v0.23.2-rc) (2026-07-06)
 
 
