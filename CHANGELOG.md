@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.23.0](https://github.com/tomylana93/nova-helpdesk/compare/v0.22.1...v0.23.0) (2026-07-06)
+
+
+### Features
+
+* **auth:** require password change on next login and harden user role rules ([879fddf](https://github.com/tomylana93/nova-helpdesk/commit/879fddfee9fde9475fac6f189da8123d0a45fd58))
+
+
+### Refactors
+
+* update Serena MCP configuration to remote and adjust context settings ([591a229](https://github.com/tomylana93/nova-helpdesk/commit/591a2298720e655b71fb51ce47e13b1e8d42d81a))
+
 ## [0.22.1] - 2026-06-15
 
 ### Fixed
@@ -320,4 +332,3 @@ All notable changes to this project will be documented in this file.
 - remove UserSeederTest as UserSeeder is no longer used
 - remove UserSeeder and update DatabaseSeeder to prevent seeding in production
 - initial commit
-
