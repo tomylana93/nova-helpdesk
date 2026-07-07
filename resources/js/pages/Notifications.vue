@@ -7,7 +7,7 @@ import {
     MessageSquare,
     ShieldAlert,
     Ticket,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes';

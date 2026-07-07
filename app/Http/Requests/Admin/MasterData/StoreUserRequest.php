@@ -42,7 +42,7 @@ class StoreUserRequest extends FormRequest
     }
 
     /**
-     * @return array{name: string, email: string, role: string, branch_id?: string|null, department_id?: string|null}
+     * @return array{name: string, email: string, phone?: string|null, role: string, branch_id?: string|null, department_id?: string|null}
      */
     public function userData(): array
     {
@@ -51,6 +51,7 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => (string) $validated['name'],
             'email' => (string) $validated['email'],
+            'phone' => isset($validated['phone']) ? (string) $validated['phone'] : null,
             'role' => (string) $validated['role'],
             'branch_id' => isset($validated['branch_id']) ? (string) $validated['branch_id'] : null,
             'department_id' => isset($validated['department_id']) ? (string) $validated['department_id'] : null,

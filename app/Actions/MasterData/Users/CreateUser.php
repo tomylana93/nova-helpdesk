@@ -15,7 +15,7 @@ class CreateUser
     ) {}
 
     /**
-     * @param  array{name: string, email: string, role: string, branch_id?: string|null, department_id?: string|null}  $data
+     * @param  array{name: string, email: string, phone?: string|null, role: string, branch_id?: string|null, department_id?: string|null}  $data
      */
     public function handle(array $data): User
     {
@@ -23,6 +23,7 @@ class CreateUser
             $user = User::query()->create([
                 'name' => $data['name'],
                 'email' => $data['email'],
+                'phone' => $data['phone'] ?? null,
                 'password' => Hash::make($this->passwordSettings->default_user_password),
                 'status' => UserStatus::Active,
                 'branch_id' => $data['branch_id'] ?? null,

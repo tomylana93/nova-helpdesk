@@ -35,9 +35,13 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
 
     Route::prefix('master-data')->name('master-data.')->group(function () {
         Route::inertia('/', 'admin/master-data/Index')->can('viewAny', User::class)->name('index');
+        Route::get('users/export', [UserController::class, 'export'])->name('users.export');
         Route::resource('users', UserController::class)->only([
-            'index', 'create', 'store', 'show', 'edit', 'update',
-        ]);
+            'index', 'create', 'store', 'show', 'edit', 'update', 'destroy',
+        ])->withTrashed(['show', 'edit', 'update', 'destroy']);
+        Route::post('users/{user}/restore', [UserController::class, 'restore'])
+            ->withTrashed()
+            ->name('users.restore');
         Route::resource('branches', BranchController::class)->only([
             'index', 'create', 'store', 'show', 'edit', 'update',
         ]);

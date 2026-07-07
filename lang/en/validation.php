@@ -195,6 +195,10 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'site_name' => 'site name',
+        'site_description' => 'site description',
+        'site_locale' => 'site locale',
+    ],
 
 ];

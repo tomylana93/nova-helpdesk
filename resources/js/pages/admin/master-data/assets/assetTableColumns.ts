@@ -1,6 +1,6 @@
 import { Link, usePage, router } from '@inertiajs/vue3';
+import { Eye, MoreHorizontal, Pencil, Trash } from '@lucide/vue';
 import type { ColumnDef } from '@tanstack/vue-table';
-import { Eye, MoreHorizontal, Pencil, Trash } from 'lucide-vue-next';
 import { h } from 'vue';
 import DataTableColumnHeader from '@/components/datatable/DataTableColumnHeader.vue';
 import TextLink from '@/components/TextLink.vue';

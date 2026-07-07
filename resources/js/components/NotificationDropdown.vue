@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router, useHttp, usePage } from '@inertiajs/vue3';
 import { useEchoNotification } from '@laravel/echo-vue';
-import { Bell, CheckCheck, Inbox } from 'lucide-vue-next';
+import { Bell, CheckCheck, Inbox } from '@lucide/vue';
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';

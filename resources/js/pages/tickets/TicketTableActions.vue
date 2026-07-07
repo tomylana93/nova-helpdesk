@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { PlusCircle } from 'lucide-vue-next';
+import { PlusCircle } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 import { useTrans } from '@/composables/useTrans';
 import { create } from '@/routes/tickets';

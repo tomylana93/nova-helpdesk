@@ -7,6 +7,7 @@ export type User = {
     id: string;
     name: string;
     email: string;
+    phone?: string | null;
     status: UserStatus;
     role?: UserRoleName | null;
     roleLabel?: string | null;
@@ -16,6 +17,8 @@ export type User = {
     department_id?: string | null;
     branchName?: string | null;
     departmentName?: string | null;
+    last_login_at?: string | null;
+    deleted_at?: string | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;

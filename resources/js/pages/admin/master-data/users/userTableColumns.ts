@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/vue3';
+import { Eye, MoreHorizontal, Pencil } from '@lucide/vue';
 import type { ColumnDef } from '@tanstack/vue-table';
-import { Eye, MoreHorizontal, Pencil } from 'lucide-vue-next';
 import { h } from 'vue';
 import DataTableColumnHeader from '@/components/datatable/DataTableColumnHeader.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -82,6 +82,15 @@ export function userTableColumns(): ColumnDef<UserTableRow>[] {
                             },
                             user.email,
                         ),
+                        user.phone
+                            ? h(
+                                  'p',
+                                  {
+                                      class: 'truncate text-xs text-muted-foreground',
+                                  },
+                                  user.phone,
+                              )
+                            : null,
                     ]),
                 ]);
             },

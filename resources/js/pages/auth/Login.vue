@@ -30,12 +30,10 @@ const form = useForm<LoginFormData>({
 });
 
 function submit(): void {
-    form.transform(
-        (data): LoginSubmitData => ({
-            ...data,
-            remember: data.remember ? 'on' : '',
-        }),
-    ).submit(store(), {
+    form.transform((data): LoginSubmitData => ({
+        ...data,
+        remember: data.remember ? 'on' : '',
+    })).submit(store(), {
         onSuccess: () => {
             form.reset('password');
         },

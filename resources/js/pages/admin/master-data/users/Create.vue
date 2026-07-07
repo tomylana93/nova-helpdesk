@@ -30,6 +30,7 @@ type Props = {
 type CreateUserFormData = {
     name: string;
     email: string;
+    phone: string;
     role: UserRoleName | '';
     branch_id: string;
     department_id: string;
@@ -44,6 +45,7 @@ const { trans } = useTrans();
 const form = useForm<CreateUserFormData>({
     name: '',
     email: '',
+    phone: '',
     role: '',
     branch_id: '',
     department_id: '',
@@ -134,6 +136,22 @@ setLayoutProps({
                     "
                 />
                 <InputError :message="form.errors.email" />
+            </div>
+            <div class="grid gap-2">
+                <Label for="phone">{{
+                    trans('admin.master_data.user.label.phone')
+                }}</Label>
+                <Input
+                    id="phone"
+                    name="phone"
+                    v-model="form.phone"
+                    autocomplete="tel"
+                    :placeholder="
+                        trans('admin.master_data.user.placeholder.phone')
+                    "
+                    :aria-invalid="!!form.errors.phone"
+                />
+                <InputError :message="form.errors.phone" />
             </div>
             <div class="grid gap-2">
                 <Label for="role">{{
