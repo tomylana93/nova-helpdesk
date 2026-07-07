@@ -40,13 +40,11 @@ const form = useForm<ResetPasswordFormData>({
 });
 
 function submit(): void {
-    form.transform(
-        (data): ResetPasswordSubmitData => ({
-            ...data,
-            token: props.token,
-            email: props.email,
-        }),
-    ).submit(update(), {
+    form.transform((data): ResetPasswordSubmitData => ({
+        ...data,
+        token: props.token,
+        email: props.email,
+    })).submit(update(), {
         onSuccess: () => {
             form.reset('password', 'password_confirmation');
         },
