@@ -8,7 +8,7 @@ import {
     Search,
     Settings,
     Ticket,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppBrand from '@/components/AppBrand.vue';
 import AppLogo from '@/components/AppLogo.vue';

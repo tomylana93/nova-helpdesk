@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps, usePage } from '@inertiajs/vue3';
-import { KeyRound, Paintbrush, Wrench } from 'lucide-vue-next';
+import { KeyRound, Paintbrush, Wrench } from '@lucide/vue';
 import { computed } from 'vue';
 import PageWrapper from '@/components/PageWrapper.vue';
 import { Button } from '@/components/ui/button';

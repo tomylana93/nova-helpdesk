@@ -12,25 +12,27 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'status', 'password', 'branch_id', 'department_id'])]
+#[Fillable(['name', 'email', 'phone', 'status', 'password', 'branch_id', 'department_id'])]
 #[Hidden(['password', 'remember_token'])]
 #[Appends(['avatar'])]
 /**
  * @property UserStatus $status
  * @property bool $must_change_password
+ * @property \DateTimeInterface|null $last_login_at
  * @property Branch|null $branch
  * @property Department|null $department
  */
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, HasUuids, InteractsWithMedia, Notifiable;
+    use HasFactory, HasRoles, HasUuids, InteractsWithMedia, Notifiable, SoftDeletes;
 
     /**
      * Register media collections for the user.
@@ -97,6 +99,7 @@ class User extends Authenticatable implements HasMedia
     protected function casts(): array
     {
         return [
+            'last_login_at' => 'datetime',
             'must_change_password' => 'boolean',
             'password' => 'hashed',
             'status' => UserStatus::class,

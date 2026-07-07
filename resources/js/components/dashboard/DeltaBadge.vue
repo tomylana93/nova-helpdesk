@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, Minus } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, Minus } from '@lucide/vue';
 import { computed } from 'vue';
 
 import { useTrans } from '@/composables/useTrans';

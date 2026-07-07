@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { CircleHelp } from '@lucide/vue';
 import { VisDonut, VisSingleContainer } from '@unovis/vue';
-import { CircleHelp } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import {

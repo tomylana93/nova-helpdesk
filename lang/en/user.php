@@ -9,6 +9,7 @@ return [
     'label' => [
         'name' => 'Name',
         'email' => 'Email',
+        'phone' => 'Phone',
         'role' => 'Role',
         'branch' => 'Branch',
         'department' => 'Department',
@@ -16,6 +17,7 @@ return [
         'actions' => 'Actions',
         'created_at' => 'Created At',
         'updated_at' => 'Updated At',
+        'last_login_at' => 'Last Login',
     ],
     'role' => [
         'super_admin' => 'Super Admin',

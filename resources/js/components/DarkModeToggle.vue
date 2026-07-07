@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Monitor, Moon, Sun } from 'lucide-vue-next';
+import { Monitor, Moon, Sun } from '@lucide/vue';
 import type { AcceptableValue } from 'reka-ui';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import {

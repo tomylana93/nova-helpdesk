@@ -38,4 +38,20 @@ class UserPolicy
     {
         return $user->can(AdminPermission::UpdateUsers->value);
     }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, User $model): bool
+    {
+        return $user->can(AdminPermission::UpdateUsers->value);
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, User $model): bool
+    {
+        return $user->can(AdminPermission::UpdateUsers->value);
+    }
 }

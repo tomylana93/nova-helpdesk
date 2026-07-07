@@ -171,14 +171,17 @@ return [
             'label' => [
                 'name' => 'Nama',
                 'email' => 'Email',
+                'phone' => 'Nomor Telepon',
                 'status' => 'Status',
                 'role' => 'Peran',
                 'branch' => 'Cabang',
                 'department' => 'Departemen',
+                'last_login_at' => 'Login Terakhir',
             ],
             'placeholder' => [
                 'name' => 'Masukkan nama lengkap',
                 'email' => 'Masukkan alamat email',
+                'phone' => 'Masukkan nomor telepon',
                 'status' => 'Pilih status',
                 'role' => 'Pilih peran',
                 'branch' => 'Pilih cabang',
@@ -199,6 +202,12 @@ return [
                 'updated' => [
                     'success' => 'User berhasil diperbarui.',
                     'error' => 'Gagal memperbarui user. Silakan coba lagi.',
+                ],
+                'deleted' => [
+                    'success' => 'User berhasil dihapus.',
+                ],
+                'restored' => [
+                    'success' => 'User berhasil dipulihkan.',
                 ],
             ],
         ],

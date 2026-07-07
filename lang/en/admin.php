@@ -173,14 +173,17 @@ return [
             'label' => [
                 'name' => 'Name',
                 'email' => 'Email',
+                'phone' => 'Phone',
                 'status' => 'Status',
                 'role' => 'Role',
                 'branch' => 'Branch',
                 'department' => 'Department',
+                'last_login_at' => 'Last Login',
             ],
             'placeholder' => [
                 'name' => 'Enter full name',
                 'email' => 'Enter email address',
+                'phone' => 'Enter phone number',
                 'status' => 'Select status',
                 'role' => 'Select role',
                 'branch' => 'Select branch',
@@ -201,6 +204,12 @@ return [
                 'updated' => [
                     'success' => 'User updated successfully.',
                     'error' => 'Failed to update user. Please try again.',
+                ],
+                'deleted' => [
+                    'success' => 'User deleted successfully.',
+                ],
+                'restored' => [
+                    'success' => 'User restored successfully.',
                 ],
             ],
         ],

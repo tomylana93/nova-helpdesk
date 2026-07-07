@@ -14,6 +14,7 @@ use App\Models\Department;
 use App\Models\User;
 use App\Tables\AbstractTable;
 use App\Tables\Filters\GlobalSearchFilter;
+use DateTimeInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
@@ -36,8 +37,10 @@ class UserTable extends AbstractTable
                 'users.id',
                 'users.name',
                 'users.email',
+                'users.phone',
                 'users.status',
                 'users.created_at',
+                'users.last_login_at',
                 'users.branch_id',
                 'users.department_id',
             ]);
@@ -174,6 +177,7 @@ class UserTable extends AbstractTable
             'id' => $user->getKey(),
             'name' => $user->name,
             'email' => $user->email,
+            'phone' => $user->phone,
             'role' => $roleName,
             'roleLabel' => $roleLabel,
             'branchName' => $user->branch?->name,
@@ -181,6 +185,12 @@ class UserTable extends AbstractTable
             'status' => $status->value,
             'statusLabel' => $status->label(),
             'createdAt' => $user->created_at?->toJSON(),
+            'lastLoginAt' => $this->formatDateTime($user->last_login_at),
         ];
+    }
+
+    private function formatDateTime(mixed $value): ?string
+    {
+        return $value instanceof DateTimeInterface ? $value->format(DATE_ATOM) : null;
     }
 }
