@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.24.0-rc](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.2-rc...v0.24.0-rc) (2026-07-07)
+
+
+### Features
+
+* align foundation with starter kit ([5d9505f](https://github.com/tomylana93/nova-helpdesk/commit/5d9505f0417c2e14279833f1e22db8d88caa34de))
+
+
+### Bug Fixes
+
+* **deploy:** promote local release artifact cleanup ([e8c8a04](https://github.com/tomylana93/nova-helpdesk/commit/e8c8a04d648ab8293e36c4e4bc8e414092656585))
+
+
+### Documentation
+
+* add foundation drift audit ledger vs nova-starter-kit ([d88ecd7](https://github.com/tomylana93/nova-helpdesk/commit/d88ecd7453579d35879c9bd3c47f6746136b8243))
+
 ## [0.23.2](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.1...v0.23.2) (2026-07-06)
 
 
