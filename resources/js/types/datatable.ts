@@ -27,8 +27,7 @@ type DataTableSelectFilterDefinition = DataTableBaseFilterDefinition & {
 };
 
 export type DataTableFilterDefinition =
-    | DataTableSearchFilterDefinition
-    | DataTableSelectFilterDefinition;
+    DataTableSearchFilterDefinition | DataTableSelectFilterDefinition;
 
 type DataTableSchema = {
     filters: DataTableFilterDefinition[];

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-vue-next';
+import { ArrowDown, ArrowUp, ChevronsUpDown } from '@lucide/vue';
 import { Button } from '@/components/ui/button';
 
 type SortableDataTableColumn = {

@@ -72,7 +72,7 @@ Do **not** run any tool, read any file, or write any code until the developer re
 
 When in doubt, default to Deep.
 
-- **Deep (architectural)** if any: introduces a new TMS domain concept (Shipment, Vehicle, Route, Order…) or a relation between them; is expensive to reverse (new migration/schema, module boundary, Inertia↔Vue pattern, auth/authorization); or the developer hasn't done it before in this stack.
+- **Deep (architectural)** if any: introduces a new core domain concept (a primary domain entity or a relation between such entities); is expensive to reverse (new migration/schema, module boundary, Inertia↔Vue pattern, auth/authorization); or the developer hasn't done it before in this stack.
 - **Routine** if all: follows an existing repo pattern (similar CRUD, add column, shadcn component); reversible and local.
 
 ## Mandatory Tool Evidence
@@ -100,7 +100,7 @@ If a required MCP/tool is unavailable, stop and report the unavailable tool plus
 
 - **Claude Code CLI (Opus 4.8):** allowed for Deep and Routine work.
 - **Codex CLI (GPT-5.5):** allowed for Deep and Routine work.
-- **Antigravity CLI (Gemini 3.5 Flash):** Routine only. If the task touches schema, auth/authorization, new dependencies, new TMS domain concepts, module boundaries, or new frontend/backend patterns, stop and ask the developer to reroute to Claude Code or Codex.
+- **Antigravity CLI (Gemini 3.5 Flash):** Routine only. If the task touches schema, auth/authorization, new dependencies, new core domain concepts, module boundaries, or new frontend/backend patterns, stop and ask the developer to reroute to Claude Code or Codex.
 
 ## Deep path (AI writes; developer directs)
 
@@ -127,28 +127,30 @@ Finishing gate:
 [ ] vendor/bin/pint --dirty --format agent          (always)
 [ ] pnpm run lint   (eslint --fix)                  (always)
 [ ] pnpm run format (prettier --write)              (always)
-[ ] php artisan wayfinder:generate --with-form --no-interaction (if any route file, controller, or action changed)
+[ ] php artisan wayfinder:generate                  (if any route file, controller, or action changed)
 [ ] composer ci:check → GREEN                       (always; inner loop uses --filter, this is the outer gate)
 [ ] Memory written: [mem:name]  or  not needed: [reason]
 [ ] Code review run  or  skipped: [reason]
 [ ] Commit requested by developer: yes / no
 ```
 
-**Wayfinder trigger — run `wayfinder:generate --with-form --no-interaction` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
+**Wayfinder trigger — run `wayfinder:generate` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
 
 **On ci:check failure:** re-run auto-fix for format/lint issues; for logic failures (test/phpstan/types) use `systematic-debugging` skill and re-run, but **stop and report** after ~2–3 unsuccessful rounds or if the fix touches a Deep-path decision — never loop blindly. See `mem:task_completion` for the exact command list.
 
-**Memory upkeep threshold:** write or update a Serena memory only if the task produced something durable — a new TMS domain concept/decision, a changed convention, or changed tooling. Most routine tasks produce no memory. If memories were deleted/renamed, consider `serena memories check`. Follow `mem:memory_maintenance`.
+**Memory upkeep threshold:** write or update a Serena memory only if the task produced something durable — a new core domain concept/decision, a changed convention, or changed tooling. Most routine tasks produce no memory. If memories were deleted/renamed, consider `serena memories check`. Follow `mem:memory_maintenance`.
 
-**Commit rule:** commit directly to `dev` only when the developer explicitly asks. Never auto-push to `main`. CI runs on push. `dev` → `main` for releases only.
+**Commit rule:** commit directly to `dev` only when the developer explicitly asks. Never auto-push to `main`. CI runs on push. Promotion runs `dev` → `staging` → `main` for releases only.
 
 ## Releases & versioning
 
 - **SemVer `0.x`** (pre-1.0). release-please drives changelog + version bumps from conventional commits. Source of truth = git tags / GitHub Releases; `config/version.php` mirrors it (auto-bumped — never edit by hand).
 - **Conventional commits matter** (they feed release-please): `feat:` → minor, `fix:`/`perf:` → patch, `feat!:`/`BREAKING CHANGE:` → minor while `0.x`. `chore:`/`ci:`/`test:`/`style:` are hidden from the changelog.
-- **Pre-release on `dev`**: pushing to `dev` makes release-please maintain a release-candidate PR; merging it tags `X.Y.Z-rc.N` (GitHub pre-release).
-- **Stable on `main`**: promote via a `dev` → `main` PR (required checks `ci` + `quality` must pass — `main` is protected). After merge, release-please opens a metadata-only release PR on `main`; merging it tags stable `X.Y.Z` + GitHub Release.
-- `main` is protected (ruleset): PR required, no direct/force push. The release-please PR only bumps version/changelog, so merging it via admin bypass is acceptable; real code review happens on the `dev` → `main` PR.
+- **Three long-lived branches:** `dev` (working/integration) → `staging` (pre-release validation) → `main` (stable release). Promote each stage via a GitHub PR merged with a **merge commit** (never squash long-lived branches). After a `staging` → `main` release, fast-forward `staging` and `dev` back to `main` so history stays linear. See `mem:branching_release_flow`.
+- **Pre-release on `dev`**: pushing to `dev` makes release-please maintain a release-candidate PR via its own `release-please-config.dev.json` + `.release-please-manifest.dev.json`; merging it tags `X.Y.Z-rc.N` (GitHub pre-release).
+- **Stable on `main`**: promote `staging` → `main` via PR (required checks `ci` + `quality` must pass — `main` is protected). After merge, release-please opens a metadata-only release PR on `main`; merging it tags stable `X.Y.Z` + GitHub Release.
+- **Dual-manifest re-baseline (MANDATORY after every stable release):** the `dev` and `main` release-please manifests are independent — the `main` job never updates `.release-please-manifest.dev.json`. After tagging stable `X.Y.Z` on `main`, set `.release-please-manifest.dev.json` to that **stable** `X.Y.Z` and commit to `dev` (`chore(release): re-baseline dev prerelease manifest to X.Y.Z`). Otherwise the dev rc line drifts _behind_ stable, because `versioning: prerelease` only bumps the rc number instead of graduating from the stable base. See `mem:branching_release_flow`.
+- `main` is protected (ruleset): PR required, no direct/force push. The release-please PR only bumps version/changelog, so merging it via admin bypass is acceptable; real code review happens on the `staging` → `main` PR.
 
 === .ai/03-mcp-routing rules ===
 
@@ -222,14 +224,14 @@ Finishing gate:
 [ ] vendor/bin/pint --dirty --format agent          (always)
 [ ] pnpm run lint   (eslint --fix)                  (always)
 [ ] pnpm run format (prettier --write)              (always)
-[ ] php artisan wayfinder:generate --with-form --no-interaction (if any route file, controller, or action changed)
+[ ] php artisan wayfinder:generate                  (if any route file, controller, or action changed)
 [ ] composer ci:check → GREEN                       (always; inner loop uses --filter, this is the outer gate)
 [ ] Memory written: [mem:name]  or  not needed: [reason]
 [ ] Code review run  or  skipped: [reason]
 [ ] Commit requested by developer: yes / no
 ```
 
-**Wayfinder trigger — run `wayfinder:generate --with-form --no-interaction` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
+**Wayfinder trigger — run `wayfinder:generate` if any of these changed:** `routes/*.php`, any controller file, any invokable action class.
 
 **On ci:check failure:** re-run auto-fix for format/lint issues; for logic failures (test/phpstan/types) use `systematic-debugging` skill and re-run, but **stop and report** after ~2–3 unsuccessful rounds or if the fix touches a Deep-path decision — never loop blindly. See `mem:task_completion` for the exact command list.
 
@@ -272,12 +274,11 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - phpunit/phpunit (PHPUNIT) - v12
 - rector/rector (RECTOR) - v2
 - @inertiajs/vue3 (INERTIA_VUE) - v3
+- laravel-echo (ECHO) - v2
 - tailwindcss (TAILWINDCSS) - v4
 - vue (VUE) - v3
-- @laravel/echo-vue (ECHO_VUE) - v2
 - @laravel/vite-plugin-wayfinder (WAYFINDER_VITE) - v0
 - eslint (ESLINT) - v10
-- laravel-echo (ECHO) - v2
 - prettier (PRETTIER) - v3
 
 ## Skills Activation

@@ -4,12 +4,14 @@ export type UserTableRow = {
     id: string;
     name: string;
     email: string;
+    phone: string | null;
     role: UserRoleName | null;
     roleLabel: string | null;
     branchName: string | null;
     departmentName: string | null;
     status: UserStatus;
     statusLabel: string;
+    lastLoginAt?: string | null;
 };
 
 export type UserTableFilters = {

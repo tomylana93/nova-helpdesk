@@ -12,11 +12,7 @@ export type TicketStatus =
 export type TicketPriority = 'low' | 'medium' | 'high' | 'critical';
 export type TicketType = 'incident' | 'service_request';
 export type TicketSlaState =
-    | 'no_sla'
-    | 'completed'
-    | 'on_track'
-    | 'due_soon'
-    | 'overdue';
+    'no_sla' | 'completed' | 'on_track' | 'due_soon' | 'overdue';
 
 export type TicketSlaTarget = {
     label: string;

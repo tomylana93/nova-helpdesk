@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { ShieldCheck } from '@lucide/vue';
 import { VisDonut, VisSingleContainer } from '@unovis/vue';
-import { ShieldCheck } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import DeltaBadge from '@/components/dashboard/DeltaBadge.vue';

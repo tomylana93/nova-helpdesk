@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\UserRole;
 use App\Models\Asset;
 use App\Models\SlaPolicy;
 use App\Models\Ticket;
@@ -15,10 +14,12 @@ use App\Settings\GeneralSettings;
 use App\Settings\PasswordSettings;
 use App\Settings\StyleSettings;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -63,7 +64,7 @@ class AppServiceProvider extends ServiceProvider
             : null,
         );
 
-        Gate::before(static fn (User $user): ?bool => $user->hasRole(UserRole::SuperAdmin) ? true : null);
+        Gate::before(static fn (User $user): ?bool => $user->hasRole((string) config('superadmin.role')) ? true : null);
 
         Gate::policy(GeneralSettings::class, AdminSettingsPolicy::class);
         Gate::policy(StyleSettings::class, AdminSettingsPolicy::class);
@@ -71,6 +72,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Asset::class, AssetPolicy::class);
         Gate::policy(Ticket::class, TicketPolicy::class);
         Gate::policy(SlaPolicy::class, SlaPolicyPolicy::class);
+
+        Event::listen(Login::class, function (Login $event): void {
+            if ($event->user instanceof User) {
+                $event->user
+                    ->forceFill(['last_login_at' => Date::now()])
+                    ->saveQuietly();
+            }
+        });
 
         RateLimiter::for('temporary-uploads', static function (Request $request): array {
             $key = $request->user()?->getAuthIdentifier() ?? $request->ip();

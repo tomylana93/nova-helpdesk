@@ -62,7 +62,7 @@ class UpdateUserRequest extends FormRequest
     }
 
     /**
-     * @return array{name: string, email: string, status: string, role: string, branch_id?: string|null, department_id?: string|null}
+     * @return array{name: string, email: string, phone?: string|null, status: string, role: string, branch_id?: string|null, department_id?: string|null}
      */
     public function userData(): array
     {
@@ -71,6 +71,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => (string) $validated['name'],
             'email' => (string) $validated['email'],
+            'phone' => array_key_exists('phone', $validated) && $validated['phone'] !== null ? (string) $validated['phone'] : null,
             'status' => (string) $validated['status'],
             'role' => (string) $validated['role'],
             'branch_id' => isset($validated['branch_id']) ? (string) $validated['branch_id'] : null,

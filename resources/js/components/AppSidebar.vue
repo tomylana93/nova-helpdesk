@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import {
-    BarChart3,
-    Database,
-    LayoutGrid,
-    Settings,
-    Ticket,
-} from 'lucide-vue-next';
+import { BarChart3, Database, LayoutGrid, Settings, Ticket } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';

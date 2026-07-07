@@ -7,7 +7,7 @@ import {
     Inbox,
     Ticket,
     UserCheck,
-} from 'lucide-vue-next';
+} from '@lucide/vue';
 import type { Component } from 'vue';
 import { computed } from 'vue';
 import BreakdownDonut from '@/components/dashboard/BreakdownDonut.vue';

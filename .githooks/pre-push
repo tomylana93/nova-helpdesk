@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Block direct pushes to main. Releases must go through the protected
+# promotion flow before release metadata is cut.
+# Enable once per clone: git config core.hooksPath .githooks
+
+protected_ref="refs/heads/main"
+
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+    if [ "$remote_ref" = "$protected_ref" ]; then
+        echo "" >&2
+        echo "  Direct push to 'main' is blocked." >&2
+        echo "  Releases go through the dev -> staging -> main promotion flow." >&2
+        echo "" >&2
+        exit 1
+    fi
+done
+
+exit 0

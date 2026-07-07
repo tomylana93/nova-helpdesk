@@ -21,6 +21,7 @@ test('admin users can be created with active status by default', function (): vo
         ->post(route('admin.master-data.users.store'), [
             'name' => 'New User',
             'email' => 'new-user@example.test',
+            'phone' => '081234567890',
             'role' => UserRole::ItAgent->value,
             'branch_id' => $branch->id,
         ]);
@@ -39,6 +40,7 @@ test('admin users can be created with active status by default', function (): vo
     expect(Hash::check(app(PasswordSettings::class)->default_user_password, (string) $createdUser?->password))->toBeTrue();
     expect($createdUser?->getRoleNames()->all())->toBe([UserRole::ItAgent->value]);
     expect($createdUser?->branch_id)->toBe($branch->id);
+    expect($createdUser?->phone)->toBe('081234567890');
 });
 
 test('admin users can be updated with unchanged email for the edited user', function (): void {
@@ -61,6 +63,7 @@ test('admin users can be updated with unchanged email for the edited user', func
         ->put(route('admin.master-data.users.update', $targetUser), [
             'name' => 'Updated Target',
             'email' => 'target-user@example.test',
+            'phone' => '089876543210',
             'status' => UserStatus::Suspend->value,
             'role' => UserRole::Requester->value,
             'branch_id' => $branch->id,
@@ -74,8 +77,51 @@ test('admin users can be updated with unchanged email for the edited user', func
     $targetUser->refresh();
 
     expect($targetUser->name)->toBe('Updated Target');
+    expect($targetUser->phone)->toBe('089876543210');
     expect($targetUser->status)->toBe(UserStatus::Suspend);
     expect($targetUser->getRoleNames()->all())->toBe([UserRole::Requester->value]);
+});
+
+test('phone must be unique when creating admin users', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+    User::factory()->create(['phone' => '081111111111']);
+
+    $response = $this
+        ->actingAs($actor)
+        ->from(route('admin.master-data.users.create'))
+        ->post(route('admin.master-data.users.store'), [
+            'name' => 'Duplicate Phone',
+            'email' => 'duplicate-phone@example.test',
+            'phone' => '081111111111',
+            'role' => UserRole::ItAgent->value,
+        ]);
+
+    $response
+        ->assertSessionHasErrors('phone')
+        ->assertRedirect(route('admin.master-data.users.create'));
+});
+
+test('admin users can be soft deleted and restored', function (): void {
+    $actor = grantAdminPermissions(User::factory()->create());
+    Role::findOrCreate(UserRole::ItAgent->value, 'web');
+
+    $targetUser = User::factory()->create();
+    $targetUser->assignRole(UserRole::ItAgent->value);
+
+    $this
+        ->actingAs($actor)
+        ->delete(route('admin.master-data.users.destroy', $targetUser))
+        ->assertRedirect(route('admin.master-data.users.index'));
+
+    $this->assertSoftDeleted($targetUser);
+
+    $this
+        ->actingAs($actor)
+        ->post(route('admin.master-data.users.restore', $targetUser))
+        ->assertRedirect(route('admin.master-data.users.index'));
+
+    $this->assertNotSoftDeleted($targetUser);
 });
 
 test('status is required when updating admin users', function (): void {

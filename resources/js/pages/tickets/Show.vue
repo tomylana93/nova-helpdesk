@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, setLayoutProps, useForm, usePage } from '@inertiajs/vue3';
-import { Paperclip } from 'lucide-vue-next';
+import { Paperclip } from '@lucide/vue';
 import { ref } from 'vue';
 import {
     approve,

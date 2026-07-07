@@ -32,6 +32,7 @@ type Props = {
 type EditUserFormData = {
     name: string;
     email: string;
+    phone: string;
     status: User['status'];
     role: UserRoleName | '';
     branch_id: string;
@@ -47,6 +48,7 @@ const { trans } = useTrans();
 const form = useForm<EditUserFormData>({
     name: props.user.name,
     email: props.user.email,
+    phone: props.user.phone ?? '',
     status: props.user.status,
     role: props.user.role ?? '',
     branch_id: props.user.branch_id ?? '',
@@ -148,6 +150,22 @@ setLayoutProps({
                     :aria-invalid="!!form.errors.email"
                 />
                 <InputError :message="form.errors.email" />
+            </div>
+            <div class="grid gap-2">
+                <Label for="phone">{{
+                    trans('admin.master_data.user.label.phone')
+                }}</Label>
+                <Input
+                    id="phone"
+                    name="phone"
+                    v-model="form.phone"
+                    autocomplete="tel"
+                    :placeholder="
+                        trans('admin.master_data.user.placeholder.phone')
+                    "
+                    :aria-invalid="!!form.errors.phone"
+                />
+                <InputError :message="form.errors.phone" />
             </div>
             <div class="grid gap-2">
                 <Label for="role">{{

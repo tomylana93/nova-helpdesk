@@ -2,6 +2,7 @@
 
 use App\Enums\UserStatus;
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\RateLimiter;
 
 test('login screen can be rendered', function (): void {
@@ -42,6 +43,23 @@ test('users with non-default passwords can authenticate without default password
     $response
         ->assertRedirect(route('dashboard', absolute: false))
         ->assertSessionMissing('inertia.flash_data.toast');
+});
+
+test('users record their last login timestamp when authenticating', function (): void {
+    $now = now()->startOfSecond();
+
+    Date::setTestNow($now);
+
+    $user = User::factory()->create([
+        'password' => 'new-password',
+    ]);
+
+    $this->post(route('login.store'), [
+        'email' => $user->email,
+        'password' => 'new-password',
+    ])->assertRedirect(route('dashboard', absolute: false));
+
+    expect($user->refresh()->last_login_at?->toDateTimeString())->toBe($now->toDateTimeString());
 });
 
 test('users can not authenticate with invalid password', function (): void {

@@ -54,6 +54,10 @@ function formatDate(dateString: string): string {
         minute: '2-digit',
     });
 }
+
+function formatNullableDate(dateString?: string | null): string {
+    return dateString ? formatDate(dateString) : '—';
+}
 </script>
 
 <template>
@@ -93,6 +97,12 @@ function formatDate(dateString: string): string {
                         </h2>
                         <p class="text-sm text-muted-foreground">
                             {{ props.user.email }}
+                        </p>
+                        <p
+                            v-if="props.user.phone"
+                            class="text-sm text-muted-foreground"
+                        >
+                            {{ props.user.phone }}
                         </p>
                     </div>
                 </CardContent>
@@ -159,6 +169,36 @@ function formatDate(dateString: string): string {
                         </span>
                         <span class="text-sm">
                             {{ props.user.departmentName ?? '—' }}
+                        </span>
+                    </div>
+                    <Separator />
+                    <div
+                        class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
+                    >
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
+                            {{ trans('admin.master_data.user.label.phone') }}
+                        </span>
+                        <span class="text-sm">
+                            {{ props.user.phone ?? '—' }}
+                        </span>
+                    </div>
+                    <Separator />
+                    <div
+                        class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4"
+                    >
+                        <span
+                            class="text-sm font-medium text-muted-foreground sm:min-w-[120px]"
+                        >
+                            {{
+                                trans(
+                                    'admin.master_data.user.label.last_login_at',
+                                )
+                            }}
+                        </span>
+                        <span class="text-sm">
+                            {{ formatNullableDate(props.user.last_login_at) }}
                         </span>
                     </div>
                     <Separator />

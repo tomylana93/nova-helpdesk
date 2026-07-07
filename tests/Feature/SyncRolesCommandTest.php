@@ -61,6 +61,19 @@ test('it is safe to rerun the sync roles command', function (): void {
         ->toBe(count(UserRole::cases()));
 });
 
+test('it syncs role permissions from the roles config seam', function (): void {
+    config()->set('roles.permissions', [
+        UserRole::ItAgent->value => [
+            AdminPermission::ViewTickets->value,
+        ],
+    ]);
+
+    $this->artisan('permission:sync-roles')->assertSuccessful();
+
+    expect(Role::findByName(UserRole::ItAgent->value, 'web')->getPermissionNames()->all())
+        ->toBe([AdminPermission::ViewTickets->value]);
+});
+
 test('user role labels translate correctly for indonesian locale', function (): void {
     app()->setLocale('id');
 

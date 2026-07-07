@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TData">
+import { Columns3, MoreHorizontal } from '@lucide/vue';
 import type { Column, Table } from '@tanstack/vue-table';
-import { Columns3, MoreHorizontal } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import {

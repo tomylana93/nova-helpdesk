@@ -1,10 +1,7 @@
 import type { Asset } from './asset';
 
 export type DashboardRole =
-    | 'requester'
-    | 'it_agent'
-    | 'auditor'
-    | 'super_admin';
+    'requester' | 'it_agent' | 'auditor' | 'super_admin';
 
 export interface DashboardPeriodProp {
     mode: 'monthly' | 'yearly';

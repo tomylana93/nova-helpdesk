@@ -140,8 +140,7 @@ export function useDataTableState<TFilters extends Record<string, unknown>>(
     let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
     function searchDefinition():
-        | Extract<DataTableFilterDefinition, { type: 'search' }>
-        | undefined {
+        Extract<DataTableFilterDefinition, { type: 'search' }> | undefined {
         return filterDefinitions.value.find(
             (
                 definition,
