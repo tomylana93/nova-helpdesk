@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.25.0](https://github.com/tomylana93/nova-helpdesk/compare/v0.24.0...v0.25.0) (2026-07-10)
+
+
+### Features
+
+* **deploy:** optimize deployment safety, worker rollback, and CI integration ([0496f33](https://github.com/tomylana93/nova-helpdesk/commit/0496f3326f1ce036f8fbd56a6bb62b5b6bd9a64e))
+
 ## [0.24.0](https://github.com/tomylana93/nova-helpdesk/compare/v0.23.2...v0.24.0) (2026-07-07)
 
 
