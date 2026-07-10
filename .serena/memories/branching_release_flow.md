@@ -25,4 +25,9 @@ The two manifests are **independent** — the `main` job never touches `.release
 
 **MANDATORY runbook step — after every stable release on `main`:** set `.release-please-manifest.dev.json` to the new **stable** version (e.g. `0.2.0`). Because the value is now stable (no `-rc`), the next dev run computes the next core bump from commits and appends the rc → e.g. `0.2.1-rc` (first) then `0.2.1-rc.1`, so rc always *leads* stable. Commit as `chore(release): re-baseline dev prerelease manifest to X.Y.Z`; the next push to `dev` auto-updates the open dev release PR.
 
+- **deploy.sh failure safety**: `activate_release` triggers rollback if `restart_workers` fails, and handles first-deploy failure (removes the `current` symlink and fails with "no previous release to restore" message).
+- **Required CI checks**: `composer test:deploy` is a required check called in `composer test`, `composer ci:check`, and `.github/workflows/tests.yml`.
+- **Test coverage**: `tests/Deployment/deploy_test.sh` is source-safe and covers dirty worktree, tag missing/unreachable, version mismatch, checksum failure, first deploy failure, restart failure, and dry-run behaviors using isolated git/ssh/rsync mocks.
+
 Related: `mem:task_completion`, `mem:suggested_commands`.
+
