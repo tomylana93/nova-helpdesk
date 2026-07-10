@@ -80,19 +80,24 @@
         "types:check": [
             "phpstan analyse"
         ],
+        "test:deploy": [
+            "bash tests/Deployment/deploy_test.sh"
+        ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
             "pnpm run lint:check",
             "pnpm run format:check",
             "pnpm run types:check",
-            "@test"
+            "@test",
+            "@test:deploy"
         ],
         "test": [
             "@php artisan config:clear --ansi",
             "@lint:check",
             "@refactor:check",
             "@types:check",
-            "@php artisan test"
+            "@php artisan test",
+            "@test:deploy"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
