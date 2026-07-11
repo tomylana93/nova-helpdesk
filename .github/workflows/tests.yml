@@ -23,6 +23,10 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+          # The deployment tests exercise deploy.sh's "tag exists locally" guard
+          # against v<config/version.php>, so the tag must be present in CI.
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -74,24 +78,8 @@ jobs:
           composer types:check
           pnpm run types:check
 
-      - name: Install rsync
-        run: |
-          # rsync is no longer preinstalled on the ubuntu-latest (24.04) image,
-          # but deploy.sh's binary guard requires it, so the deployment tests
-          # exercise that guard. Install it explicitly.
-          sudo apt-get update
-          sudo apt-get install -y rsync
-
       - name: Run deployment tests
-        run: |
-          echo "=== binary availability (deploy.sh guard) ==="
-          for b in git composer pnpm ssh rsync tar sha256sum; do
-            echo "$b: $(command -v "$b" || echo MISSING)"
-          done
-          echo "=== running deploy tests (verbose) ==="
-          bash -x tests/Deployment/deploy_test.sh 2>&1 | tail -60 || true
-          echo "=== authoritative run ==="
-          composer test:deploy
+        run: composer test:deploy
 
       - name: Tests
         run: php artisan test
