@@ -83,7 +83,15 @@ jobs:
           sudo apt-get install -y rsync
 
       - name: Run deployment tests
-        run: composer test:deploy
+        run: |
+          echo "=== binary availability (deploy.sh guard) ==="
+          for b in git composer pnpm ssh rsync tar sha256sum; do
+            echo "$b: $(command -v "$b" || echo MISSING)"
+          done
+          echo "=== running deploy tests (verbose) ==="
+          bash -x tests/Deployment/deploy_test.sh 2>&1 | tail -60 || true
+          echo "=== authoritative run ==="
+          composer test:deploy
 
       - name: Tests
         run: php artisan test
