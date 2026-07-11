@@ -74,6 +74,14 @@ jobs:
           composer types:check
           pnpm run types:check
 
+      - name: Install rsync
+        run: |
+          # rsync is no longer preinstalled on the ubuntu-latest (24.04) image,
+          # but deploy.sh's binary guard requires it, so the deployment tests
+          # exercise that guard. Install it explicitly.
+          sudo apt-get update
+          sudo apt-get install -y rsync
+
       - name: Run deployment tests
         run: composer test:deploy
 

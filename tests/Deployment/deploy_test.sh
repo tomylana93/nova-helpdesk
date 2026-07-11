@@ -24,12 +24,10 @@ assert_fails() {
   command grep -Fq "$expected" <<<"$output"
 }
 
-echo "MARK: entering case 1" >&2
 # --- 1. Basic stable tag validation ---
 assert_fails "not a stable release tag" validate_stable_tag v1.2.3-rc.1
 validate_stable_tag v1.2.3
 
-echo "MARK: entering case 2" >&2
 # --- 2. Archive exclusions & checksum integrity ---
 SOURCE="$TMP/source"
 mkdir -p "$SOURCE/public/build" "$SOURCE/vendor" "$SOURCE/tests" "$SOURCE/node_modules"
@@ -59,7 +57,6 @@ grep -Fq './public/build/manifest.json' "$TMP/files"
   assert_fails "FAILED" sh -c "cd $TEST_BUNDLE_DIR && sha256sum --check v1.2.3-checksum.sha256"
 )
 
-echo "MARK: entering case 3" >&2
 # --- 3. Locking ---
 LOCK_ROOT="$TMP/remote"
 mkdir -p "$LOCK_ROOT/shared" "$LOCK_ROOT/releases/old" "$LOCK_ROOT/releases/new"
@@ -69,7 +66,6 @@ acquire_deploy_lock "$LOCK_ROOT"
 assert_fails "another deployment is active" acquire_deploy_lock "$LOCK_ROOT"
 release_deploy_lock "$LOCK_ROOT"
 
-echo "MARK: entering case 4" >&2
 # --- 4. Rollback on health check failure with existing release ---
 (
   restart_workers() { :; }
@@ -78,7 +74,6 @@ echo "MARK: entering case 4" >&2
   test "$(readlink "$LOCK_ROOT/current")" = "$LOCK_ROOT/releases/old"
 )
 
-echo "MARK: entering case 5" >&2
 # --- 5. Rollback on worker restart failure with existing release ---
 (
   restart_workers() { return 1; }
@@ -87,7 +82,6 @@ echo "MARK: entering case 5" >&2
   test "$(readlink "$LOCK_ROOT/current")" = "$LOCK_ROOT/releases/old"
 )
 
-echo "MARK: entering case 6" >&2
 # --- 6. First deploy failure (no previous release) ---
 (
   FIRST_DEPLOY_ROOT="$TMP/first_deploy"
@@ -112,7 +106,6 @@ export DEPLOY_ROOT="$TMP/remote_guard"
 export REVERB_HOST="test-reverb"
 export HEALTHCHECK_URL="http://localhost/up"
 
-echo "MARK: entering case 7" >&2
 # --- 7. Dirty worktree guard test ---
 (
   git() {
@@ -125,7 +118,6 @@ echo "MARK: entering case 7" >&2
   assert_fails "Working tree is dirty" main "$VALID_TAG"
 )
 
-echo "MARK: entering case 8" >&2
 # --- 8. Missing/unreachable tags guard tests ---
 (
   # Tag does not exist locally
@@ -201,7 +193,6 @@ echo "MARK: entering case 8" >&2
   assert_fails "is not reachable from origin/main" main "$VALID_TAG"
 )
 
-echo "MARK: entering case 9" >&2
 # --- 9. Version mismatch guard test ---
 (
   grep() {
@@ -240,7 +231,6 @@ echo "MARK: entering case 9" >&2
   assert_fails "config/version.php does not contain version" main "$VALID_TAG"
 )
 
-echo "MARK: entering case 10" >&2
 # --- 10. Dry-run execution test ---
 (
   # Mock git to pass all local checks
