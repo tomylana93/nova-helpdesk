@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.25.1](https://github.com/tomylana93/nova-helpdesk/compare/v0.25.0...v0.25.1) (2026-07-11)
+
+
+### Bug Fixes
+
+* **realtime:** pass reverb credentials to configureEcho ([d418e9d](https://github.com/tomylana93/nova-helpdesk/commit/d418e9dcef756b2f1c2b64eef871cf69d7bca6db))
+
 ## [0.25.0](https://github.com/tomylana93/nova-helpdesk/compare/v0.24.0...v0.25.0) (2026-07-10)
 
 
