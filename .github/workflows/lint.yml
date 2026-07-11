@@ -63,7 +63,7 @@ jobs:
         run: php artisan key:generate
 
       - name: Generate Wayfinder Routes
-        run: php artisan wayfinder:generate --with-form --no-interaction
+        run: php artisan wayfinder:generate
 
       - name: Run Pint Check
         run: composer lint:check

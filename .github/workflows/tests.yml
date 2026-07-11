@@ -23,12 +23,17 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: false
+          # The deployment tests exercise deploy.sh's "tag exists locally" guard
+          # against v<config/version.php>, so the tag must be present in CI.
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          tools: composer:v2
           coverage: none
 
       - name: Resolve Composer cache directory
