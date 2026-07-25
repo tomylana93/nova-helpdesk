@@ -104,7 +104,19 @@ VALID_TAG="v${ACTUAL_VERSION}"
 export DEPLOY_HOST="test-host"
 export DEPLOY_ROOT="$TMP/remote_guard"
 export REVERB_HOST="test-reverb"
+export REVERB_APP_KEY="test-key"
 export HEALTHCHECK_URL="http://localhost/up"
+
+# --- 6b. Missing REVERB_APP_KEY guard test ---
+# Without the app key the client bundle bakes key:undefined, which crashes
+# useEchoNotification at setup in production. The deploy must fail loudly.
+# Point SCRIPT_DIR at an empty dir so a developer's real .env.deploy (which
+# defines REVERB_APP_KEY) is not sourced and can't mask the unset.
+(
+  SCRIPT_DIR="$TMP"
+  unset REVERB_APP_KEY
+  assert_fails "Set REVERB_APP_KEY" main "$VALID_TAG"
+)
 
 # --- 7. Dirty worktree guard test ---
 (

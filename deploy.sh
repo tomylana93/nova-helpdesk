@@ -157,6 +157,7 @@ create_release_bundle() {
     cd "$BUILD_WORKTREE"
     composer install --no-dev --classmap-authoritative --no-interaction --no-progress
     pnpm install --frozen-lockfile --config.strict-dep-builds=false
+    VITE_REVERB_APP_KEY="$REVERB_APP_KEY" \
     VITE_REVERB_HOST="$REVERB_HOST" \
     VITE_REVERB_PORT="$REVERB_PORT" \
     VITE_REVERB_SCHEME="$REVERB_SCHEME" \
@@ -204,6 +205,10 @@ main() {
   : "${DEPLOY_HOST:?Set DEPLOY_HOST (e.g. deployer@host) in .env.deploy or the environment}"
   : "${DEPLOY_ROOT:?Set DEPLOY_ROOT (e.g. /srv/nova-helpdesk) in .env.deploy or the environment}"
   : "${REVERB_HOST:?Set REVERB_HOST (e.g. helpdesk.example.com) in .env.deploy or the environment}"
+  # The client bundle is built locally from a clean worktree with no .env, so the
+  # public Reverb app key must be supplied here or Vite bakes key:undefined into
+  # the bundle and useEchoNotification crashes at setup in production.
+  : "${REVERB_APP_KEY:?Set REVERB_APP_KEY (public Reverb app key, matching the server shared .env) in .env.deploy or the environment}"
   : "${REVERB_PORT:=443}"
   : "${REVERB_SCHEME:=https}"
   : "${KEEP_RELEASES:=3}"
