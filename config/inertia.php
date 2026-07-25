@@ -16,7 +16,10 @@ return [
     */
 
     'ssr' => [
-        'enabled' => true,
+        // Disabled: production builds client assets only (`pnpm run build`, not
+        // `build:ssr`) and runs no SSR process, so there is nothing to render
+        // against. Enable this only alongside a real SSR bundle + running server.
+        'enabled' => false,
         'url' => 'http://127.0.0.1:13714',
         // 'bundle' => base_path('bootstrap/ssr/ssr.mjs'),
 
