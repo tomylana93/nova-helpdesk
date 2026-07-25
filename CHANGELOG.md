@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.25.3](https://github.com/tomylana93/nova-helpdesk/compare/v0.25.2...v0.25.3) (2026-07-25)
+
+
+### Bug Fixes
+
+* **inertia:** disable SSR to match production build/runtime ([1ad0a9a](https://github.com/tomylana93/nova-helpdesk/commit/1ad0a9ad206e3e5fe033e918854b041229583731))
+
 ## [0.25.2](https://github.com/tomylana93/nova-helpdesk/compare/v0.25.1...v0.25.2) (2026-07-25)
 
 
