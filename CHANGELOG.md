@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.25.2](https://github.com/tomylana93/nova-helpdesk/compare/v0.25.1...v0.25.2) (2026-07-25)
+
+
+### Bug Fixes
+
+* **deploy:** bake VITE_REVERB_APP_KEY into prod bundle + guard missing key ([096150c](https://github.com/tomylana93/nova-helpdesk/commit/096150c2c115325ed56c7ab3901428cb5e340321))
+* **deploy:** release VITE_REVERB_APP_KEY build fix to main ([d1ebcd9](https://github.com/tomylana93/nova-helpdesk/commit/d1ebcd9e86d9fb5c0b003c692539764d8b749c97))
+
+
+### Refactors
+
+* **project.yml:** streamline workspace folder settings and update ignored paths ([cae7bf9](https://github.com/tomylana93/nova-helpdesk/commit/cae7bf97da626c336166afc80225cc23c6f98064))
+
 ## [0.25.1](https://github.com/tomylana93/nova-helpdesk/compare/v0.25.0...v0.25.1) (2026-07-11)
 
 
